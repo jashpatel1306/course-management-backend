@@ -1,23 +1,29 @@
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const jwt = require("jsonwebtoken");
 const isset = require("isset");
-const { getUserByEmail } = require("../services/user.services");
+const { getUserByEmail } = require("../services/users.services");
 const createError = require("http-errors");
 // const { userServices } = require("../services/user.services");
-const { getAdminByEmail } = require("../services/admin.services");
+// const { getAdminByEmail } = require("../services/admin.services");
 // const {getUserByEmail} = require("../services/user")
 
 //======================================= sign Access Token =======================================//
 /**
  * change the issuer,time and other params as required to generate jwt access token
  */
-(module.exports.signAccessToken = (userId, userRole, email, time) => {
+(module.exports.signAccessToken = (
+  userId,
+  userRole,
+  email,
+  permissions,
+  time
+) => {
   return new Promise((resolve, reject) => {
-    const payload = { userId, email, userRole };
+    const payload = { userId, email, userRole, permissions };
     const secret = process.env.JWT_SECRET_KEY;
     const options = {
       expiresIn: time,
-      issuer: "your application name", 
+      issuer: "learning-management-platform",
       audience: [userId],
     };
     jwt.sign(payload, secret, options, (err, token) => {
@@ -26,8 +32,8 @@ const { getAdminByEmail } = require("../services/admin.services");
     });
   });
 }),
-//========================================== Verify JWT ========================================//
-  
+  //========================================== Verify JWT ========================================//
+
   /**
    * pass the token and verify the authenticity of it
    * access the details from the token like userId, role and email and
@@ -126,7 +132,6 @@ module.exports.isUserAuthentic = (req, res, next) => {
 
 // =================================== Check admin authentication  ===================================
 
-
 /**
  * role based access controller middleware to use directly in the routes for role based access control for Admins only
  * in return you can set parameters in res.locals for different use-cases
@@ -156,7 +161,7 @@ module.exports.isAdminAuthentic = (req, res, next) => {
     }
     // console.log(result);
     if (result && isset(result.userId)) {
-      const getAdminData = await getAdminByEmail(result.email);
+      const getAdminData = await getUserByEmail(result.email);
       // console.log("getAdminData : ",getAdminData)
       if (!getAdminData)
         return res.json({
@@ -166,6 +171,8 @@ module.exports.isAdminAuthentic = (req, res, next) => {
           isAuth: false,
           data: [],
         });
+
+
       return next();
     }
     return res.json({

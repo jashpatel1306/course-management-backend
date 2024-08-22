@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 mongoose.set("strictQuery", false);
 require("dotenv").config();
+const { addDefaultAdmin } = require("../services/users.services");
 
 let mongoUrl;
 
@@ -25,6 +26,7 @@ function mongoConnect() {
   mongoose
     .connect(mongoUrl)
     .then(async () => {
+      await addDefaultAdmin();
       console.log("DB connection successful!");
       // await remindBookingBeforeAWeek();
     })

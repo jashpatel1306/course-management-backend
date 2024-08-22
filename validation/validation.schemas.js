@@ -5,18 +5,16 @@ module.exports = {
   userSchema: Joi.object().keys({
     email: validate.reqEmail,
     password: validate.string,
-    name: validate.reqString,
     role: validate.reqString,
-    mobileNo: validate.reqString,
-    address: {
-      addressLine1: validate.string,
-      addressLine2: validate.string,
-      landmark: validate.string,
-      city: validate.string,
-      state: validate.string,
-      country: validate.string,
-      pincode: validate.string,
-    },
+    // address: {
+    //   addressLine1: validate.string,
+    //   addressLine2: validate.string,
+    //   landmark: validate.string,
+    //   city: validate.string,
+    //   state: validate.string,
+    //   country: validate.string,
+    //   pincode: validate.string,
+    // },
   }),
 
   userProfileSchema: Joi.object().keys({
