@@ -3,7 +3,7 @@ const createError = require("http-errors");
 const { signAccessToken } = require("../helpers/auth.helper");
 
 module.exports = {
-  getUserByEmail: async (email) => {
+  getUserByEmail: async function (email){
     try {
       const user = await userModel.findOne({ email });
       if (!user) {
@@ -22,6 +22,7 @@ module.exports = {
           email: "learning_management@admmin.com",
           password: "Admin@123",
           role: "admin",
+          name: "Admin 1",
         });
         await newUser.save();
       }
@@ -50,6 +51,17 @@ module.exports = {
         TIME
       );
       return { accessToken, user };
+    } catch (error) {
+      throw error;
+    }
+  },
+  getUserById: async (userId) => {
+    try {
+      const user = await userModel.findOne({ _id: userId });
+      if (!user) {
+        throw createError(404, "User not found");
+      }
+      return user;
     } catch (error) {
       throw error;
     }

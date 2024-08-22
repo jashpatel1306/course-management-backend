@@ -24,4 +24,18 @@ module.exports = {
       next(error);
     }
   },
+
+  getUserProfileData: async (req, res, next) => {
+    try {
+      const userId = res.locals.userId;
+      const user = await userServices.getUserById(userId);
+      return res.status(200).json({
+        success: true,
+        message: "User profile data fetched successfully",
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

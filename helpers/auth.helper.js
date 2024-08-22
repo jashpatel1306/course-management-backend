@@ -5,7 +5,6 @@ const { getUserByEmail } = require("../services/users.services");
 const createError = require("http-errors");
 // const { userServices } = require("../services/user.services");
 // const { getAdminByEmail } = require("../services/admin.services");
-// const {getUserByEmail} = require("../services/user")
 
 //======================================= sign Access Token =======================================//
 /**
@@ -69,7 +68,7 @@ const createError = require("http-errors");
 module.exports.isUserAuthentic = (req, res, next) => {
   try {
     let token = req.headers.authorization;
-    // console.log("token", token);
+    console.log("token", token);
     if (!token)
       return res.status(401).json({
         success: false,
@@ -91,9 +90,9 @@ module.exports.isUserAuthentic = (req, res, next) => {
           data: [],
         });
       }
-      // console.log("result", result);
-
-      const userData = await getUserByEmail(result.email);
+      console.log("result", result);
+      const userEmail = result.email;
+      const userData = await getUserByEmail(userEmail);
 
       if (!userData)
         return next(createError.Unauthorized("You are not authorized!"));
@@ -171,7 +170,6 @@ module.exports.isAdminAuthentic = (req, res, next) => {
           isAuth: false,
           data: [],
         });
-
 
       return next();
     }
