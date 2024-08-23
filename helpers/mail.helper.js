@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
-
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_KEY);
 /**
  * Asynchronously sends an email using Nodemailer.
  *
@@ -23,7 +24,7 @@ module.exports.sendEmail = async (email, subject, html) => {
 
     // Define the email options
     var mailOptions = {
-      from: `Aggarwal Ecommerce <${process.env.MAIL_USER}>`, // Sender's address
+      from: `Learning Management System <${process.env.MAIL_USER}>`, // Sender's address
       to: email, // Recipient's address
       subject: subject, // Email subject
       html: html, // Email content in HTML format
@@ -91,7 +92,7 @@ const sendMailWithResend = async (to, subject, body) => {
   return new Promise(async (resolve) => {
     try {
       const mailOptions = {
-        from: process.env.RESEND_EMAIL_AUTH_USER,
+        from: `learningManagement<${process.env.RESEND_EMAIL_AUTH_USER}>`,
         to: to,
         subject: subject,
         html: body,
@@ -105,7 +106,7 @@ const sendMailWithResend = async (to, subject, body) => {
           message: "Could not send Email!",
         });
       }
-
+      console.log("email data", data);
       return resolve({ status: true, message: "Email sent!." });
     } catch (error) {
       console.log("sendMailWithResend error:", error);

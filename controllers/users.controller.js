@@ -1,6 +1,7 @@
 const { userServices } = require("../services");
 const commonFunctions = require("../helpers/commonFunctions");
 const commonUploadFunction = require("../helpers/fileUpload.helper");
+const createHttpError = require("http-errors");
 
 module.exports = {
   userSignIn: async (req, res, next) => {
@@ -97,6 +98,68 @@ module.exports = {
         status: true,
         message: `The user has been successfully edited`,
         data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  forgotPassword: async (req, res, next) => {
+    try {
+      const reqData = req?.body;
+
+      const email = reqData.email;
+      console.log("email", email);
+
+      const forgotPassword = await userServices.forgotPassword(email);
+      if (!forgotPassword) {
+        return next(createHttpError(500, `Could not send Email`));
+      }
+      return res.status(200).json({
+        status: true,
+        message: `The OTP has been successfully sent to your Email.`,
+        data: [],
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  verifyOtp: async (req, res, next) => {
+    try {
+      const reqData = req?.body;
+      const otp = reqData.otp;
+      const email = reqData.email;
+      const verifyOtp = await userServices.verifyOtp(email, otp);
+      if (!verifyOtp) {
+        return next(createHttpError(500, `Error verifying OTP.`));
+      }
+      return res.status(200).json({
+        status: true,
+        message: `The OTP has been successfully verified.`,
+        data: {
+          code: "OTP_VERIFIED",
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  changePassword: async (req, res, next) => {
+    try {
+      const request_body = req?.body;
+      const email = request_body.email;
+      const password = request_body.password;
+
+      const changePassword = await userServices.changePassword(email, password);
+      if (!changePassword) {
+        return next(createHttpError(500, `Error changing password.`));
+      }
+      return res.status(200).json({
+        status: true,
+        message: `The password has been successfully changed.`,
+        data: [],
       });
     } catch (error) {
       next(error);

@@ -13,7 +13,8 @@ module.exports = {
   // =================================== Check  authentication  ===================================
   isAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
-
+    token = token.split(" ")[1];
+    console.log("token: ", token);
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       console.log("result :", token, result);
       if (err)
@@ -44,6 +45,8 @@ module.exports = {
   },
   isAdminCommonAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
+    token = token.split(" ")[1];
+    console.log("token: ", token);
 
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       console.log("result :", token, result);

@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const { SUPERADMIN } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
+const { generateRandomOTP } = require("../../helpers/common.helper");
+const { sendMailWithServices } = require("../../helpers/mail.helper");
 
 module.exports = {
   getUserByEmail: async function (email) {
@@ -74,7 +76,7 @@ module.exports = {
   userSignIn: async (email, password) => {
     try {
       const user = await userModel.findOne({ email });
-      console.log("user: ", email,password);
+      console.log("user: ", email, password);
       if (!user) {
         throw createError.Unauthorized(
           "There is no account associated with this email address. Please try again."
@@ -130,6 +132,57 @@ module.exports = {
       );
     } catch (error) {
       console.log("resetPasswordUpdate service error  : ", error);
+      throw error;
+    }
+  },
+  forgotPassword: async (email) => {
+    try {
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        throw createError(404, "Please Enter Valid Email.");
+      }
+
+      const otp = generateRandomOTP();
+      await userModel.updateOne({ email }, { otp });
+
+      const subject = "Forgot Password";
+      const body = `Your OTP is ${opt}.`;
+      const sendMail = await sendMailWithServices(email, subject, body);
+      if (!sendMail) {
+        throw createError(500, "Could not send Email.");
+      }
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  verifyOtp: async (email, otp) => {
+    try {
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        throw createError(404, "User not found");
+      }
+      if (user.otp !== otp) {
+        throw createError(401, "Invalid OTP");
+      }
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  changePassword: async (email, password) => {
+    try {
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        throw createError(404, "User not found");
+      }
+      password = await commonFunctions.encode(password);
+      await userModel.updateOne({ email }, { password });
+      return true;
+    } catch (error) {
       throw error;
     }
   },

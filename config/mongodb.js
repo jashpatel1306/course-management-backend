@@ -26,7 +26,7 @@ function mongoConnect() {
   mongoose
     .connect(mongoUrl)
     .then(async () => {
-      await addDefaultAdmin();
+      addDefaultAdmin();
       console.log("DB connection successful!");
       // await remindBookingBeforeAWeek();
     })
