@@ -2,63 +2,10 @@ const validate = require("./validation");
 const Joi = require("joi");
 
 module.exports = {
-  userSchema: Joi.object().keys({
+  logInSchema: Joi.object().keys({
     email: validate.reqEmail,
-    password: validate.string,
-    role: validate.reqString,
-    // address: {
-    //   addressLine1: validate.string,
-    //   addressLine2: validate.string,
-    //   landmark: validate.string,
-    //   city: validate.string,
-    //   state: validate.string,
-    //   country: validate.string,
-    //   pincode: validate.string,
-    // },
+    password: validate.reqString,
   }),
-
-  userProfileSchema: Joi.object().keys({
-    email: validate.email,
-    name: validate.string,
-    mobileNo: validate.string,
-    address: {
-      addressLine1: validate.string,
-      addressLine2: validate.string,
-      landmark: validate.string,
-      city: validate.string,
-      state: validate.string,
-      country: validate.string,
-      pincode: validate.string,
-    },
-  }),
-
-  adminSchema: Joi.object().keys({
-    email: validate.reqEmail,
-    password: validate.string,
-  }),
-
-  roleSchema: Joi.object().keys({
-    role: validate.reqString,
-    // level: validate.reqString,
-    superiorRole: validate.number,
-    shortForm: validate.reqString,
-    permissions: validate.reqArray,
-  }),
-
-  logInSchema: Joi.object()
-    .keys({
-      email: validate.string,
-      password: validate.reqString,
-    })
-    .or("email", "id"),
-
-  userLogInSchema: Joi.object()
-    .keys({
-      email: validate.string,
-      mobile: validate.string,
-      password: validate.reqString,
-    })
-    .or("email", "id"),
 
   queryIdSchema: Joi.object().keys({
     id: validate.id,
@@ -74,9 +21,14 @@ module.exports = {
   }),
 
   resetForgotPasswordSchema: Joi.object().keys({
-    password: validate.reqString,
-    // email: validate.email,
+    oldPassword: validate.reqString,
+    newPassword: validate.reqString,
   }),
-
-  
+  editUserSchemas: Joi.object().keys({
+    user_id: validate.string,
+    user_name: validate.reqString,
+    email: validate.email,
+    password: validate.string,
+    active: validate.reqBoolean,
+  }),
 };

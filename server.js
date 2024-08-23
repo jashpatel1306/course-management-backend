@@ -37,7 +37,7 @@ app.all("/", (req, res) => {
 
 app.all("*", async (req, res) => {
   return res.status(404).send({
-    success: false,
+    status: false,
     message: `URL not found.`,
   });
 });
@@ -48,16 +48,16 @@ app.use((err, req, res, next) => {
   if (err.name === "SequelizeUniqueConstraintError") {
     console.log("Sequelize Duplication error: ", err);
 
-    return res.status(400).send({
-      success: false,
-      status: err.status || 400,
+    return res.status(200).send({
+      status: false,
+      statusCode: err.status || 400,
       message: `Validation Failed, ${err.errors[0].message}`,
     });
   } else {
     console.log(err);
-    return res.status(err?.status || 500).send({
-      success: false,
-      status: err?.status || 500,
+    return res.status(200).send({
+      status: false,
+      statusCode: err?.status || 500,
       message: err.message,
     });
   }

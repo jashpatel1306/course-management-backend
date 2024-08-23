@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const { ADMIN, ROLES } = require("../constants/roles.constant");
+const { ROLES, ADMIN } = require("../../constants/roles.constant");
+const commonFunctions = require("../../helpers/commonFunctions");
 
 const userSchema = new mongoose.Schema(
   {
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema(
     ],
     avatar: {
       type: String,
-      default: `https://espo-live.s3.us-west-1.amazonaws.com/content/images/logo/30698015106821034319.webp`,
+      default: `https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg`,
       trim: true,
     },
     role: {

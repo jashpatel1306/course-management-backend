@@ -1,12 +1,15 @@
 const Joi = require("joi");
 
 module.exports = {
-  string: Joi.string().min(0),
-  reqString: Joi.string().required(),
+  string: Joi.string().min(0).trim(),
+  reqString: Joi.string().trim().required(),
   reqEmail: Joi.string()
-    .email({ tlds: { allow: false } })
-    .required(),
-  email: Joi.string().email({ tlds: { allow: false } }),
+  .email({ tlds: { allow: false } })
+  .trim()
+  .required(),
+email: Joi.string()
+  .email({ tlds: { allow: false } })
+  .trim(),
   number: Joi.number(),
   reqNumber: Joi.number().required(),
   array: Joi.array(),

@@ -1,15 +1,21 @@
 const jwt = require("jsonwebtoken");
 const isset = require("isset");
-const { usersService } = require("../services");
-const { SUPERADMIN, ADMIN } = require("../constants/roles.constant");
+const {
+  ADMIN,
+  INSTRUCTOR,
+  SUPERADMIN,
+  STUDENT,
+  STAFF,
+} = require("../constants/roles.constant");
+const { userServices } = require("../services");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 module.exports = {
-  // =================================== Check admin authentication  ===================================
-  isAdminCommonAuthenticate: (req, res, next) => {
+  // =================================== Check  authentication  ===================================
+  isAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
 
     jwt.verify(token, JWTSecretKey, async (err, result) => {
-      console.log("result :",token, result);
+      console.log("result :", token, result);
       if (err)
         return res.json({
           status: false,
@@ -18,16 +24,47 @@ module.exports = {
         });
 
       if (result && isset(result.user_id)) {
-        const getUserData = await usersService.findUserById(result.user_id);
-        console.log("getUserData: ",getUserData)
-        if (!getUserData?.length)
+        const getUserData = await userServices.findUserById(result.user_id);
+        console.log("getUserData: ", getUserData);
+        if (!getUserData)
+          return res.json({
+            status: false,
+            message: `Invalid token or expired!`,
+            isAuth: false,
+          });
+        req.body.user_id = result.user_id;
+        return next();
+      }
+      return res.json({
+        status: false,
+        message: `Invalid token or expired!`,
+        isAuth: false,
+      });
+    });
+  },
+  isAdminCommonAuthenticate: (req, res, next) => {
+    let token = req.headers.authorization;
+
+    jwt.verify(token, JWTSecretKey, async (err, result) => {
+      console.log("result :", token, result);
+      if (err)
+        return res.json({
+          status: false,
+          message: `Invalid token or expired!`,
+          isAuth: false,
+        });
+
+      if (result && isset(result.user_id)) {
+        const getUserData = await userServices.findUserById(result.user_id);
+        console.log("getUserData: ", getUserData);
+        if (!getUserData)
           return res.json({
             status: false,
             message: `Invalid token or expired!`,
             isAuth: false,
           });
 
-        if (getUserData[0]?.role === SUPERADMIN || getUserData[0]?.role === ADMIN)
+        if ([INSTRUCTOR, STUDENT, STAFF].includes(getUserData?.role))
           return res.json({
             status: false,
             message: `Access to the target resource has been denied`,
@@ -54,22 +91,24 @@ module.exports = {
           isAuth: false,
         });
       if (result && isset(result.user_id)) {
-        const getUserData = await usersService.findbyAdminEmail(result.email);
-        if (!getUserData?.length)
+        const getUserData = await userServices.findUserById(result.user_id);
+        console.log("getUserData:  ", getUserData);
+        if (!getUserData)
           return res.json({
             status: false,
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        if (getUserData[0]?.role !== SUPERADMIN)
+        if (getUserData.role === SUPERADMIN) {
+          req.body.user_id = result.user_id;
+          return next();
+        } else {
           return res.json({
             status: false,
             message: `Access to the target resource has been denied`,
             isAuth: false,
           });
-
-        req.body.user_id = result.user_id;
-        return next();
+        }
       }
       return res.json({
         status: false,

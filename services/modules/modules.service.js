@@ -1,5 +1,6 @@
-const { modulesModel } = require("../models");
+
 const createError = require("http-errors");
+const modulesModel = require("./modules.model");
 
 module.exports = {
   addDefaultModules: async () => {

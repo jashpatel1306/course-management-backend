@@ -39,7 +39,7 @@ module.exports.handleExcelData = async (req, res, next) => {
     // console.log("processedData", processedData);
     if (!processedData)
       return res.status(500).send({
-        success: false,
+        status: false,
         message: "Error processing the sheet, please try again.",
         data: [],
       });
@@ -54,7 +54,7 @@ module.exports.handleExcelData = async (req, res, next) => {
     // Log the error and return an error response
     console.error(err);
     return res.status(500).send({
-      success: false,
+      status: false,
       message: "Error processing the sheet, please try again.",
       data: [],
     });
