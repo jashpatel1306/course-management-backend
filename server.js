@@ -2,13 +2,10 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const createError = require("http-errors");
 const cookieParser = require("cookie-parser");
 var expressFile = require("express-fileupload");
-const http = require("http");
 const path = require("path");
 const router = require("./routes/index");
-
 const PORT = process.env.PORT || 3030;
 const app = express();
 
@@ -19,8 +16,8 @@ app.use(cookieParser());
 app.use(expressFile());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ limit: `50mb`, extended: true }));
+app.use(bodyParser.json({ limit: `15mb` }));
 
 require("./config/mongodb.js");
 router.userAPI(app);
@@ -66,8 +63,6 @@ app.use((err, req, res, next) => {
   }
 });
 
-const server = new http.createServer(app);
-
-server.listen(PORT, () => {
-  console.log("server is running on", PORT);
+app.listen(PORT, () => {
+  console.log(`server is running on port ` + PORT);
 });

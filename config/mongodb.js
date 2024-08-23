@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 mongoose.set("strictQuery", false);
 require("dotenv").config();
-const { addDefaultAdmin } = require("../services/users.services");
+const { addDefaultAdmin } = require("../services/users");
 
 let mongoUrl;
 

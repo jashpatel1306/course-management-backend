@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { ValidateBody } = require("../validation/validation.methods");
-const userController = require("../controllers/users.controller");
+const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
-const { isAdminAuthentic } = require("../helpers/auth.helper");
+const { isAdminCommonAuthenticate } = require("../helpers/auth.helper");
 
+const userController = require("../controllers/users.controller");
 router.post(
   "/signIn",
-  ValidateBody(schemas.logInSchema),
+  Validate(schemas.logInSchema),
   userController.userSignIn
 );
 
-router.get("/profile", isAdminAuthentic, userController.getUserProfileData);
+router.get("/profile",isAdminCommonAuthenticate, userController.getUserProfileData);
 module.exports = router;

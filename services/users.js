@@ -1,9 +1,11 @@
 const { userModel } = require("../models");
 const createError = require("http-errors");
-const { signAccessToken } = require("../helpers/auth.helper");
+const jwt = require("jsonwebtoken");
+const { SUPERADMIN } = require("../constants/roles.constant");
+const JWTSecretKey = process.env.JWT_SECRET_KEY;
 
 module.exports = {
-  getUserByEmail: async function (email){
+  getUserByEmail: async function (email) {
     try {
       const user = await userModel.findOne({ email });
       if (!user) {
@@ -16,13 +18,13 @@ module.exports = {
   },
   addDefaultAdmin: async () => {
     try {
-      const user = await userModel.findOne({ role: "admin" });
+      const user = await userModel.findOne({ role: SUPERADMIN });
       if (!user) {
         const newUser = new userModel({
-          email: "learning_management@admmin.com",
+          email: "lms@admin.com",
           password: "Admin@123",
-          role: "admin",
-          name: "Admin 1",
+          role: SUPERADMIN,
+          user_name: "First Admin",
         });
         await newUser.save();
       }
@@ -41,21 +43,23 @@ module.exports = {
       if (user.password !== password) {
         throw createError.Unauthorized("Invalid password.");
       }
-      const TIME = "30d";
 
-      const accessToken = await signAccessToken(
-        user._id,
-        user.role,
-        user.email,
-        user.permissions,
-        TIME
-      );
+      const userData = {
+        user_id: user._id,
+        role: user.role,
+        email: user.email,
+        permissions: user.permissions,
+      };
+
+      const accessToken = jwt.sign(userData, JWTSecretKey, {
+        expiresIn: 86400,
+      });
       return { accessToken, user };
     } catch (error) {
       throw error;
     }
   },
-  getUserById: async (userId) => {
+  findUserById: async (userId) => {
     try {
       const user = await userModel.findOne({ _id: userId });
       if (!user) {

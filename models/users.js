@@ -1,36 +1,42 @@
 const mongoose = require("mongoose");
+const { ADMIN, ROLES } = require("../constants/roles.constant");
 
 const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
+      trim: true,
+      unique: true,
+      lowercase: true,
+      required: [true, `email is required`],
     },
     password: {
       type: String,
-      required: true,
+      required: [true, `password is required`],
     },
-    role: {
+    user_name: {
       type: String,
-      enum: ["admin", "user", "college", "student", "staff"],
-    },
-    profileImage: {
-      type: String,
-      default:
-        "https://static.vecteezy.com/system/resources/thumbnails/002/002/403/small/man-with-beard-avatar-character-isolated-icon-free-vector.jpg",
+      required: [true, `user_name is required`],
     },
     permissions: [
       {
         type: String,
       },
     ],
-    status: {
+    avatar: {
+      type: String,
+      default: `https://espo-live.s3.us-west-1.amazonaws.com/content/images/logo/30698015106821034319.webp`,
+      trim: true,
+    },
+    role: {
+      type: String,
+      default: ADMIN,
+      trim: true,
+      enum: ROLES,
+    },
+    active: {
       type: Boolean,
       default: true,
-    },
-    name: {
-      type: String,
-      required: true,
     },
   },
   { timestamps: true, versionKey: false }

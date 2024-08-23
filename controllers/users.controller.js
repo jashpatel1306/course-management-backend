@@ -1,5 +1,5 @@
-const userServices = require("../services/users.services");
-const createError = require("http-errors");
+const { userServices } = require("../services");
+
 
 module.exports = {
   userSignIn: async (req, res, next) => {
@@ -28,7 +28,7 @@ module.exports = {
   getUserProfileData: async (req, res, next) => {
     try {
       const userId = res.locals.userId;
-      const user = await userServices.getUserById(userId);
+      const user = await userServices.findUserById(userId);
       return res.status(200).json({
         success: true,
         message: "User profile data fetched successfully",
