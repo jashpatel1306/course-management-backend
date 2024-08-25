@@ -1,0 +1,100 @@
+const batchServices = require("../services/batches/batches.services");
+const createError = require("http-errors");
+const {
+  getBatchWiseStudents,
+} = require("../services/students/student.services");
+
+module.exports = {
+  createBatch: async (req, res, next) => {
+    try {
+      const batch = await batchServices.createBatch(req.body);
+      res.status(200).send({
+        success: true,
+        message: "batch created successfully",
+        data: batch,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getBatchById: async (req, res, next) => {
+    try {
+      const batch = await batchServices.getBatchById(req.params.id);
+      res.status(200).send({
+        success: true,
+        message: "batch fetched successfully",
+        data: batch,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAllBatches: async (req, res, next) => {
+    try {
+      const batches = await batchServices.getAllBatches(
+        req.body.search,
+        req.body.pageNo,
+        req.body.perPage
+      );
+      res.status(200).send({
+        success: true,
+        message: "batches fetched successfully",
+        data: batches,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateBatch: async (req, res, next) => {
+    try {
+      const batch = await batchServices.updateBatch(req.params.id, req.body);
+      res.status(200).send({
+        success: true,
+        message: "batch updated successfully",
+        data: batch,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  deleteBatch: async (req, res, next) => {
+    try {
+      const batch = await batchServices.deleteBatch(req.params.id);
+      res.status(200).send({
+        success: true,
+        message: "batch deleted successfully",
+        data: batch,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  activeStatusChange: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const batch = await batchServices.activeStatusChange(id);
+      const message = batch.active === true ? "activated" : "inactivated";
+      res.status(200).json({
+        success: true,
+        message: `batch ${message} successfully`,
+        data: batch,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getBatchList: async (req, res, next) => {
+    try {
+      const batches = await batchServices.getKeyValueBatches();
+      res.status(200).send({
+        success: true,
+        message: "batches fetched successfully",
+        data: batches,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+};

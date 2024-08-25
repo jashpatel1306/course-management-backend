@@ -1,7 +1,7 @@
 const userModel = require("./user.model");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { SUPERADMIN } = require("../../constants/roles.constant");
+  const { SUPERADMIN } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
