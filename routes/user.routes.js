@@ -12,6 +12,7 @@ const userController = require("../controllers/users.controller");
 const batchesController = require("../controllers/batches.controller");
 const studentController = require("../controllers/student.controller");
 const departmentController = require("../controllers/department.controller");
+const { handleExcelData } = require("../helpers/excel.helper");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -97,6 +98,12 @@ router.post(
   studentController.createStudent
 );
 
+router.post(
+  "/students-bulk",
+  // isAdminCommonAuthenticate,
+  handleExcelData,
+  studentController.createBulkStudents
+);
 router.get(
   "/students/all",
   // isAdminCommonAuthenticate,

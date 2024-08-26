@@ -4,9 +4,9 @@ var XLSX = require("xlsx");
 // callback function for parsing data from file
 function handleWorkbook(workbook) {
   const sheetNames = workbook.SheetNames;
-
+  console.log("Sheet Names:", sheetNames);
   const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"]);
-  //   console.log("Sheet Data:", sheetData);
+  console.log("Sheet Data:", sheetData);
   if (!sheetData) return false;
   return sheetData;
 }
@@ -28,16 +28,16 @@ function processSheet(stream, cb) {
  */
 module.exports.handleExcelData = async (req, res, next) => {
   try {
+    console.log("req.files.excelFile", req.files);
     // Get the excel file from the request
     const myStream = req.files.excelFile;
 
     // Process the excel sheet data using the processSheet and handleWorkbook functions
     const processedData = processSheet(myStream.data, handleWorkbook);
+    console.log("processedData", processedData);
 
     // If no data is processed, return an error response
     if (!processedData) {
-    // console.log("processedData", processedData);
-    if (!processedData)
       return res.status(500).send({
         status: false,
         message: "Error processing the sheet, please try again.",

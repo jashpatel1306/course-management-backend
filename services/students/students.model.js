@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const commonHelpers = require("../../helpers/common.helper");
-userServices = require("../users/user.service");
+const userServices = require("../users/user.service");
 const { STUDENT } = require("../../constants/roles.constant");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
@@ -88,9 +88,9 @@ studentSchema.pre("save", async function (next) {
   const body = `Your Password for Learning management system is ${password}`;
 
   sendMailWithServices(to, subject, body);
-
   next();
 });
+
 studentSchema.index({ rollNo: 1, userId: 1, email: 1 }, { unique: true });
 
 const studentsModel = mongoose.model("students", studentSchema);

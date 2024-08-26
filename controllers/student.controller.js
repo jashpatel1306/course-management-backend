@@ -1,6 +1,6 @@
 const studentServices = require("../services/students/student.services");
 const createError = require("http-errors");
-
+const excelHelper = require("../helpers/excel.helper");
 module.exports = {
   createStudent: async (req, res, next) => {
     try {
@@ -15,6 +15,29 @@ module.exports = {
     }
   },
 
+  createBulkStudents: async (req, res, next) => {
+    try {
+      console.log("req.body", req.body);
+
+      // Use Promise.all to resolve all promises in the array
+      const studentData = await Promise.all(
+        req.body.map(async (student) => {
+          const insertedStudent = await studentServices.createStudent(student);
+          return insertedStudent;
+        })
+      );
+
+      console.log("studentData", studentData);
+
+      res.send({
+        success: true,
+        message: "students created successfully",
+        data: studentData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   getStudentById: async (req, res, next) => {
     try {
       const student = await studentServices.getStudentById(req.params.id);

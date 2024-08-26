@@ -34,6 +34,20 @@ module.exports = {
     }
   },
 
+  createStudentsInBulk: async (data) => {
+    try {
+      const student = await studentModel.insertMany(data);
+      if (!student) throw createError(500, "Error while creating student");
+      return student;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+
+  preStudentCreate: async (data) => {
+    return data;
+  },
+
   getStudentById: async (id) => {
     try {
       const student = await studentModel.findOne({ _id: id });

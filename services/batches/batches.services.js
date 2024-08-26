@@ -1,6 +1,4 @@
 const { default: mongoose } = require("mongoose");
-const studentsModel = require("../students/students.model");
-const batchesModel = require("./batches.model");
 const BatchModel = require("./batches.model");
 const createError = require("http-errors");
 const ObjectId = mongoose.Types.ObjectId;
@@ -99,7 +97,7 @@ module.exports = {
     try {
       let batches = await BatchModel.aggregate([
         {
-          $match: { collegeId:new ObjectId(collegeId) },
+          $match: { collegeId: new ObjectId(collegeId) },
         },
         {
           $lookup: {
