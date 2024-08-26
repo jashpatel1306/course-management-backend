@@ -1,7 +1,8 @@
 const userModel = require("./user.model");
+const collegesModel = require("../colleges/colleges.model");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-  const { SUPERADMIN } = require("../../constants/roles.constant");
+const { SUPERADMIN } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
@@ -29,12 +30,31 @@ module.exports = {
           role: SUPERADMIN,
           user_name: "First Admin",
         };
+
         data.password = await commonFunctions.encode(data.password);
         await userModel.updateOne(
           { email: data.email },
           { ...data },
           { upsert: true }
         );
+        const userResult = await userModel.findOne({ email: data.email });
+        if (userResult._id) {
+          const collegeData = {
+            userId: userResult._id,
+            collegeName: "superAdmin College",
+            collegeNo: "-1",
+            contactPersonName: "First Admin",
+            contactPersonNo: "+9199999999999",
+            shortName: "superAdmin College",
+            isAdmin: true,
+          };
+          await collegesModel.updateOne(
+            { userId: userResult._id },
+            { ...collegeData },
+            { upsert: true }
+          );
+          console.log("creating college for Admin");
+        }
       }
     } catch (error) {
       throw error;
@@ -63,9 +83,9 @@ module.exports = {
       if (data.password) {
         data.password = await commonFunctions.encode(data.password);
       }
-      await userModel.updateOne({ _id }, { ...data }, { upsert: true });
+      await userModel.updateOne({ _id: _id }, { ...data }, { upsert: true });
       return await userModel.findOne(
-        { _id: data.user_id },
+        { _id: _id },
         { createdAt: 0, updatedAt: 0, __v: 0 }
       );
     } catch (error) {
@@ -75,8 +95,7 @@ module.exports = {
 
   userSignIn: async (email, password) => {
     try {
-      const user = await userModel.findOne({ email });
-      console.log("user: ", email, password);
+      let user = await userModel.findOne({ email });
       if (!user) {
         throw createError.Unauthorized(
           "There is no account associated with this email address. Please try again."
@@ -91,18 +110,19 @@ module.exports = {
       if (dbPassword !== password) {
         throw createError.Unauthorized("Invalid password.");
       }
-
+      const collegeData = await collegesModel.findOne({ userId: user._id });
       const userData = {
         user_id: user._id,
         role: user.role,
         email: user.email,
         permissions: user.permissions,
+        college_id: collegeData?._id,
       };
-
+      const collegeId = collegeData?._id ? collegeData?._id : null;
       const accessToken = jwt.sign(userData, JWTSecretKey, {
         expiresIn: 86400,
       });
-      return { accessToken, user };
+      return { accessToken, user, collegeId };
     } catch (error) {
       throw error;
     }
@@ -139,14 +159,17 @@ module.exports = {
     try {
       const user = await userModel.findOne({ email });
       if (!user) {
-        throw createError(404, "Please Enter Valid Email.");
+        throw createError(
+          404,
+          "Email Not Found, Please Try With Registered Email."
+        );
       }
 
       const otp = generateRandomOTP();
       await userModel.updateOne({ email }, { otp });
 
       const subject = "Forgot Password";
-      const body = `Your OTP is ${opt}.`;
+      const body = `Your OTP is ${otp}.`;
       const sendMail = await sendMailWithServices(email, subject, body);
       if (!sendMail) {
         throw createError(500, "Could not send Email.");
@@ -164,23 +187,24 @@ module.exports = {
       if (!user) {
         throw createError(404, "User not found");
       }
+
       if (user.otp !== otp) {
         throw createError(401, "Invalid OTP");
       }
-      return true;
+      return user._id;
     } catch (error) {
       throw error;
     }
   },
 
-  changePassword: async (email, password) => {
+  changePassword: async (user_id, password) => {
     try {
-      const user = await userModel.findOne({ email });
+      const user = await userModel.findOne({ _id: user_id });
       if (!user) {
         throw createError(404, "User not found");
       }
       password = await commonFunctions.encode(password);
-      await userModel.updateOne({ email }, { password });
+      await userModel.updateOne({ _id: user_id }, { password });
       return true;
     } catch (error) {
       throw error;

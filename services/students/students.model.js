@@ -14,7 +14,10 @@ const studentSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
+    },
+    rollNo: {
+      type: String,
+      required: true,
     },
     phone: {
       type: String,
@@ -33,7 +36,6 @@ const studentSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Types.ObjectId,
       ref: "users",
-      unique: true,
     },
     department: {
       type: String,
@@ -49,7 +51,7 @@ const studentSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["male", "female", "Other"],
+      enum: ["male", "female", "other"],
     },
     semester: {
       type: Number,
@@ -65,7 +67,8 @@ const studentSchema = new mongoose.Schema(
 
 studentSchema.pre("save", async function (next) {
   console.log("creating hook");
-  const password = commonHelpers.generateRandomPassword();
+  // const password = commonHelpers.generateRandomPassword();
+  const password = "Admin@123";
 
   const userData = {
     email: this.email,
@@ -88,6 +91,7 @@ studentSchema.pre("save", async function (next) {
 
   next();
 });
+studentSchema.index({ rollNo: 1, userId: 1, email: 1 }, { unique: true });
 
 const studentsModel = mongoose.model("students", studentSchema);
 module.exports = studentsModel;

@@ -8,21 +8,23 @@ module.exports = {
       const userData = {
         email: data.email,
         password: data.password,
-        user_name: data.collegeName,
+        user_name: data.contactPersonName,
         permissions: [],
         role: "admin",
       };
-
-      const createUser = await userServices.createUser(userData);
-
-      collegeData.userId = createUser._id;
-      console.log("collegeData", collegeData);
+      let userResult;
+      if (data.userId) {
+        userResult = await userServices.updateUser(data.userId, userData);
+      } else {
+        userResult = await userServices.createUser(userData);
+      }
+      collegeData.userId = userResult._id;
       await CollegeModel.updateOne(
-        { userId: createUser._id },
+        { userId: userResult._id },
         { ...collegeData },
         { upsert: true }
       );
-      const college = await CollegeModel.findOne({ userId: createUser._id });
+      const college = await CollegeModel.findOne({ userId: userResult._id });
       return college;
     } catch (error) {
       throw error;
@@ -41,21 +43,36 @@ module.exports = {
     }
   },
 
-  getAllColleges: async (search, pageNo, perPage) => {
+  getAllColleges: async (searchText, pageNo, perPage, status) => {
     try {
       let filter = {};
-      if (search) {
-        filter = {
-          $or: [
-            { collegeName: { $regex: search } },
-            { shortName: { $regex: search } },
-          ],
-        };
-      }
+
+      const tabData =
+        status === `0`
+          ? { active: false, isAdmin: false }
+          : status === `1`
+          ? { active: true, isAdmin: false }
+          : { isAdmin: false };
+      filter = {
+        $and: [
+          tabData,
+          {
+            $or: [
+              { collegeName: { $regex: searchText } },
+              { shortName: { $regex: searchText } },
+              { collegeNo: { $regex: searchText } },
+              { contactPersonName: { $regex: searchText } },
+              { contactPersonNo: { $regex: searchText } },
+            ],
+          },
+        ],
+      };
+
       const college = await CollegeModel.find(filter)
+        .populate("userId", "email password ")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
-      const count = await CollegeModel.countDocuments();
+      const count = await CollegeModel.countDocuments(filter);
       if (!college) {
         throw createError(404, "Colleges not found");
       }

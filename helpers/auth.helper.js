@@ -13,10 +13,10 @@ module.exports = {
   // =================================== Check  authentication  ===================================
   isAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
-    token = token.split(" ")[1];
-    console.log("token: ", token);
+    token = token.toLowerCase().includes("bearer")
+      ? token.split(" ")[1]
+      : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
-      console.log("result :", token, result);
       if (err)
         return res.json({
           status: false,
@@ -26,14 +26,14 @@ module.exports = {
 
       if (result && isset(result.user_id)) {
         const getUserData = await userServices.findUserById(result.user_id);
-        console.log("getUserData: ", getUserData);
         if (!getUserData)
           return res.json({
             status: false,
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        req.body.user_id = result.user_id;
+          req.body.user_id = result.user_id;
+          req.body.college_id = result.college_id;
         return next();
       }
       return res.json({
@@ -45,11 +45,11 @@ module.exports = {
   },
   isAdminCommonAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
-    token = token.split(" ")[1];
-    console.log("token: ", token);
+    token = token.toLowerCase().includes("bearer")
+      ? token.split(" ")[1]
+      : token;
 
     jwt.verify(token, JWTSecretKey, async (err, result) => {
-      console.log("result :", token, result);
       if (err)
         return res.json({
           status: false,
@@ -59,7 +59,6 @@ module.exports = {
 
       if (result && isset(result.user_id)) {
         const getUserData = await userServices.findUserById(result.user_id);
-        console.log("getUserData: ", getUserData);
         if (!getUserData)
           return res.json({
             status: false,
@@ -74,6 +73,7 @@ module.exports = {
             isAuth: false,
           });
         req.body.user_id = result.user_id;
+        req.body.college_id = result.college_id;
         return next();
       }
       return res.json({
@@ -86,6 +86,9 @@ module.exports = {
   // =================================== Check super admin authentication  ===================================
   isSuperAdminAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
+    token = token.toLowerCase().includes("bearer")
+      ? token.split(" ")[1]
+      : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       if (err)
         return res.json({
@@ -95,7 +98,6 @@ module.exports = {
         });
       if (result && isset(result.user_id)) {
         const getUserData = await userServices.findUserById(result.user_id);
-        console.log("getUserData:  ", getUserData);
         if (!getUserData)
           return res.json({
             status: false,
@@ -104,6 +106,7 @@ module.exports = {
           });
         if (getUserData.role === SUPERADMIN) {
           req.body.user_id = result.user_id;
+          req.body.college_id = result.college_id;
           return next();
         } else {
           return res.json({

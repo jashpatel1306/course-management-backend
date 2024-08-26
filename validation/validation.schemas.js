@@ -36,10 +36,11 @@ module.exports = {
     otp: validate.reqString,
   }),
   changePasswordSchema: Joi.object().keys({
-    email: validate.reqEmail,
+    user_id: validate.reqString,
     password: validate.reqString,
   }),
   addCollegeSchema: Joi.object().keys({
+    userId: validate.string,
     collegeName: validate.reqString,
     shortName: validate.reqString,
     collegeNo: validate.reqString,
@@ -47,6 +48,7 @@ module.exports = {
     contactPersonNo: validate.reqString,
     email: validate.reqEmail,
     password: validate.reqString,
+    active: validate.boolean,
   }),
   searchPaginationScema: Joi.object().keys({
     perPage: validate.reqNumber,
@@ -54,16 +56,20 @@ module.exports = {
     search: validate.string,
   }),
   batchSchema: Joi.object().keys({
+    batchId: validate.string,
     batchName: validate.reqString,
-    batchNumber: validate.reqNumber,
+    batchNumber: validate.reqString,
     collegeId: validate.string,
-    trainerIds: validate.array,
+    instructorIds: validate.array,
     courses: validate.array,
+    active: validate.boolean,
   }),
   studentSchema: Joi.object().keys({
+    studentId: validate.string,
     name: validate.reqString,
     email: validate.reqEmail,
     phone: validate.reqString,
+    rollNo: validate.reqString,
     collegeUserId: validate.id,
     batchId: validate.id,
     department: validate.reqString,
@@ -71,6 +77,7 @@ module.exports = {
     passoutYear: validate.reqNumber,
     gender: validate.reqString,
     semester: validate.reqNumber,
+    active: validate.boolean,
   }),
   batchWiseStudentsSchema: Joi.object().keys({
     batchId: validate.id,

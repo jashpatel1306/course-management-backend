@@ -1,3 +1,4 @@
+const { ADMIN } = require("../constants/roles.constant");
 const collegeServices = require("../services/colleges/colleges.service");
 const createError = require("http-errors");
 
@@ -5,7 +6,7 @@ module.exports = {
   createCollege: async (req, res, next) => {
     try {
       const data = req.body;
-      data.role = "admin";
+      data.role = ADMIN;
       const college = await collegeServices.createCollege(data);
       res.status(201).json({
         success: true,
@@ -22,10 +23,13 @@ module.exports = {
       const perPage = req.body.perPage;
       const pageNo = req.body.pageNo;
       const search = req.body.search;
+      const searchText = new RegExp(search, `i`);
+      const status = req.params.status;
       const { college, count } = await collegeServices.getAllColleges(
-        search,
+        searchText,
         pageNo,
-        perPage
+        perPage,
+        status
       );
       res.status(200).json({
         success: true,

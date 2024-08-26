@@ -10,7 +10,7 @@ module.exports = {
       const email = reqBody.email;
       const password = reqBody.password;
 
-      const { accessToken, user } = await userServices.userSignIn(
+      const { accessToken, user, collegeId } = await userServices.userSignIn(
         email,
         password
       );
@@ -20,6 +20,7 @@ module.exports = {
         data: {
           token: accessToken,
           data: user,
+          collegeId: collegeId,
         },
       });
     } catch (error) {
@@ -109,7 +110,6 @@ module.exports = {
       const reqData = req?.body;
 
       const email = reqData.email;
-      console.log("email", email);
 
       const forgotPassword = await userServices.forgotPassword(email);
       if (!forgotPassword) {
@@ -137,9 +137,7 @@ module.exports = {
       return res.status(200).json({
         status: true,
         message: `The OTP has been successfully verified.`,
-        data: {
-          code: "OTP_VERIFIED",
-        },
+        user_id: verifyOtp,
       });
     } catch (error) {
       next(error);
@@ -149,10 +147,13 @@ module.exports = {
   changePassword: async (req, res, next) => {
     try {
       const request_body = req?.body;
-      const email = request_body.email;
+      const user_id = request_body.user_id;
       const password = request_body.password;
 
-      const changePassword = await userServices.changePassword(email, password);
+      const changePassword = await userServices.changePassword(
+        user_id,
+        password
+      );
       if (!changePassword) {
         return next(createHttpError(500, `Error changing password.`));
       }

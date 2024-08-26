@@ -4,6 +4,7 @@ const collegeSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Types.ObjectId,
+      ref: "users",
       required: true,
     },
     collegeName: {

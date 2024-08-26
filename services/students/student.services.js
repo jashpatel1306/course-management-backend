@@ -1,10 +1,32 @@
+const { STUDENT } = require("../../constants/roles.constant");
 const studentModel = require("./students.model");
 const createError = require("http-errors");
+const commonHelpers = require("../../helpers/common.helper");
+const { sendMailWithServices } = require("../../helpers/mail.helper");
+const { userServices } = require("..");
 
 module.exports = {
   createStudent: async (data) => {
     try {
       const student = await studentModel.create(data);
+      // const password = commonHelpers.generateRandomPassword();
+
+      // const userData = {
+      //   email: data.email,
+      //   password,
+      //   user_name: data.name,
+      //   permissions: [],
+      //   role: STUDENT,
+      // };
+      // const createUser = await userServices.createUser(userData);
+      // if (!createUser) {
+      //   next(createError.InternalServerError("Error creating user."));
+      // }
+      // const to = data.email;
+      // const subject = "Password for Learning management system";
+      // const body = `Your Password for Learning management system is ${password}`;
+      // sendMailWithServices(to, subject, body);
+
       if (!student) createError(500, "Error while creating student");
       return student;
     } catch (error) {
@@ -49,7 +71,11 @@ module.exports = {
       let filter = {};
       if (search) {
         filter = {
-          $or: [{ name: { $regex: search } }, { email: { $regex: search } }],
+          $or: [
+            { name: { $regex: search } },
+            { email: { $regex: search } },
+            { rollNo: { $regex: search } },
+          ],
         };
       }
 
@@ -80,23 +106,28 @@ module.exports = {
   },
   getBatchWiseStudents: async (batchId, search, perPage, pageNo) => {
     try {
-      const filter = { batchId: batchId };
-      if (search) {
-        filter[$or] = [
-          { name: { $regex: search } },
-          { email: { $regex: search } },
-        ];
-      }
-      console.log("filter", filter);
-      const student = await studentModel
+      const filter = {
+        $and: [
+          { batchId },
+          {
+            $or: [
+              { name: { $regex: search } },
+              { email: { $regex: search } },
+              { rollNo: { $regex: search } },
+            ],
+          },
+        ],
+      };
+      const students = await studentModel
         .find(filter)
+        .populate("collegeUserId", "_id collegeName collegeNo")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       const count = await studentModel.countDocuments(filter);
-      if (!student) {
-        throw createError(404, "Students not found");
-      }
-      return { student, count };
+      // if (students.length) {
+      //   throw createError(404, "Students not found");
+      // }
+      return { students, count };
     } catch (error) {
       throw error;
     }
@@ -110,7 +141,6 @@ module.exports = {
           { email: { $regex: search } },
         ];
       }
-      console.log("filter", filter);
       const student = await studentModel
         .find(filter)
         .skip((pageNo - 1) * perPage)

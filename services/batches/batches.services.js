@@ -1,6 +1,9 @@
+const { default: mongoose } = require("mongoose");
+const studentsModel = require("../students/students.model");
 const batchesModel = require("./batches.model");
 const BatchModel = require("./batches.model");
 const createError = require("http-errors");
+const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
   createBatch: async (data) => {
@@ -57,6 +60,18 @@ module.exports = {
       throw error;
     }
   },
+  getAllBatchesByCollegeId: async (collegeId) => {
+    try {
+      const batch = await BatchModel.find({ collegeId });
+      if (!batch) {
+        throw createError(404, "Batches not found");
+      }
+
+      return batch;
+    } catch (error) {
+      throw error;
+    }
+  },
 
   deleteBatch: async (id) => {
     try {
@@ -80,16 +95,29 @@ module.exports = {
       throw error;
     }
   },
-  getKeyValueBatches: async () => {
+  getKeyValueBatches: async (collegeId) => {
     try {
-      const batches = await batchesModel.aggregate([
+      let batches = await BatchModel.aggregate([
+        {
+          $match: { collegeId:new ObjectId(collegeId) },
+        },
+        {
+          $lookup: {
+            from: "students", // Referencing the students collection
+            localField: "_id", // Field from the batches collection
+            foreignField: "batchId", // Field from the students collection
+            as: "studentsData", // Alias for the joined data
+          },
+        },
         {
           $project: {
-            key: "$batchName",
-            value: "$_id",
+            label: "$batchName", // Renaming field to 'label'
+            value: "$_id", // Renaming field to 'value'
+            totalStudents: { $size: "$studentsData" }, // Counting students in each batch
           },
         },
       ]);
+      console.log("batches : ", collegeId, batches);
       return batches;
     } catch (error) {
       throw error;

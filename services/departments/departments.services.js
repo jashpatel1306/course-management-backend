@@ -5,13 +5,10 @@ module.exports = {
   getDepartments: async (userId) => {
     try {
       const departments = await departmentModel.find({ userId });
-      console.log("departments", departments);
       const array = departments[0].departments;
-      console.log("array", array);
       const data = array.map((department) => {
         return { key: department, value: department };
       });
-      console.log("data", data);
       return data;
     } catch (error) {
       throw createError(500, error.message);

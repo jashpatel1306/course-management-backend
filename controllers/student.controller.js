@@ -91,16 +91,28 @@ module.exports = {
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
       const batchId = req.body.batchId;
-      const students = await studentServices.getBatchWiseStudents(
+      const perPage = req.body.perPage;
+      const pageNo = req.body.pageNo;
+      const search = req.body.search;
+
+      const searchText = new RegExp(search, `i`);
+
+      const { students, count } = await studentServices.getBatchWiseStudents(
         batchId,
-        req.body.search,
-        req.body.perPage,
-        req.body.pageNo
+        searchText,
+        perPage,
+        pageNo
       );
       res.send({
         success: true,
         message: "students fetched successfully",
         data: students,
+        pagination: {
+          total: count,
+          perPage: perPage,
+          pageNo: pageNo,
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);

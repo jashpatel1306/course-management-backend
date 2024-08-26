@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
-const { isAdminCommonAuthenticate } = require("../helpers/auth.helper");
+const { isSuperAdminAuthenticate } = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
 const collegeController = require("../controllers/college.controller");
@@ -11,26 +11,26 @@ const collegeController = require("../controllers/college.controller");
 router.post(
   "/college",
   Validate(schemas.addCollegeSchema),
-  isAdminCommonAuthenticate,
+  isSuperAdminAuthenticate,
   collegeController.createCollege
 );
 
-router.get(
-  "/colleges/all",
-  Validate(schemas.queryIdSchema),
-  isAdminCommonAuthenticate,
+router.post(
+  "/colleges/all/:status",
+  Validate(schemas.searchPaginationScema),
+  isSuperAdminAuthenticate,
   collegeController.getAllColleges
 );
 
 router.get(
   "/college/:id",
-  isAdminCommonAuthenticate,
+  isSuperAdminAuthenticate,
   collegeController.getCollegeById
 );
 
 router.patch(
   "/college-status/:id",
-  isAdminCommonAuthenticate,
+  isSuperAdminAuthenticate,
   collegeController.changeActiveStatus
 );
 

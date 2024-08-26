@@ -31,11 +31,27 @@ module.exports = {
   },
   getAllBatches: async (req, res, next) => {
     try {
-      const batches = await batchServices.getAllBatches(
-        req.body.search,
-        req.body.pageNo,
-        req.body.perPage
-      );
+      college_id = req.body.college_id;
+      // const batches = await batchServices.getAllBatches(
+      //   req.body.search,
+      //   req.body.pageNo,
+      //   req.body.perPage
+      // );
+      const batches = await batchServices.getAllBatchesByCollegeId(college_id);
+      res.status(200).send({
+        success: true,
+        message: "batches fetched successfully",
+        data: batches,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getBatchesOption: async (req, res, next) => {
+    try {
+      college_id = req.body.college_id;
+    
+      const batches = await batchServices.getKeyValueBatches(college_id);
       res.status(200).send({
         success: true,
         message: "batches fetched successfully",

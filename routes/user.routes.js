@@ -67,8 +67,13 @@ router.put(
 
 router.get(
   "/batches/all",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   batchesController.getAllBatches
+);
+router.get(
+  "/batches-option",
+  isAdminCommonAuthenticate,
+  batchesController.getBatchesOption
 );
 
 router.get(
