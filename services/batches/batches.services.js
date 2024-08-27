@@ -2,6 +2,7 @@ const { default: mongoose } = require("mongoose");
 const BatchModel = require("./batches.model");
 const createError = require("http-errors");
 const CollegeModel = require("../colleges/colleges.model");
+const studentsModel = require("../students/students.model");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
