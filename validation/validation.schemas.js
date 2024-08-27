@@ -80,13 +80,13 @@ module.exports = {
     active: validate.boolean,
   }),
   batchWiseStudentsSchema: Joi.object().keys({
-    batchId: validate.id,
+    batchId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
   }),
   collegeWiseStudentsSchema: Joi.object().keys({
-    collegeId: validate.id,
+    collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,

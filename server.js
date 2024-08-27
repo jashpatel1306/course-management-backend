@@ -11,7 +11,7 @@ const app = express();
 
 //postgres connection
 
-app.use(cors({ origin: "*" }));
+app.use(cors());
 app.use(cookieParser());
 app.use(expressFile());
 app.use(express.static(path.join(__dirname, "public")));
@@ -32,7 +32,7 @@ app.all("/*", function (req, res, next) {
 });
 
 app.all("/", (req, res) => {
-  return res.status(200).send("Learning management system is running well.");
+  return res.status(200).send("Learning management system is running well. version : 1.0.1");
 });
 
 app.all("*", async (req, res) => {

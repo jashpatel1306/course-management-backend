@@ -130,7 +130,7 @@ module.exports = {
       const searchText = new RegExp(search, `i`);
 
       const { students, count } = await studentServices.getBatchWiseStudents(
-        batchId,
+        batchId === "all"?"":batchId,
         searchText,
         perPage,
         pageNo

@@ -123,7 +123,7 @@ module.exports = {
     try {
       const filter = {
         $and: [
-          { batchId },
+          batchId ? { batchId } : {},
           {
             $or: [
               { name: { $regex: search } },
@@ -136,12 +136,11 @@ module.exports = {
       const students = await studentModel
         .find(filter)
         .populate("collegeUserId", "_id collegeName collegeNo")
+        .populate("batchId", "_id batchName batchNumber")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       const count = await studentModel.countDocuments(filter);
-      // if (students.length) {
-      //   throw createError(404, "Students not found");
-      // }
+
       return { students, count };
     } catch (error) {
       throw error;
