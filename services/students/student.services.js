@@ -8,6 +8,7 @@ const { userServices } = require("..");
 module.exports = {
   createStudent: async (data) => {
     try {
+      
       const student = await studentModel.create(data);
       // const password = commonHelpers.generateRandomPassword();
 

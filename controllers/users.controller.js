@@ -7,6 +7,7 @@ module.exports = {
   userSignIn: async (req, res, next) => {
     try {
       const reqBody = req.body;
+      console.log("reqBody", reqBody);
       const email = reqBody.email;
       const password = reqBody.password;
 

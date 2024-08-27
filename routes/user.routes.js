@@ -100,7 +100,7 @@ router.post(
 
 router.post(
   "/students-bulk",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   handleExcelData,
   studentController.createBulkStudents
 );

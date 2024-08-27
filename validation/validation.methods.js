@@ -3,16 +3,15 @@ const Validate = (schema) => {
   return async (req, res, next) => {
     try {
       const requestData = req?.body;
-
+      console.log("requestData", requestData);
       if (isset(requestData)) {
-        // const data = requestData;
-        const data =
-          process.env.NODE_ENV === "development"
-            ? { data: JSON.parse(requestData.data) }
-            : { data: requestData };
+        const data = requestData;
+        // const data =
+        //   process.env.NODE_ENV === "development"
+        //     ? { data: JSON.parse(requestData.data) }
+        //     : { data: requestData };
 
-            
-        const result = await schema.validate(data.data);
+        const result = await schema.validate(data);
         if (result.error) {
           return res.status(200).json({
             status: false,
@@ -20,7 +19,7 @@ const Validate = (schema) => {
           });
         } else {
           // req.body = data;
-          req.body = data.data;
+          req.body = data;
           return next();
         }
       } else {

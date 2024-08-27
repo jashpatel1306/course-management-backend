@@ -1,6 +1,7 @@
 const studentServices = require("../services/students/student.services");
 const createError = require("http-errors");
 const excelHelper = require("../helpers/excel.helper");
+const batchesServices = require("../services/batches/batches.services");
 module.exports = {
   createStudent: async (req, res, next) => {
     try {
@@ -18,10 +19,18 @@ module.exports = {
   createBulkStudents: async (req, res, next) => {
     try {
       console.log("req.body", req.body);
+      const collegeId = req.body.college_id;
 
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
         req.body.map(async (student) => {
+          console.log("student.batchId", student.batchId);
+          const batchId = await batchesServices.getBatchByCollegeIdAndName(
+            collegeId,
+            student.batchId
+          );
+          console.log("batchId", batchId);
+          student.batchId = batchId._id;
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;
         })

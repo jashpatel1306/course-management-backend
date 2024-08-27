@@ -33,6 +33,21 @@ module.exports = {
       throw error;
     }
   },
+
+  getBatchByCollegeIdAndName: async (collegeId, batchName) => {
+    try {
+      
+      const batchId = await BatchModel.findOne(
+        { collegeId, batchName },
+        { _id: 1 }
+      );
+      console.log("batchId", batchId);
+      if (!batchId) createError.BadRequest("Invalid batch name .");
+      return batchId;
+    } catch (error) {
+      throw error;
+    }
+  },
   getAllBatches: async (search, pageNo, perPage) => {
     try {
       let filter = {};
