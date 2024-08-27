@@ -19,18 +19,13 @@ module.exports = {
   createBulkStudents: async (req, res, next) => {
     try {
       console.log("req.body", req.body);
-      const collegeId = req.body.college_id;
+      const batchId = req.body.batchId;
 
+      const studentsData = req.body.excelData;
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
-        req.body.map(async (student) => {
-          console.log("student.batchId", student.batchId);
-          const batchId = await batchesServices.getBatchByCollegeIdAndName(
-            collegeId,
-            student.batchId
-          );
-          console.log("batchId", batchId);
-          student.batchId = batchId._id;
+        studentsData.map(async (student) => {
+          student.batchId = batchId;
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;
         })
@@ -130,7 +125,7 @@ module.exports = {
       const searchText = new RegExp(search, `i`);
 
       const { students, count } = await studentServices.getBatchWiseStudents(
-        batchId === "all"?"":batchId,
+        batchId === "all" ? "" : batchId,
         searchText,
         perPage,
         pageNo

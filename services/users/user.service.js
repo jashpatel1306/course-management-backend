@@ -110,7 +110,9 @@ module.exports = {
       if (dbPassword !== password) {
         throw createError.Unauthorized("Invalid password.");
       }
+      console.log("user123", user);
       const collegeData = await collegesModel.findOne({ userId: user._id });
+      console.log("collegeData", collegeData);
       const userData = {
         user_id: user._id,
         role: user.role,

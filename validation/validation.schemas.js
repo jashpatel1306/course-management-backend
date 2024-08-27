@@ -78,6 +78,8 @@ module.exports = {
     gender: validate.reqString,
     semester: validate.reqNumber,
     active: validate.boolean,
+    colCode: validate.string,
+    colName: validate.string,
   }),
   batchWiseStudentsSchema: Joi.object().keys({
     batchId: validate.string,
@@ -94,5 +96,9 @@ module.exports = {
   departmentSchema: Joi.object().keys({
     departments: validate.array,
     userId: validate.id,
+  }),
+  bulkStudentSchema: Joi.object().keys({
+    batchId: validate.id,
+    excelFile: validate.object,
   }),
 };

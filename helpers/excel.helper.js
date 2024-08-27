@@ -46,7 +46,7 @@ module.exports.handleExcelData = async (req, res, next) => {
     }
 
     // Set the processed data in the request body
-    req.body = processedData;
+    req.body.excelData = processedData;
 
     // Call the next middleware function
     next();

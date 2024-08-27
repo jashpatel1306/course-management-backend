@@ -45,6 +45,7 @@ module.exports = {
   },
   isAdminCommonAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
+    console.log("token", token);
     token = token.toLowerCase().includes("bearer")
       ? token.split(" ")[1]
       : token;
@@ -60,6 +61,7 @@ module.exports = {
       }
 
       if (result && isset(result.user_id)) {
+        console.log("result", result);
         const getUserData = await userServices.findUserById(result.user_id);
         if (!getUserData)
           return res.json({
