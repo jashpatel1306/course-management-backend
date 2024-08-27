@@ -5,11 +5,11 @@ const Validate = (schema) => {
       const requestData = req?.body;
       console.log("requestData", requestData);
       if (isset(requestData)) {
-        const data = requestData;
-        // const data =
-        //   process.env.NODE_ENV === "development"
-        //     ? { data: JSON.parse(requestData.data) }
-        //     : { data: requestData };
+        // const data = requestData;
+        const data =
+          process.env.NODE_ENV === "development"
+            ? { data: JSON.parse(requestData.data) }
+            : { data: requestData };
 
         const result = await schema.validate(data);
         if (result.error) {
@@ -18,8 +18,8 @@ const Validate = (schema) => {
             message: result?.error?.details,
           });
         } else {
+          req.body = data.data;
           // req.body = data;
-          req.body = data;
           return next();
         }
       } else {
