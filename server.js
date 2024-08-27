@@ -32,7 +32,7 @@ app.all("/*", function (req, res, next) {
 });
 
 app.all("/", (req, res) => {
-  return res.status(200).send("Learning management system is running well.");
+  return res.status(200).send("Learning management system is running well. version : 1.0.0");
 });
 
 app.all("*", async (req, res) => {
