@@ -10,8 +10,9 @@ const Validate = (schema) => {
           process.env.NODE_ENV === "development"
             ? { data: JSON.parse(requestData.data) }
             : { data: requestData };
+        console.log("data", data.data);
 
-        const result = await schema.validate(data);
+        const result = await schema.validate(data.data);
         if (result.error) {
           return res.status(200).json({
             status: false,
