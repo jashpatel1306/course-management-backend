@@ -1,6 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const BatchModel = require("./batches.model");
 const createError = require("http-errors");
+const CollegeModel = require("../colleges/colleges.model");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -115,7 +116,14 @@ module.exports = {
           },
         },
       ]);
-      console.log("batches : ", collegeId, batches);
+      let allBatchesStudentsCount = await studentsModel.countDocuments({
+        collegeUserId: collegeId,
+      });
+      batches.unshift({
+        label: "All",
+        value: "all",
+        totalStudents: allBatchesStudentsCount,
+      });
       return batches;
     } catch (error) {
       throw error;
