@@ -118,7 +118,7 @@ module.exports = {
         },
       ]);
       let allBatchesStudentsCount = await studentsModel.countDocuments({
-        collegeUserId: collegeId,
+        collegeUserId: new ObjectId(collegeId),
       });
       batches.unshift({
         label: "All",
