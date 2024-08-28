@@ -126,6 +126,7 @@ module.exports = {
         },
         {
           $project: {
+            batchNumber: "$batchNumber",
             label: "$batchName", // Renaming field to 'label'
             value: "$_id", // Renaming field to 'value'
             totalStudents: { $size: "$studentsData" }, // Counting students in each batch

@@ -98,8 +98,8 @@ module.exports = {
     userId: validate.id,
   }),
   bulkStudentSchema: Joi.object().keys({
-    batchId: validate.id,
-    excelFile: validate.object,
+    batchId: validate.reqString,
+    // excelFile: validate.object,
   }),
   questionsSchema: Joi.object().keys({
     question: validate.reqString,

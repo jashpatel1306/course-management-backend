@@ -8,7 +8,6 @@ const { userServices } = require("..");
 module.exports = {
   createStudent: async (data) => {
     try {
-      
       const student = await studentModel.create(data);
       // const password = commonHelpers.generateRandomPassword();
 
@@ -119,11 +118,17 @@ module.exports = {
       throw createError(error);
     }
   },
-  getBatchWiseStudents: async (batchId, search, perPage, pageNo) => {
+  getBatchWiseStudents: async (
+    batchId,
+    search,
+    perPage,
+    pageNo,
+    collegeUserId
+  ) => {
     try {
       const filter = {
         $and: [
-          batchId ? { batchId } : {},
+          batchId ? { batchId } : collegeUserId ? { collegeUserId } : {},
           {
             $or: [
               { name: { $regex: search } },
