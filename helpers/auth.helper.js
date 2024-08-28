@@ -45,11 +45,9 @@ module.exports = {
   },
   isAdminCommonAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
-    console.log("token", token);
     token = token.toLowerCase().includes("bearer")
       ? token.split(" ")[1]
       : token;
-    console.log("token", token);
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       if (err) {
         console.log("err1", err);
@@ -61,7 +59,6 @@ module.exports = {
       }
 
       if (result && isset(result.user_id)) {
-        console.log("result", result);
         const getUserData = await userServices.findUserById(result.user_id);
         if (!getUserData)
           return res.json({
@@ -76,8 +73,12 @@ module.exports = {
             message: `Access to the target resource has been denied`,
             isAuth: false,
           });
-        req.body.user_id = result.user_id;
-        req.body.college_id = result.college_id;
+        req.body = {
+          ...req.body,
+          user_id: result.user_id,
+          college_id: result.college_id,
+        };
+
         return next();
       }
       return res.json({

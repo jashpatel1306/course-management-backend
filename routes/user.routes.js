@@ -133,6 +133,7 @@ router.put(
 router.post(
   "/batch-wise-students",
   Validate(schemas.batchWiseStudentsSchema),
+  isAdminCommonAuthenticate,
   studentController.getAllStudentsBatchWise
 );
 
