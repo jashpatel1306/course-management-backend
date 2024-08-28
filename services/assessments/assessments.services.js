@@ -27,13 +27,26 @@ module.exports = {
   getAssessmentById: async (id) => {
     try {
       const assessment = await AssessmentsModel.aggregate([
-        { $match: { _id: mongoose.Types.ObjectId(id) } },
+        { $match: { _id: new mongoose.Types.ObjectId(id) } },
         {
           $lookup: {
             from: "quizzes", // Collection name for quizzes
             localField: "contents.id",
             foreignField: "_id",
             as: "quizData",
+            pipeline: [
+              { $match: { active: true } },
+              {
+                $project: {
+                  title: 1,
+                  _id: 1,
+                  description: 1,
+                  totalMarks: 1,
+                  questions: 1,
+                  active: 1,
+                },
+              },
+            ],
           },
         },
         {
@@ -89,7 +102,20 @@ module.exports = {
             },
           },
         },
-        { $project: { quizData: 0, exerciseData: 0 } }, // Remove lookup arrays from the result
+
+        {
+          $project: {
+            title: 1,
+            expiresAt: 1,
+            content: {
+              $filter: {
+                input: "$contents",
+                as: "content",
+                cond: { $eq: ["$$content.data.active", true] },
+              },
+            },
+          },
+        }, // Remove lookup arrays from the result
       ]);
 
       if (!assessment || assessment.length === 0)

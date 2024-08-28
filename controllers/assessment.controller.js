@@ -81,10 +81,10 @@ module.exports = {
 
   getAssessmentsByBatch: async (req, res, next) => {
     try {
-      const { batchId, pageNo, perPage, status } = req.body;
-
+      const { pageNo, perPage, status } = req.body;
+      const batchId = req.params.batchId;
       const filter = {
-        batchId: { $eq: mongoose.Types.ObjectId(batchId) },
+        batches: { $elemMatch: { $eq: new mongoose.Types.ObjectId(batchId) } },
       };
 
       if (status === "active") {

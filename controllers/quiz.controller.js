@@ -74,10 +74,10 @@ module.exports = {
 
   getQuizzesByAssessment: async (req, res, next) => {
     try {
-      const { assessmentId, pageNo, perPage, status } = req.body;
-
+      const { pageNo, perPage, status } = req.body;
+      const assessmentId = req.params.assessmentId;
       const filter = {
-        assessmentId: { $eq: mongoose.Types.ObjectId(assessmentId) },
+        assessmentId: { $eq: new mongoose.Types.ObjectId(assessmentId) },
       };
 
       if (status === "active") {
@@ -106,4 +106,3 @@ module.exports = {
     }
   },
 };
-

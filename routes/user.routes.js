@@ -220,14 +220,15 @@ router.put(
 
 router.get("/quiz/:id", isAdminCommonAuthenticate, quizController.getQuizById);
 
-router.get(
-  "/quizzes/:assessmentId",
+router.post(
+  "/get-quizzes/:assessmentId",
+  Validate(schemas.paginationAndFilterSchema),
   isAdminCommonAuthenticate,
   quizController.getQuizzesByAssessment
 );
 
 router.put(
-  "/quiz/:status",
+  "/quiz/status/:id",
   isAdminCommonAuthenticate,
   quizController.changeActiveStatusQuiz
 );
@@ -260,14 +261,15 @@ router.get(
   assessmentController.getAssessmentById
 );
 
-router.get(
-  "/assessments/:batchId",
+router.post(
+  "/get-assessments/:batchId",
+  Validate(schemas.paginationAndFilterSchema),
   isAdminCommonAuthenticate,
   assessmentController.getAssessmentsByBatch
 );
 
 router.put(
-  "/assessment/:status",
+  "/assessment/status/:id",
   isAdminCommonAuthenticate,
   assessmentController.changeActiveStatus
 );

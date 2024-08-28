@@ -22,16 +22,21 @@ module.exports = {
             localField: "questions", // Field in QuizzesModel that holds question IDs
             foreignField: "_id",
             as: "questionsData",
-            // pipeline: [
-            //   { $match: { active: true } }, // Only include active questions
-            // ],
+            pipeline: [
+              { $match: { active: true } }, // Only include active questions
+            ],
           },
         },
         {
           $project: {
             // Include other fields of quiz as necessary
             title: 1,
+            description: 1,
+            active: 1,
             questionsData: 1,
+            totalMarks: 1,
+            assessmentId: 1,
+            createdAt: 1,
             // other fields...
           },
         },
@@ -75,9 +80,11 @@ module.exports = {
       const quizzes = await QuizzesModel.find(filter)
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
-
       if (!quizzes) throw createError(500, "Error while Fetching quizzes.");
-      return quizzes;
+
+      const count = await QuizzesModel.countDocuments(filter);
+
+      return { quizzes, count };
     } catch (error) {
       throw createError.InternalServerError(error);
     }
@@ -85,11 +92,11 @@ module.exports = {
 
   toggleActiveStatus: async (id, active) => {
     try {
-      const quiz = await QuizzesModel.findOneAndUpdate(
-        { _id: id },
-        { active: active }
-      );
+      const quiz = await QuizzesModel.findOne({ _id: id });
       if (!quiz) throw createError(400, "invalid quiz id");
+
+      quiz.active = !quiz.active;
+      await quiz.save();
       return quiz;
     } catch (error) {
       throw createError.InternalServerError(error);
