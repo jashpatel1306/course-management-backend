@@ -1,4 +1,4 @@
-const isset = require(isset);
+const isset = require("isset");
 const Validate = (schema) => {
   return async (req, res, next) => {
     try {

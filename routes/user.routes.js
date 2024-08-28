@@ -55,14 +55,14 @@ module.exports = router;
 router.post(
   "/batch",
   Validate(schemas.batchSchema),
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   batchesController.createBatch
 );
 
 router.put(
   "/batch/:id",
   Validate(schemas.batchSchema),
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   batchesController.updateBatch
 );
 
@@ -79,13 +79,13 @@ router.get(
 
 router.get(
   "/batch/:id",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   batchesController.getBatchById
 );
 
 router.put(
   "/batch/active/:id",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   batchesController.activeStatusChange
 );
 
@@ -94,7 +94,7 @@ router.put(
 router.post(
   "/student",
   Validate(schemas.studentSchema),
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   studentController.createStudent
 );
 
@@ -107,26 +107,26 @@ router.post(
 );
 router.get(
   "/students/all",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   studentController.getAllStudents
 );
 
 router.get(
   "/student/:id",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   studentController.getStudentById
 );
 
 router.put(
   "/student/:id",
   Validate(schemas.studentSchema),
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   studentController.updateStudent
 );
 
 router.put(
   "/student/status/:id",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   studentController.activeStatusChange
 );
 
