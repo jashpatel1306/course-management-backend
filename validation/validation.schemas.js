@@ -101,4 +101,39 @@ module.exports = {
     batchId: validate.id,
     excelFile: validate.object,
   }),
+  questionsSchema: Joi.object().keys({
+    question: validate.reqString,
+    answers: validate.array.items(
+      validate.object.keys({
+        content: validate.reqString,
+        correct: validate.boolean,
+        reason: validate.string,
+      })
+    ),
+    marks: validate.reqNumber,
+    quizId: validate.id,
+  }),
+
+  quizSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.reqString,
+    totalMarks: validate.reqNumber,
+    questions: validate.array,
+    assessmentId: validate.id,
+  }),
+
+  assessmentSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.reqString,
+    totalMarks: validate.reqNumber,
+    expiresAt: validate.reqDate,
+    batches: validate.array,
+
+  }),
+
+  paginationAndFilterSchema: Joi.object().keys({
+    perPage: validate.reqNumber,
+    pageNo: validate.reqNumber,
+    status: validate.string,
+  }),
 };

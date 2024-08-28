@@ -13,6 +13,9 @@ const batchesController = require("../controllers/batches.controller");
 const studentController = require("../controllers/student.controller");
 const departmentController = require("../controllers/department.controller");
 const { handleExcelData } = require("../helpers/excel.helper");
+const questionController = require("../controllers/question.controller");
+const quizController = require("../controllers/quiz.controller");
+const assessmentController = require("../controllers/assessment.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -156,6 +159,122 @@ router.put(
   "/department/:id",
   Validate(schemas.departmentSchema),
   departmentController.updateDepartment
+);
+
+//------------------------------- questions ---------------------------------//
+router.post(
+  "/question",
+  Validate(schemas.questionsSchema),
+  isAdminCommonAuthenticate,
+  questionController.createQuestion
+);
+
+router.put(
+  "/question/:id",
+  Validate(schemas.questionsSchema),
+  isAdminCommonAuthenticate,
+  questionController.updateQuestion
+);
+
+router.get(
+  "/question/:id",
+  isAdminCommonAuthenticate,
+  questionController.getQuestionById
+);
+
+router.post(
+  "/get-questions/:quizId",
+  Validate(schemas.paginationAndFilterSchema),
+  isAdminCommonAuthenticate,
+  questionController.getQuestionsByQuiz
+);
+
+router.put(
+  "/question-status/:id",
+  isAdminCommonAuthenticate,
+  questionController.changeActiveStatus
+);
+
+router.delete(
+  "/question/:id",
+  isAdminCommonAuthenticate,
+  questionController.deleteQuestion
+);
+
+//------------------------------ quiz ---------------------------------//
+
+router.post(
+  "/quiz",
+  Validate(schemas.quizSchema),
+  isAdminCommonAuthenticate,
+  quizController.createQuiz
+);
+
+router.put(
+  "/quiz/:id",
+  Validate(schemas.quizSchema),
+  isAdminCommonAuthenticate,
+  quizController.updateQuiz
+);
+
+router.get("/quiz/:id", isAdminCommonAuthenticate, quizController.getQuizById);
+
+router.get(
+  "/quizzes/:assessmentId",
+  isAdminCommonAuthenticate,
+  quizController.getQuizzesByAssessment
+);
+
+router.put(
+  "/quiz/:status",
+  isAdminCommonAuthenticate,
+  quizController.changeActiveStatusQuiz
+);
+
+router.delete(
+  "/quiz/:id",
+  isAdminCommonAuthenticate,
+  quizController.deleteQuiz
+);
+
+//------------------------------- assessments ---------------------------------//
+
+router.post(
+  "/assessment",
+  Validate(schemas.assessmentSchema),
+  isAdminCommonAuthenticate,
+  assessmentController.createAssessment
+);
+
+router.put(
+  "/assessment/:id",
+  Validate(schemas.assessmentSchema),
+  isAdminCommonAuthenticate,
+  assessmentController.updateAssessment
+);
+
+router.get(
+  "/assessment/:id",
+  isAdminCommonAuthenticate,
+  assessmentController.getAssessmentById
+);
+
+router.get(
+  "/assessments/:batchId",
+  isAdminCommonAuthenticate,
+  assessmentController.getAssessmentsByBatch
+);
+
+router.put(
+  "/assessment/:status",
+  isAdminCommonAuthenticate,
+  assessmentController.changeActiveStatus
+);
+
+router.delete(
+  "/assessment/:id",
+  isAdminCommonAuthenticate,
+  assessmentController.deleteAssessment
 );
 
 module.exports = router;

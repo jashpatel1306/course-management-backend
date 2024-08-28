@@ -75,4 +75,17 @@ module.exports = {
       next(error);
     }
   },
+  inactivateCollege: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const college = await collegeServices.activeStatusChange(id);
+      res.status(200).json({
+        success: true,
+        message: "college inactivated successfully",
+        data: college,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

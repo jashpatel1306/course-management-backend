@@ -2,7 +2,7 @@ const CollegeModel = require("./colleges.model");
 const createError = require("http-errors");
 const userServices = require("../users/user.service");
 module.exports = {
-  createCollege: async (data) => {
+    createCollege: async (data) => {
     try {
       const { email, password, ...collegeData } = data;
       const userData = {
