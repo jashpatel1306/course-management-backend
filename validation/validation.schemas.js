@@ -121,14 +121,21 @@ module.exports = {
     questions: validate.array,
     assessmentId: validate.id,
   }),
-
+  createQuizSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.string,
+    assessmentId: validate.id,
+  }),
+  createAssessmentSchema: Joi.object().keys({
+    title: validate.reqString,
+    expiresAt: validate.reqDate,
+  }),
   assessmentSchema: Joi.object().keys({
     title: validate.reqString,
     description: validate.reqString,
     totalMarks: validate.reqNumber,
     expiresAt: validate.reqDate,
     batches: validate.array,
-
   }),
 
   paginationAndFilterSchema: Joi.object().keys({

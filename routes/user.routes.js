@@ -206,7 +206,7 @@ router.delete(
 
 router.post(
   "/quiz",
-  Validate(schemas.quizSchema),
+  Validate(schemas.createQuizSchema),
   isAdminCommonAuthenticate,
   quizController.createQuiz
 );
@@ -243,7 +243,7 @@ router.delete(
 
 router.post(
   "/assessment",
-  Validate(schemas.assessmentSchema),
+  Validate(schemas.createAssessmentSchema),
   isAdminCommonAuthenticate,
   assessmentController.createAssessment
 );
