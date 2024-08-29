@@ -20,13 +20,22 @@ module.exports = {
   createBulkStudents: async (req, res, next) => {
     try {
       const batchId = req.body.batchId;
-
+      const collegeId = req.body.user_id;
       const studentsData = req.body.excelData;
+
+      console.log(
+        "batchId",
+        "collegeId",
+        "studentData",
+        batchId,
+        collegeId,
+        studentsData
+      );
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
         studentsData.map(async (student) => {
           student.batchId = batchId;
-          const collegeId = await collegeServices.getCollegeId();
+          student.collegeUserId = collegeId;
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;
         })
