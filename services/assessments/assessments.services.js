@@ -1,6 +1,8 @@
 const AssessmentsModel = require("./assessments.model");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
+
 const { toggleActive } = require("../quizzes/quizzes.services");
 module.exports = {
   createAssessment: async (data) => {
@@ -27,7 +29,7 @@ module.exports = {
   getAssessmentById: async (id) => {
     try {
       const assessment = await AssessmentsModel.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
+        { $match: { _id: new ObjectId(id) } },
         {
           $lookup: {
             from: "quizzes", // Collection name for quizzes
