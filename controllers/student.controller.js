@@ -2,6 +2,7 @@ const studentServices = require("../services/students/student.services");
 const createError = require("http-errors");
 const excelHelper = require("../helpers/excel.helper");
 const batchesServices = require("../services/batches/batches.services");
+const collegeServices = require("../services/colleges/colleges.service");
 module.exports = {
   createStudent: async (req, res, next) => {
     try {
@@ -25,6 +26,7 @@ module.exports = {
       const studentData = await Promise.all(
         studentsData.map(async (student) => {
           student.batchId = batchId;
+          const collegeId = await collegeServices.getCollegeId();
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;
         })
@@ -114,19 +116,20 @@ module.exports = {
   },
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
-      console.log("getAllStudentsBatchWise yreq.body :",req.body)
+      console.log("getAllStudentsBatchWise yreq.body :", req.body);
       const batchId = req.body.batchId;
       const perPage = req.body.perPage;
       const pageNo = req.body.pageNo;
       const search = req.body.search;
-      const college_id = req.body.college_id
+      const college_id = req.body.college_id;
       const searchText = new RegExp(search, `i`);
 
       const { students, count } = await studentServices.getBatchWiseStudents(
         batchId === "all" ? "" : batchId,
         searchText,
         perPage,
-        pageNo,college_id
+        pageNo,
+        college_id
       );
       res.send({
         success: true,

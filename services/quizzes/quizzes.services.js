@@ -28,12 +28,39 @@ module.exports = {
           },
         },
         {
+          $addFields: {
+            questions: {
+              $filter: {
+                input: {
+                  $map: {
+                    input: "$questions",
+                    as: "questionId",
+                    in: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: "$questionsData",
+                            as: "question",
+                            cond: { $eq: ["$$question._id", "$$questionId"] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                },
+                as: "question",
+                cond: { $ne: ["$$question", null] }, // Filter out null values
+              },
+            },
+          },
+        },
+        {
           $project: {
-            // Include other fields of quiz as necessary
             title: 1,
             description: 1,
             active: 1,
-            questionsData: 1,
+            questions: 1, // Include the filtered and reordered questions array
             totalMarks: 1,
             assessmentId: 1,
             createdAt: 1,

@@ -2,7 +2,7 @@ const CollegeModel = require("./colleges.model");
 const createError = require("http-errors");
 const userServices = require("../users/user.service");
 module.exports = {
-    createCollege: async (data) => {
+  createCollege: async (data) => {
     try {
       const { email, password, ...collegeData } = data;
       const userData = {
@@ -26,6 +26,18 @@ module.exports = {
       );
       const college = await CollegeModel.findOne({ userId: userResult._id });
       return college;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getCollegeId: async (code,name) => {
+    try {
+      const college = await CollegeModel.findOne({collegeName: name,collegeId: code});
+      if (!college) {
+        throw createError(404, "College not found");
+      }
+      return college._id;
     } catch (error) {
       throw error;
     }

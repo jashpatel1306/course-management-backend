@@ -34,19 +34,7 @@ module.exports = {
             localField: "contents.id",
             foreignField: "_id",
             as: "quizData",
-            pipeline: [
-              { $match: { active: true } },
-              {
-                $project: {
-                  title: 1,
-                  _id: 1,
-                  description: 1,
-                  totalMarks: 1,
-                  questions: 1,
-                  active: 1,
-                },
-              },
-            ],
+            pipeline: [{ $match: { active: true } }],
           },
         },
         {
