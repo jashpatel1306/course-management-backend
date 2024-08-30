@@ -100,7 +100,7 @@ studentSchema.pre("save", async function (next) {
   const subject = "Password for Learning management system";
   const body = `Your Password for Learning management system is ${password}`;
 
-  // sendMailWithServices(to, subject, body);
+  sendMailWithServices(to, subject, body);
   next();
 });
 

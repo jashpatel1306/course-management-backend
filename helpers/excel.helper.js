@@ -4,9 +4,7 @@ var XLSX = require("xlsx");
 // callback function for parsing data from file
 function handleWorkbook(workbook) {
   const sheetNames = workbook.SheetNames;
-  console.log("Sheet Names:", sheetNames);
-  const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"]);
-  console.log("Sheet Data:", sheetData);
+  const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetNames[0]]);
   if (!sheetData) return false;
   return sheetData;
 }

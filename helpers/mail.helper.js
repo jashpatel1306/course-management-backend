@@ -92,7 +92,7 @@ const sendMailWithResend = async (to, subject, body) => {
   return new Promise(async (resolve) => {
     try {
       const mailOptions = {
-        from: `${process.env.RESEND_EMAIL_AUTH_USER}`,
+        from: `LMS <${process.env.RESEND_EMAIL_AUTH_USER}>`,
         to: to,
         subject: subject,
         html: body,
