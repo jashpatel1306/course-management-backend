@@ -2,11 +2,13 @@ const userModel = require("./user.model");
 const collegesModel = require("../colleges/colleges.model");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { SUPERADMIN } = require("../../constants/roles.constant");
+const { SUPERADMIN, STUDENT } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
+const batchesModel = require("../batches/batches.model");
+const studentsModel = require("../students/students.model");
 
 module.exports = {
   getUserByEmail: async function (email) {
@@ -110,21 +112,30 @@ module.exports = {
       if (dbPassword !== password) {
         throw createError.Unauthorized("Invalid password.");
       }
-      console.log("user123", user);
       const collegeData = await collegesModel.findOne({ userId: user._id });
-      console.log("collegeData", collegeData);
+      let collegeId = collegeData?._id ? collegeData?._id : null;
+      let batchId = null;
+      if (!collegeId && user.role === STUDENT) {
+        const studentData = await studentsModel.findOne({ userId: user._id });
+        batchId = studentData?.batchId ? studentData?.batchId : null;
+        const batchData = await batchesModel.findOne({ _id: batchId });
+        collegeId = batchData?.collegeId ? batchData?.collegeId : null;
+      }
+
       const userData = {
         user_id: user._id,
         role: user.role,
         email: user.email,
         permissions: user.permissions,
-        college_id: collegeData?._id,
+        college_id: collegeId,
+        batch_id: batchId,
       };
-      const collegeId = collegeData?._id ? collegeData?._id : null;
+      console.log("userData: ", userData);
+      // const collegeId = collegeData?._id ? collegeData?._id : null;
       const accessToken = jwt.sign(userData, JWTSecretKey, {
         expiresIn: 86400,
       });
-      return { accessToken, user, collegeId };
+      return { accessToken, user, collegeId, batchId };
     } catch (error) {
       throw error;
     }

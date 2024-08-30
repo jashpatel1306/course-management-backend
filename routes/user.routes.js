@@ -213,7 +213,7 @@ router.post(
 
 router.put(
   "/quiz/:id",
-  Validate(schemas.quizSchema),
+  Validate(schemas.updateQuizSchema),
   isAdminCommonAuthenticate,
   quizController.updateQuiz
 );
@@ -261,12 +261,19 @@ router.get(
   assessmentController.getAssessmentById
 );
 
+// router.post(
+//   "/get-assessments/:batchId",
+//   Validate(schemas.paginationAndFilterSchema),
+//   isAdminCommonAuthenticate,
+//   assessmentController.getAssessmentsByBatch
+// );
 router.post(
-  "/get-assessments/:batchId",
+  "/get-all-assessments",
   Validate(schemas.paginationAndFilterSchema),
   isAdminCommonAuthenticate,
   assessmentController.getAssessmentsByBatch
 );
+
 
 router.put(
   "/assessment/status/:id",

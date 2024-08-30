@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.urlencoded({ limit: `50mb`, extended: true }));
 app.use(bodyParser.json({ limit: `15mb` }));
 
-require("./config/mongodb.js");
+require("./config/mongodb");
 router.userAPI(app);
 
 app.all("/*", function (req, res, next) {

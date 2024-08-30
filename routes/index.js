@@ -1,10 +1,10 @@
 const admin = require("./admin.routes");
 const user = require("./user.routes");
-// const common = require("./common.routes");
+const student = require("./student.routes");
 module.exports = {
   userAPI: (app) => {
     app.use("/admin", admin);
     app.use("/user", user);
-    // app.use("/common", common);
+    app.use("/student", student);
   },
 };

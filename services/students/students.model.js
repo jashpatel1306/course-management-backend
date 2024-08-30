@@ -72,7 +72,6 @@ const studentSchema = new mongoose.Schema(
 );
 
 studentSchema.pre("save", async function (next) {
-  console.log("creating hook");
   // const password = commonHelpers.generateRandomPassword();
   const password = "Admin@123";
 

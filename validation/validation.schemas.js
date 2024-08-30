@@ -8,11 +8,11 @@ module.exports = {
   }),
 
   queryIdSchema: Joi.object().keys({
-    id: validate.id,
+    id: validate.reqId,
   }),
 
   activeInactiveSchema: Joi.object().keys({
-    id: validate.id,
+    id: validate.reqId,
     status: validate.reqBoolean,
   }),
 
@@ -70,8 +70,8 @@ module.exports = {
     email: validate.reqEmail,
     phone: validate.reqString,
     rollNo: validate.reqString,
-    collegeUserId: validate.id,
-    batchId: validate.id,
+    collegeUserId: validate.reqId,
+    batchId: validate.reqId,
     department: validate.reqString,
     section: validate.reqString,
     passoutYear: validate.reqNumber,
@@ -95,7 +95,7 @@ module.exports = {
   }),
   departmentSchema: Joi.object().keys({
     departments: validate.array,
-    userId: validate.id,
+    userId: validate.reqId,
   }),
   bulkStudentSchema: Joi.object().keys({
     batchId: validate.reqString,
@@ -111,28 +111,36 @@ module.exports = {
       })
     ),
     marks: validate.reqNumber,
-    quizId: validate.id,
+    quizId: validate.reqId,
   }),
 
   quizSchema: Joi.object().keys({
     title: validate.reqString,
-    description: validate.reqString,
+    description: validate.string,
     totalMarks: validate.reqNumber,
     questions: validate.array,
-    assessmentId: validate.id,
+    assessmentId: validate.reqId,
+  }),
+  updateQuizSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.string,
+    totalMarks: validate.reqNumber,
+    questions: validate.array,
   }),
   createQuizSchema: Joi.object().keys({
     title: validate.reqString,
     description: validate.string,
-    assessmentId: validate.id,
+    assessmentId: validate.reqId,
+    quizId: validate.id,
   }),
   createAssessmentSchema: Joi.object().keys({
     title: validate.reqString,
     expiresAt: validate.reqDate,
   }),
   assessmentSchema: Joi.object().keys({
+    assessmentId: validate.id,
     title: validate.reqString,
-    description: validate.reqString,
+    description: validate.string,
     totalMarks: validate.reqNumber,
     expiresAt: validate.reqDate,
     batches: validate.array,
@@ -142,5 +150,7 @@ module.exports = {
     perPage: validate.reqNumber,
     pageNo: validate.reqNumber,
     status: validate.string,
+    search: validate.string,
+    batchId: validate.string,
   }),
 };

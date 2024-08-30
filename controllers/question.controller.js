@@ -1,6 +1,7 @@
 const questionServices = require("../services/questions/questions.services");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const quizzesServices = require("../services/quizzes/quizzes.services");
 module.exports = {
   createQuestion: async (req, res, next) => {
     try {
@@ -83,7 +84,7 @@ module.exports = {
       const filter = {
         quizId: { $eq: new mongoose.Types.ObjectId(quizId) },
       };
-
+      const quizData = await quizzesServices.getQuizById(quizId);
       if (status === "active") {
         filter.active = true;
       } else if (status === "inactive") {
@@ -96,8 +97,9 @@ module.exports = {
       );
       return res.status(200).send({
         success: true,
-        message: "Questions fetched successfully",
-        data: result,
+        message: "Questions fetched successfullys",
+        data: quizData.questions,
+        quizData: quizData.questions,
         pagination: {
           total: count,
           perPage,

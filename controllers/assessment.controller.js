@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {
+      req.body = { ...req.body, collegeId: req.body.college_id };
       const assessment = await assessmentServices.createAssessment(req.body);
       return res.status(201).send({
         success: true,
@@ -81,17 +82,72 @@ module.exports = {
 
   getAssessmentsByBatch: async (req, res, next) => {
     try {
-      const { pageNo, perPage, status } = req.body;
-      const batchId = req.params.batchId;
-      const filter = {
-        batches: { $elemMatch: { $eq: new mongoose.Types.ObjectId(batchId) } },
-      };
+      const { pageNo, perPage, search, batchId } = req.body;
 
-      if (status === "active") {
-        filter.active = true;
-      } else if (status === "inactive") {
-        filter.active = false;
+      const college_id = req.body.college_id;
+      const searchText = new RegExp(search, `i`);
+      let filter =
+        batchId !== "all"
+          ? {
+              batches: batchId,
+            }
+          : {};
+      console.log("batchId: ", search, batchId);
+
+      if (search) {
+        filter = {
+          $and: [
+            filter,
+            {
+              $or: [{ title: { $regex: searchText } }],
+            },
+          ],
+        };
       }
+      console.log("filter: ", filter);
+      const { assessments, count } =
+        await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
+      return res.status(200).send({
+        success: true,
+        message: "Assessments fetched successfully",
+        data: assessments,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAssessmentsByStudentId: async (req, res, next) => {
+    try {
+      const { pageNo, perPage, search } = req.body;
+
+      const college_id = req.body.college_id;
+      const batch_id = req.body.batch_id;
+      const searchText = new RegExp(search, `i`);
+      let filter =
+        batch_id !== "all"
+          ? {
+              batches: batch_id,
+            }
+          : {};
+      console.log("search: ", search);
+
+      if (search) {
+        filter = {
+          $and: [
+            filter,
+            {
+              $or: [{ title: { $regex: searchText } }],
+            },
+          ],
+        };
+      }
+      console.log("filter: ", filter);
       const { assessments, count } =
         await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
       return res.status(200).send({

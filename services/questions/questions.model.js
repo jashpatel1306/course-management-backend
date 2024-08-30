@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const QuestionSchema = new mongoose.Schema(
   {
     question: {
@@ -37,15 +36,18 @@ const QuestionSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-
-QuestionSchema.post("save", async function(question) {
+QuestionSchema.post("save", async function (question) {
   const { quizId } = question;
   try {
-    const quiz = await mongoose.model("quizzes").findOneAndUpdate(
-      { _id: quizId },
-      { $push: { questions: question._id } },
-      { new: true }
-    );
+    const quiz = await mongoose
+      .model("quizzes")
+      .findOneAndUpdate(
+        { _id: quizId },
+        { $push: { questions: question._id } },
+        { new: true }
+      );
+
+    handlePostTotalMarkOperation(question);
     if (!quiz) {
       throw new Error("Quiz not found");
     }
@@ -53,6 +55,57 @@ QuestionSchema.post("save", async function(question) {
     console.log(`Error updating quiz with new question: ${error.message}`);
   }
 });
+QuestionSchema.post("findOneAndDelete", async function (question) {
+  if (!question) return;
 
+  const { quizId } = question;
+  try {
+    const quiz = await mongoose
+      .model("quizzes")
+      .findOneAndUpdate(
+        { _id: quizId },
+        { $pull: { questions: question._id } },
+        { new: true }
+      );
+    handlePostTotalMarkOperation(question);
+    if (!quiz) {
+      throw new Error("Quiz not found");
+    }
+  } catch (error) {
+    console.log(`Error updating quiz by removing question: ${error.message}`);
+  }
+});
+QuestionSchema.post("findOneAndUpdate", async function (question) {
+  if (question) handlePostTotalMarkOperation(question);
+});
+const handlePostTotalMarkOperation = async function (question) {
+  const { quizId } = question;
+  try {
+    const quizData = await mongoose.model("questions").aggregate([
+      {
+        $match: {
+          quizId: new mongoose.Types.ObjectId(quizId),
+        },
+      },
+      {
+        $group: {
+          _id: "$quizId",
+          totalMarks: { $sum: "$marks" },
+        },
+      },
+    ]);
+    const quiz = await mongoose
+      .model("quizzes")
+      .findOneAndUpdate(
+        { _id: quizId },
+        { totalMarks: quizData[0].totalMarks }
+      );
+    if (!quiz) {
+      throw new Error("Quiz not found");
+    }
+  } catch (error) {
+    console.log(`Error updating quiz with new question: ${error.message}`);
+  }
+};
 const QuestionsModel = mongoose.model("questions", QuestionSchema);
 module.exports = QuestionsModel;

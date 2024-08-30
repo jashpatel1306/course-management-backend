@@ -23,14 +23,7 @@ module.exports = {
       const collegeId = req.body.user_id;
       const studentsData = req.body.excelData;
 
-      console.log(
-        "batchId",
-        "collegeId",
-        "studentData",
-        batchId,
-        collegeId,
-        studentsData
-      );
+      
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
         studentsData.map(async (student) => {
@@ -125,7 +118,6 @@ module.exports = {
   },
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
-      console.log("getAllStudentsBatchWise yreq.body :", req.body);
       const batchId = req.body.batchId;
       const perPage = req.body.perPage;
       const pageNo = req.body.pageNo;

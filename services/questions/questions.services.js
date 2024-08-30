@@ -28,7 +28,7 @@ module.exports = {
         .find(filter)
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
-
+       
       if (!result) throw createError(500, "Error while fetching questions");
       const count = await questionsModel.countDocuments(filter);
       return { result, count };

@@ -43,7 +43,6 @@ module.exports = {
         { collegeId, batchName },
         { _id: 1 }
       );
-      console.log("batchId", batchId);
       if (!batchId) createError.BadRequest("Invalid batch name .");
       return batchId;
     } catch (error) {
@@ -137,7 +136,7 @@ module.exports = {
         collegeUserId: new ObjectId(collegeId),
       });
       batches.unshift({
-        label: "All",
+        label: "All Batches",
         value: "all",
         totalStudents: allBatchesStudentsCount,
       });

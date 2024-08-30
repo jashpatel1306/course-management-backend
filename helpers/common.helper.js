@@ -22,8 +22,6 @@ function generateRandomPassword() {
   return password;
 }
 
-console.log(generateRandomPassword());
-
 module.exports = {
   generateRandomOTP,
   generateRandomPassword,

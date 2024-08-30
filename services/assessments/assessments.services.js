@@ -96,6 +96,8 @@ module.exports = {
         {
           $project: {
             title: 1,
+            totalMarks: 1,
+            totalQuestions: 1,
             expiresAt: 1,
             content: {
               $filter: {
@@ -145,10 +147,7 @@ module.exports = {
 
   getAssessmentsByBatch: async (filter, perPage, pageNo) => {
     try {
-      // {
-      //   batchIds: { $elemMatch: { $eq: batchId } },
-      // }
-
+      console.log("filter: ",filter)
       const assessments = await AssessmentsModel.find(filter)
         .skip((pageNo - 1) * perPage)
         .limit(perPage);

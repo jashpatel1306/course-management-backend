@@ -4,7 +4,12 @@ const mongoose = require("mongoose");
 module.exports = {
   createQuiz: async (data) => {
     try {
-      const quiz = await QuizzesModel.create(data);
+      let quiz;
+      if (data.quizId) {
+        quiz = await QuizzesModel.findOneAndUpdate({ _id: data.quizId }, data);
+      } else {
+        quiz = await QuizzesModel.create(data);
+      }
       if (!quiz) throw createError(500, "Error while creating quiz");
       return quiz;
     } catch (error) {
@@ -14,64 +19,46 @@ module.exports = {
 
   getQuizById: async (id) => {
     try {
-      const quiz = await QuizzesModel.aggregate([
-        { $match: { _id: new mongoose.Types.ObjectId(id) } },
-        {
-          $lookup: {
-            from: "questions", // Assuming 'questions' is the collection name
-            localField: "questions", // Field in QuizzesModel that holds question IDs
-            foreignField: "_id",
-            as: "questionsData",
-            pipeline: [
-              { $match: { active: true } }, // Only include active questions
-            ],
-          },
-        },
-        {
-          $addFields: {
-            questions: {
-              $filter: {
-                input: {
-                  $map: {
-                    input: "$questions",
-                    as: "questionId",
-                    in: {
-                      $arrayElemAt: [
-                        {
-                          $filter: {
-                            input: "$questionsData",
-                            as: "question",
-                            cond: { $eq: ["$$question._id", "$$questionId"] },
-                          },
-                        },
-                        0,
-                      ],
-                    },
-                  },
-                },
-                as: "question",
-                cond: { $ne: ["$$question", null] }, // Filter out null values
-              },
-            },
-          },
-        },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            active: 1,
-            questions: 1, // Include the filtered and reordered questions array
-            totalMarks: 1,
-            assessmentId: 1,
-            createdAt: 1,
-            // other fields...
-          },
-        },
-      ]);
+      // Fetch the quiz and populate questions
+      const quiz = await QuizzesModel.findById(id)
+        .populate({
+          path: "questions",
+          match: { active: true }, // Optional: Filter to include only active questions
+        })
+        .exec();
 
-      if (!quiz || quiz.length === 0) throw createError(400, "Invalid quiz id");
+      if (!quiz) throw new Error("Quiz not found");
 
-      return quiz[0]; // Since aggregate returns an array
+      // Reorder questions to match the original order
+      // const orderedQuestions = quiz.questions.map((qId) => {
+      //   return quiz.questions.find((question) => question._id.equals(qId));
+      // });
+
+      // Return the quiz with ordered questions
+      return {
+        ...quiz.toObject(),
+        // questions: orderedQuestions,
+      };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+  getQuizQuestionsById: async (id) => {
+    try {
+      // Fetch the quiz and populate questions
+      const quiz = await QuizzesModel.findById(id)
+        .populate({
+          path: "questions",
+          match: { active: true }, // Optional: Filter to include only active questions
+        })
+        .exec();
+
+      if (!quiz) throw new Error("Quiz not found");
+
+     
+
+      // Return the quiz with ordered questions
+      return quiz;
     } catch (error) {
       throw createError.InternalServerError(error);
     }
