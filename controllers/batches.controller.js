@@ -49,9 +49,9 @@ module.exports = {
   },
   getBatchesOption: async (req, res, next) => {
     try {
-      college_id = req.body.college_id;
-    
-      const batches = await batchServices.getKeyValueBatches(college_id);
+      const batches = req.params?.collegeId
+        ? await batchServices.getKeyValueBatches(req.params?.collegeId, 1)
+        : await batchServices.getKeyValueBatches(req.body?.college_id, 0);
       res.status(200).send({
         success: true,
         message: "batches fetched successfully",

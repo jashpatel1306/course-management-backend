@@ -4,6 +4,7 @@ const userServices = require("../users/user.service");
 const { STUDENT } = require("../../constants/roles.constant");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
+const commonFunctions = require("../../helpers/commonFunctions");
 
 const studentSchema = new mongoose.Schema(
   {
@@ -82,8 +83,15 @@ studentSchema.pre("save", async function (next) {
     permissions: [],
     role: STUDENT,
   };
-
-  const createUser = await userServices.createUser(userData);
+  if (userData.password) {
+    userData.password = await commonFunctions.encode(userData.password);
+  }
+  await mongoose
+    .model("users")
+    .updateOne({ email: userData.email }, { ...userData }, { upsert: true });
+  const createUser = await mongoose
+    .model("users")
+    .findOne({ email: userData.email }, { createdAt: 0, updatedAt: 0, __v: 0 });
   if (!createUser) {
     next(createError.InternalServerError("Error creating user."));
   }

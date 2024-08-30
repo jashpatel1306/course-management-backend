@@ -1,6 +1,7 @@
 const CollegeModel = require("./colleges.model");
 const createError = require("http-errors");
 const userServices = require("../users/user.service");
+const batchesModel = require("../batches/batches.model");
 module.exports = {
   createCollege: async (data) => {
     try {
@@ -31,9 +32,12 @@ module.exports = {
     }
   },
 
-  getCollegeId: async (code,name) => {
+  getCollegeId: async (code, name) => {
     try {
-      const college = await CollegeModel.findOne({collegeName: name,collegeId: code});
+      const college = await CollegeModel.findOne({
+        collegeName: name,
+        collegeId: code,
+      });
       if (!college) {
         throw createError(404, "College not found");
       }
@@ -84,6 +88,16 @@ module.exports = {
         .populate("userId", "email password ")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
+
+      // const finalCollegeData = college.forEach(async (info) => {
+      //   return {
+      //     ...info,
+      //     totalBatch: await batchesModel.countDocuments({
+      //       collegeId: info._id,
+      //     }),
+      //   };
+      // });
+      // console.log("finalCollegeData:  ", finalCollegeData);
       const count = await CollegeModel.countDocuments(filter);
       if (!college) {
         throw createError(404, "Colleges not found");
@@ -104,6 +118,22 @@ module.exports = {
       await college.save();
 
       return college;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getKeyValueColleges: async () => {
+    try {
+      let colleges = await CollegeModel.aggregate([
+        {
+          $project: {
+            label: "$collegeName",
+            collegeNo: "$collegeNo",
+            value: "$_id",
+          },
+        },
+      ]);
+      return colleges;
     } catch (error) {
       throw error;
     }

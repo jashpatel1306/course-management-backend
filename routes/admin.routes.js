@@ -33,5 +33,18 @@ router.patch(
   isSuperAdminAuthenticate,
   collegeController.changeActiveStatus
 );
+router.get(
+  "/college-option",
+  isSuperAdminAuthenticate,
+  collegeController.getCollegesOption
+);
+
+const batcheController = require("../controllers/batches.controller");
+
+router.get(
+  "/batches-option/:collegeId",
+  isSuperAdminAuthenticate,
+  batcheController.getBatchesOption
+);
 
 module.exports = router;

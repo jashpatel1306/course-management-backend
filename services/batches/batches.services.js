@@ -38,7 +38,6 @@ module.exports = {
 
   getBatchByCollegeIdAndName: async (collegeId, batchName) => {
     try {
-      
       const batchId = await BatchModel.findOne(
         { collegeId, batchName },
         { _id: 1 }
@@ -109,7 +108,7 @@ module.exports = {
       throw error;
     }
   },
-  getKeyValueBatches: async (collegeId) => {
+  getKeyValueBatches: async (collegeId, adminStatus) => {
     try {
       let batches = await BatchModel.aggregate([
         {
@@ -129,17 +128,28 @@ module.exports = {
             label: "$batchName", // Renaming field to 'label'
             value: "$_id", // Renaming field to 'value'
             totalStudents: { $size: "$studentsData" }, // Counting students in each batch
+            labelAndTotal: {
+              $concat: [
+                "$batchName", // The label
+                " (", // Separator (you can customize this)
+                { $toString: { $size: "$studentsData" } }, // Convert totalStudents to string
+                ")",
+              ],
+            },
           },
         },
       ]);
-      let allBatchesStudentsCount = await studentsModel.countDocuments({
-        collegeUserId: new ObjectId(collegeId),
-      });
-      batches.unshift({
-        label: "All Batches",
-        value: "all",
-        totalStudents: allBatchesStudentsCount,
-      });
+      if (!adminStatus) {
+        let allBatchesStudentsCount = await studentsModel.countDocuments({
+          collegeUserId: new ObjectId(collegeId),
+        });
+        batches.unshift({
+          label: "All Batches",
+          value: "all",
+          totalStudents: allBatchesStudentsCount,
+        });
+      }
+
       return batches;
     } catch (error) {
       throw error;

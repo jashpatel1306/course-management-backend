@@ -88,4 +88,16 @@ module.exports = {
       next(error);
     }
   },
+  getCollegesOption: async (req, res, next) => {
+    try {
+      const college = await collegeServices.getKeyValueColleges();
+      res.status(200).send({
+        success: true,
+        message: "college fetched successfully",
+        data: college,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

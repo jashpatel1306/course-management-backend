@@ -83,6 +83,7 @@ module.exports = {
   }),
   batchWiseStudentsSchema: Joi.object().keys({
     batchId: validate.string,
+    collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
@@ -99,6 +100,7 @@ module.exports = {
   }),
   bulkStudentSchema: Joi.object().keys({
     batchId: validate.reqString,
+    collegeId: validate.string,
     // excelFile: validate.object,
   }),
   questionsSchema: Joi.object().keys({
