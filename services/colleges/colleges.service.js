@@ -132,6 +132,11 @@ module.exports = {
             value: "$_id",
           },
         },
+        {
+          $sort: {
+            label: 1,
+          },
+        },
       ]);
       return colleges;
     } catch (error) {

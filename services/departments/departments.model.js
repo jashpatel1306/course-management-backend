@@ -2,18 +2,20 @@ const mongoose = require("mongoose");
 
 const departmentSchema = new mongoose.Schema(
   {
-    userId: {
+    collegeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
+      ref: "colleges",
       required: true,
     },
-    departments: [{ type: String }],
+    department: { type: String, required: true },
+    active: { type: Boolean, default: true },
   },
   {
     timestamps: true,
     versionKey: false,
   }
 );
+departmentSchema.index({ collegeId: 1, department: 1 }, { unique: true });
 
 const departmentModel = mongoose.model("departments", departmentSchema);
 

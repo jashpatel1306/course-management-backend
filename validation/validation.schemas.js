@@ -95,8 +95,9 @@ module.exports = {
     perPage: validate.reqNumber,
   }),
   departmentSchema: Joi.object().keys({
-    departments: validate.array,
-    userId: validate.reqId,
+    department: validate.reqString,
+    collegeId: validate.id,
+    active: validate.boolean,
   }),
   bulkStudentSchema: Joi.object().keys({
     batchId: validate.reqString,

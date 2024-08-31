@@ -24,7 +24,7 @@ const batchSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-batchSchema.index({ batchNumber: 1, collegeId: 1 }, { unique: true });
+batchSchema.index({ batchName: 1, collegeId: 1 }, { unique: true });
 
 const batchesModel = mongoose.model("batches", batchSchema);
 module.exports = batchesModel;

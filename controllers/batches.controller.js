@@ -31,7 +31,7 @@ module.exports = {
   },
   getAllBatches: async (req, res, next) => {
     try {
-      college_id = req.body.college_id;
+      college_id = req.params.collegeId || req.body.college_id;
       // const batches = await batchServices.getAllBatches(
       //   req.body.search,
       //   req.body.pageNo,

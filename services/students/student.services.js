@@ -1,5 +1,5 @@
 const { STUDENT } = require("../../constants/roles.constant");
-const studentModel = require("./students.model");
+const studentModel = require("./student.model");
 const createError = require("http-errors");
 const commonHelpers = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
@@ -95,6 +95,7 @@ module.exports = {
 
       const student = await studentModel
         .find(filter)
+        .sort({ name: 1 })
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       const count = await studentModel.countDocuments();

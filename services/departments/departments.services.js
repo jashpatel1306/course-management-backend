@@ -2,12 +2,20 @@ const departmentModel = require("./departments.model");
 const createError = require("http-errors");
 
 module.exports = {
-  getDepartments: async (userId) => {
+  getDepartments: async (collegeId) => {
     try {
-      const departments = await departmentModel.find({ userId });
-      const array = departments[0].departments;
-      const data = array.map((department) => {
-        return { key: department, value: department };
+      const departments = await departmentModel.find({ collegeId });
+
+      return departments;
+    } catch (error) {
+      throw createError(500, error.message);
+    }
+  },
+  getDepartmentsOptions: async (collegeId) => {
+    try {
+      const departments = await departmentModel.find({ collegeId });
+      const data = departments.map((item) => {
+        return { label: item.department, value: item._id };
       });
       return data;
     } catch (error) {
@@ -16,6 +24,7 @@ module.exports = {
   },
   createDepartmentData: async (data) => {
     try {
+      console.log("data: ", data);
       const department = await departmentModel.create(data);
       if (!department) createError(500, "Error while creating department");
       return department;

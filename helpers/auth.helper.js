@@ -101,7 +101,9 @@ module.exports = {
           message: `Something is wrong in Authentication.Please try again.`,
           isAuth: false,
         });
+
       if (result && isset(result.user_id)) {
+        
         const getUserData = await userServices.findUserById(result.user_id);
         if (!getUserData)
           return res.json({

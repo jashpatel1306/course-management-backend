@@ -8,7 +8,7 @@ const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const batchesModel = require("../batches/batches.model");
-const studentsModel = require("../students/students.model");
+const studentsModel = require("../students/student.model");
 
 module.exports = {
   getUserByEmail: async function (email) {

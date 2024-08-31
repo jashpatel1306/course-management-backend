@@ -70,7 +70,7 @@ router.put(
 );
 
 router.get(
-  "/batches/all",
+  "/batches/:collegeId",
   isAdminCommonAuthenticate,
   batchesController.getAllBatches
 );
@@ -143,6 +143,7 @@ router.post(
 router.post(
   "/college-wise-students",
   Validate(schemas.batchWiseStudentsSchema),
+  isAdminCommonAuthenticate,
   studentController.getCollegeWiseStudents
 );
 
@@ -151,15 +152,23 @@ router.post(
 router.post(
   "/department",
   Validate(schemas.departmentSchema),
+  isAdminCommonAuthenticate,
   departmentController.createDepartment
 );
 
-router.get("/departments/:userId", departmentController.getDepartments);
+router.get("/departments/:collegeId", departmentController.getDepartments);
 
 router.put(
   "/department/:id",
   Validate(schemas.departmentSchema),
+  isAdminCommonAuthenticate,
   departmentController.updateDepartment
+);
+
+router.get(
+  "/department-options/:collegeId",
+  isAdminCommonAuthenticate,
+  departmentController.getDepartmentsOptions
 );
 
 //------------------------------- questions ---------------------------------//
@@ -273,7 +282,6 @@ router.post(
   isAdminCommonAuthenticate,
   assessmentController.getAssessmentsByBatch
 );
-
 
 router.put(
   "/assessment/status/:id",
