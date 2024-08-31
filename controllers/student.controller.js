@@ -3,6 +3,7 @@ const createError = require("http-errors");
 const excelHelper = require("../helpers/excel.helper");
 const batchesServices = require("../services/batches/batches.services");
 const collegeServices = require("../services/colleges/colleges.service");
+const departmentsServices = require("../services/departments/departments.services");
 module.exports = {
   createStudent: async (req, res, next) => {
     try {
@@ -28,6 +29,9 @@ module.exports = {
         studentsData.map(async (student) => {
           student.batchId = batchId;
           student.collegeUserId = collegeId;
+          const departmentData = await departmentsServices.getDepartmentsbyName(collegeId,student.department)
+          console.log("departmentData :",departmentData._id)
+          student.department = departmentData?._id;
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;
         })

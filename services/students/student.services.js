@@ -143,6 +143,7 @@ module.exports = {
         .find(filter)
         .populate("collegeUserId", "_id collegeName collegeNo")
         .populate("batchId", "_id batchName batchNumber")
+        .populate("department", "_id department")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       const count = await studentModel.countDocuments(filter);

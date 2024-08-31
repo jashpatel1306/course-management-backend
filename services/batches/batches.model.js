@@ -7,7 +7,7 @@ const batchSchema = new mongoose.Schema(
     },
     batchNumber: {
       type: String,
-      required: true,
+      default: "",
     },
     collegeId: {
       type: mongoose.Types.ObjectId,

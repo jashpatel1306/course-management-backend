@@ -11,6 +11,18 @@ module.exports = {
       throw createError(500, error.message);
     }
   },
+  getDepartmentsbyName: async (collegeId, departmentName) => {
+    try {
+      const departments = await departmentModel.findOne({
+        collegeId,
+        department: new RegExp(`^${departmentName}$`, "i"),
+      });
+
+      return departments;
+    } catch (error) {
+      throw createError(500, error.message);
+    }
+  },
   getDepartmentsOptions: async (collegeId) => {
     try {
       const departments = await departmentModel.find({ collegeId });

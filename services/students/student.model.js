@@ -38,7 +38,8 @@ const studentSchema = new mongoose.Schema(
       ref: "users",
     },
     department: {
-      type: String,
+      type: mongoose.Types.ObjectId,
+      ref: "departments",
       required: true,
     },
     section: {

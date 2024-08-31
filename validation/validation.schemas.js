@@ -58,7 +58,7 @@ module.exports = {
   batchSchema: Joi.object().keys({
     batchId: validate.string,
     batchName: validate.reqString,
-    batchNumber: validate.reqString,
+    batchNumber: validate.string,
     collegeId: validate.string,
     instructorIds: validate.array,
     courses: validate.array,
