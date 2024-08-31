@@ -59,6 +59,7 @@ module.exports = {
       }
 
       const batch = await BatchModel.find(filter)
+        .sort({ batchName: 1 })
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
 
@@ -75,7 +76,7 @@ module.exports = {
   },
   getAllBatchesByCollegeId: async (collegeId) => {
     try {
-      const batch = await BatchModel.find({ collegeId });
+      const batch = await BatchModel.find({ collegeId }).sort({ batchName: 1 });
       if (!batch) {
         throw createError(404, "Batches not found");
       }

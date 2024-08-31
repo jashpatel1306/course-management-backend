@@ -31,12 +31,11 @@ module.exports = {
   },
   getAllBatches: async (req, res, next) => {
     try {
-      college_id = req.params.collegeId || req.body.college_id;
-      // const batches = await batchServices.getAllBatches(
-      //   req.body.search,
-      //   req.body.pageNo,
-      //   req.body.perPage
-      // );
+      college_id =
+        req.params.collegeId !== "all"
+          ? req.params.collegeId
+          : req.body.college_id;
+
       const batches = await batchServices.getAllBatchesByCollegeId(college_id);
       res.status(200).send({
         success: true,
