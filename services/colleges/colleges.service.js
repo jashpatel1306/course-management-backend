@@ -65,10 +65,10 @@ module.exports = {
 
       const tabData =
         status === `0`
-          ? { active: false, isAdmin: false }
+          ? { active: false }
           : status === `1`
-          ? { active: true, isAdmin: false }
-          : { isAdmin: false };
+          ? { active: true }
+          : {};
       filter = {
         $and: [
           tabData,
