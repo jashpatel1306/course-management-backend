@@ -45,13 +45,13 @@ app.all("*", async (req, res) => {
 //error handler middleware
 app.use((err, req, res, next) => {
   //handling mongo validation error
-  if (err.name === "SequelizeUniqueConstraintError") {
-    console.log("Sequelize Duplication error: ", err);
-
-    return res.status(200).send({
-      status: false,
-      statusCode: err.status || 400,
-      message: `Validation Failed, ${err.errors[0].message}`,
+  if (err.code === 11000) {
+    console.log("Mongo Duplication error: ", err);
+    const duplicateKey = Object.keys(err.keyValue)[0]; 
+    return res.status(409).send({
+      success: false,
+      status: 409,
+      message: `Validation Failed, ${duplicateKey} already exists`,
     });
   } else {
     console.log(err);

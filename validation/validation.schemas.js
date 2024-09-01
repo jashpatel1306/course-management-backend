@@ -156,4 +156,29 @@ module.exports = {
     search: validate.string,
     batchId: validate.string,
   }),
+  trainerSchema: Joi.object().keys({
+    name: validate.reqString,
+    email: validate.reqEmail,
+    phone: validate.string,
+    collegeId: validate.reqId,
+    experienceInYears: validate.reqNumber,
+    skills: validate.array,
+    location: validate.reqString,
+  }),
+  trainersCollegeIdSchema: Joi.object().keys({
+    collegeId: validate.reqId,
+    search: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber,
+  }), 
+  startUploadSchema: Joi.object().keys({
+    fileName: validate.reqString,
+     fileType: validate.reqString,
+  }),
+  uploadPartSchema: Joi.object().keys({  
+    fileName: validate.reqString,
+    partNumber: validate.reqNumber,
+    uploadId: validate.reqString,
+    file: validate.object,
+  })
 };

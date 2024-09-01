@@ -44,10 +44,6 @@ module.exports = {
     }
   },
 
-  preStudentCreate: async (data) => {
-    return data;
-  },
-
   getStudentById: async (id) => {
     try {
       const student = await studentModel.findOne({ _id: id });

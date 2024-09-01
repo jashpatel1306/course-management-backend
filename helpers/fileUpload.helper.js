@@ -407,3 +407,63 @@ module.exports.convertWebp = async () => {
     };
   }
 };
+
+
+const awsConfig = {
+  accessKeyId: process.env.AWS_S3_ACCESSKEYID,
+  secretAccessKey: process.env.AWS_S3_SECRETKEY,
+  region: process.env.AWS_S3_REGION,
+};
+AWS.config.update(awsConfig);
+
+
+const s3 = new AWS.S3();
+module.exports = {
+  startUpload: async (fileName, fileType) => {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: fileName,
+      ContentType: fileType,
+    };
+
+    try {
+      const upload = await s3.createMultipartUpload(params).promise();
+      return { uploadId: upload.UploadId };
+    } catch (error) {
+      throw new Error("Error initiating upload: " + error.message);
+    }
+  },
+
+  uploadPart: async (fileName, partNumber, uploadId, fileChunk) => {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: fileName,
+      PartNumber: partNumber,
+      UploadId: uploadId,
+      Body: fileChunk,
+    };
+
+    try {
+      const uploadParts = await s3.uploadPart(params).promise();
+      return { ETag: uploadParts.ETag };
+    } catch (error) {
+      throw new Error("Error uploading part: " + error.message);
+    }
+  },
+
+  completeUpload: async (fileName, uploadId, parts) => {
+    const params = {
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: fileName,
+      UploadId: uploadId,
+      MultipartUpload: { Parts: parts },
+    };
+
+    try {
+      const complete = await s3.completeMultipartUpload(params).promise();
+      return { fileUrl: complete.Location };
+    } catch (error) {
+      throw new Error("Error completing upload: " + error.message);
+    }
+  }
+};

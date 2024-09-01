@@ -16,6 +16,8 @@ const { handleExcelData } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
 const quizController = require("../controllers/quiz.controller");
 const assessmentController = require("../controllers/assessment.controller");
+const trainersController = require("../controllers/trainers.controller");
+const multipartUploadController = require("../controllers/multipartUpload.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -295,4 +297,55 @@ router.delete(
   assessmentController.deleteAssessment
 );
 
+//---------------------------------- trainers --------------------------------//
+
+router.post(
+  "/trainer",
+  Validate(schemas.trainerSchema),
+  isAdminCommonAuthenticate,
+  trainersController.createTrainer
+);
+
+router.put(
+  "/trainer/:id",
+  Validate(schemas.trainerSchema),
+  isAdminCommonAuthenticate,
+  trainersController.updateTrainer
+);
+
+router.get(
+  "/trainer/:id",
+  isAdminCommonAuthenticate,
+  trainersController.getTrainerById
+);
+
+router.post(
+  "/get-trainers/college",
+  Validate(schemas.trainersCollegeIdSchema),
+  isAdminCommonAuthenticate,
+  trainersController.getTrainersByCollegeId
+);
+
+router.put(
+  "/trainer/status/:id",
+  isAdminCommonAuthenticate,
+  trainersController.statusToggle
+);
+
+router.get(
+  "/trainer/mappings/:collegeId",
+  isAdminCommonAuthenticate,
+  trainersController.getTrainersNameIdMappingByCollegeId
+);
+
+//--------------------------- multipart file upload ------------------------//
+
+router.post(
+  "/start-upload",
+  // isAdminCommonAuthenticate,
+  Validate(schemas.startUploadSchema),
+  multipartUploadController.startUpload
+);
+
+router.post("/upload-part", Validate(schemas.uploadPartSchema),multipartUploadController.uploadPart)
 module.exports = router;
