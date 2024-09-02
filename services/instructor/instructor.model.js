@@ -3,8 +3,8 @@ const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
 
-// Define Trainer Schema
-const TrainerSchema = new mongoose.Schema(
+// Define Instructor Schema
+const InstructorSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -50,10 +50,10 @@ const TrainerSchema = new mongoose.Schema(
 );
 
 // Pre-save hook
-TrainerSchema.pre("save", async function (next) {
+InstructorSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("email")) {
     try {
-      // Create or update user associated with this trainer
+      // Create or update user associated with this instructor
       // const password = commonHelpers.generateRandomPassword();
       const password = "Admin@123"; // Default password (should be hashed in a real scenario)
 
@@ -61,7 +61,7 @@ TrainerSchema.pre("save", async function (next) {
         email: this.email,
         password: await commonFunctions.encode(password), // Encode password
         user_name: this.name,
-        role: "trainer", // Adjust role as needed
+        role: "instructor", // Adjust role as needed
       };
       console.log("userData", userData);
       const User = mongoose.model("users");
@@ -76,7 +76,7 @@ TrainerSchema.pre("save", async function (next) {
   if (!createUser) {
     next(createError.InternalServerError("Error creating user."));
   }
-      // Associate user with trainer
+      // Associate user with instructor
       this.userId = createUser._id;
 
       // Send email notification
@@ -87,13 +87,13 @@ TrainerSchema.pre("save", async function (next) {
       await sendMailWithServices(to, subject, body);
     } catch (error) {
       return next(
-        createError.InternalServerError("Error while trainer creation.")
+        createError.InternalServerError("Error while instructor creation.")
       );
     }
   }
   next();
 });
 
-// Create and export the Trainer model
-const TrainerModel = mongoose.model("trainers", TrainerSchema);
-module.exports = TrainerModel;
+// Create and export the Instructor model
+const InstructorModel = mongoose.model("instructors", InstructorSchema);
+module.exports = InstructorModel;

@@ -156,7 +156,7 @@ module.exports = {
     search: validate.string,
     batchId: validate.string,
   }),
-  trainerSchema: Joi.object().keys({
+  instructorSchema: Joi.object().keys({
     name: validate.reqString,
     email: validate.reqEmail,
     phone: validate.string,
@@ -164,21 +164,22 @@ module.exports = {
     experienceInYears: validate.reqNumber,
     skills: validate.array,
     location: validate.reqString,
+    active: validate.reqBoolean,
   }),
-  trainersCollegeIdSchema: Joi.object().keys({
-    collegeId: validate.reqId,
+  instructorsCollegeIdSchema: Joi.object().keys({
+    collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
-  }), 
+  }),
   startUploadSchema: Joi.object().keys({
     fileName: validate.reqString,
-     fileType: validate.reqString,
+    fileType: validate.reqString,
   }),
-  uploadPartSchema: Joi.object().keys({  
+  uploadPartSchema: Joi.object().keys({
     fileName: validate.reqString,
     partNumber: validate.reqNumber,
     uploadId: validate.reqString,
     file: validate.object,
-  })
+  }),
 };

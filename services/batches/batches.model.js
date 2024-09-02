@@ -14,7 +14,7 @@ const batchSchema = new mongoose.Schema(
       ref: "colleges",
       required: true,
     },
-    instructorIds: [{ type: mongoose.Types.ObjectId }],
+    instructorIds: [{ type: mongoose.Types.ObjectId, ref: "instructors" }],
     courses: [{ type: mongoose.Types.ObjectId }],
     active: {
       type: Boolean,

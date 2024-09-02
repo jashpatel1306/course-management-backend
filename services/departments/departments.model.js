@@ -7,7 +7,7 @@ const departmentSchema = new mongoose.Schema(
       ref: "colleges",
       required: true,
     },
-    department: { type: String, required: true },
+    department: { type: String, required: true, set: (v) => v.trim().toLowerCase() },
     active: { type: Boolean, default: true },
   },
   {

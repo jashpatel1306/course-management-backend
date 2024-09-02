@@ -1,6 +1,6 @@
-const assessmentServices = require("../services/assessments/assessments.services");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const { assessmentServices } = require("../services");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {

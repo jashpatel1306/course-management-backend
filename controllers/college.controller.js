@@ -1,6 +1,6 @@
 const { ADMIN } = require("../constants/roles.constant");
-const collegeServices = require("../services/colleges/colleges.service");
 const createError = require("http-errors");
+const { collegeServices } = require("../services");
 
 module.exports = {
   createCollege: async (req, res, next) => {

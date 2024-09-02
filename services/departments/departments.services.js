@@ -15,9 +15,13 @@ module.exports = {
     try {
       const departments = await departmentModel.findOne({
         collegeId,
-        department: new RegExp(`^${departmentName}$`, "i"),
+        $expr: {
+          $eq: [
+            { $toLower: { $trim: { input: "$department" } } },
+            departmentName.trim().toLowerCase(),
+          ],
+        },
       });
-
       return departments;
     } catch (error) {
       throw createError(500, error.message);

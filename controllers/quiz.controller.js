@@ -1,10 +1,10 @@
-const quizServices = require("../services/quizzes/quizzes.services");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const { quizzesServices } = require("../services");
 module.exports = {
   createQuiz: async (req, res, next) => {
     try {
-      const quiz = await quizServices.createQuiz(req.body);
+      const quiz = await quizzesServices.createQuiz(req.body);
       return res.status(201).send({
         success: true,
         message: "Quiz created successfully.",

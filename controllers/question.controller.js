@@ -1,7 +1,6 @@
-const questionServices = require("../services/questions/questions.services");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
-const quizzesServices = require("../services/quizzes/quizzes.services");
+const { questionServices, quizzesServices } = require("../services");
 module.exports = {
   createQuestion: async (req, res, next) => {
     try {

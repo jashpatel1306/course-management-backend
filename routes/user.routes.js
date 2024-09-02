@@ -16,7 +16,7 @@ const { handleExcelData } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
 const quizController = require("../controllers/quiz.controller");
 const assessmentController = require("../controllers/assessment.controller");
-const trainersController = require("../controllers/trainers.controller");
+const instructorsController = require("../controllers/instructors.controller");
 const multipartUploadController = require("../controllers/multipartUpload.controller");
 router.post(
   "/sign-in",
@@ -297,45 +297,51 @@ router.delete(
   assessmentController.deleteAssessment
 );
 
-//---------------------------------- trainers --------------------------------//
+//---------------------------------- instructors --------------------------------//
 
 router.post(
-  "/trainer",
-  Validate(schemas.trainerSchema),
+  "/instructor",
+  Validate(schemas.instructorSchema),
   isAdminCommonAuthenticate,
-  trainersController.createTrainer
+  instructorsController.createInstructor
 );
 
 router.put(
-  "/trainer/:id",
-  Validate(schemas.trainerSchema),
+  "/instructor/:id",
+  Validate(schemas.instructorSchema),
   isAdminCommonAuthenticate,
-  trainersController.updateTrainer
+  instructorsController.updateInstructor
 );
 
 router.get(
-  "/trainer/:id",
+  "/instructor/:id",
   isAdminCommonAuthenticate,
-  trainersController.getTrainerById
+  instructorsController.getInstructorById
 );
 
 router.post(
-  "/get-trainers/college",
-  Validate(schemas.trainersCollegeIdSchema),
+  "/get-instructors/college",
+  Validate(schemas.instructorsCollegeIdSchema),
   isAdminCommonAuthenticate,
-  trainersController.getTrainersByCollegeId
+  instructorsController.getInstructorsByCollegeId
 );
 
 router.put(
-  "/trainer/status/:id",
+  "/instructor/status/:id",
   isAdminCommonAuthenticate,
-  trainersController.statusToggle
+  instructorsController.statusToggle
 );
 
 router.get(
-  "/trainer/mappings/:collegeId",
+  "/instructor/mappings/:collegeId",
   isAdminCommonAuthenticate,
-  trainersController.getTrainersNameIdMappingByCollegeId
+  instructorsController.getInstructorsNameIdMappingByCollegeId
+);
+
+router.get(
+  "/instructor-options/:collegeId",
+  isAdminCommonAuthenticate,
+  instructorsController.getInstructorsOptions
 );
 
 //--------------------------- multipart file upload ------------------------//

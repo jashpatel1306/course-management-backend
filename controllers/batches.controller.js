@@ -1,8 +1,5 @@
-const batchServices = require("../services/batches/batches.services");
 const createError = require("http-errors");
-const {
-  getBatchWiseStudents,
-} = require("../services/students/student.services");
+const { batchServices } = require("../services");
 
 module.exports = {
   createBatch: async (req, res, next) => {

@@ -28,7 +28,10 @@ module.exports = {
   },
   getBatchById: async (id) => {
     try {
-      const batch = await BatchModel.findOne({ _id: id });
+      const batch = await BatchModel.findOne({ _id: id }).populate(
+        "instructorIds",
+        "_id name"
+      );
       if (!batch) createError.BadRequest("Invalid batch id.");
       return batch;
     } catch (error) {
@@ -41,7 +44,7 @@ module.exports = {
       const batchId = await BatchModel.findOne(
         { collegeId, batchName },
         { _id: 1 }
-      );
+      ).populate("instructorIds", "_id name");
       if (!batchId) createError.BadRequest("Invalid batch name .");
       return batchId;
     } catch (error) {
@@ -59,6 +62,7 @@ module.exports = {
       }
 
       const batch = await BatchModel.find(filter)
+        .populate("instructorIds", "_id name")
         .sort({ batchName: 1 })
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
@@ -76,7 +80,9 @@ module.exports = {
   },
   getAllBatchesByCollegeId: async (collegeId) => {
     try {
-      const batch = await BatchModel.find({ collegeId }).sort({ batchName: 1 });
+      const batch = await BatchModel.find({ collegeId })
+        .populate("instructorIds", "_id name")
+        .sort({ batchName: 1 });
       if (!batch) {
         throw createError(404, "Batches not found");
       }
