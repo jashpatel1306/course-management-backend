@@ -182,4 +182,12 @@ module.exports = {
     uploadId: validate.reqString,
     file: validate.object,
   }),
+  completeUploadSchema: Joi.object().keys({
+    fileName: validate.reqString,
+    uploadId: validate.reqString,
+    parts: validate.array,
+  }),
+  uploadFileSchema: Joi.object().keys({
+    image: validate.object.required(),
+  }),
 };

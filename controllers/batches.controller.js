@@ -31,7 +31,7 @@ module.exports = {
       college_id =
         req.params.collegeId !== "all"
           ? req.params.collegeId
-          : req.body.college_id;
+          : req.body?.college_id;
 
       const batches = await batchServices.getAllBatchesByCollegeId(college_id);
       res.status(200).send({

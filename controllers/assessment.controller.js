@@ -4,7 +4,7 @@ const { assessmentServices } = require("../services");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {
-      req.body = { ...req.body, collegeId: req.body.college_id };
+      req.body = { ...req.body, collegeId: req.body?.college_id };
       const assessment = await assessmentServices.createAssessment(req.body);
       return res.status(201).send({
         success: true,
@@ -84,7 +84,7 @@ module.exports = {
     try {
       const { pageNo, perPage, search, batchId } = req.body;
 
-      const college_id = req.body.college_id;
+      const college_id = req.body?.college_id;
       const searchText = new RegExp(search, `i`);
       let filter =
         batchId !== "all"
@@ -126,8 +126,8 @@ module.exports = {
     try {
       const { pageNo, perPage, search } = req.body;
 
-      const college_id = req.body.college_id;
-      const batch_id = req.body.batch_id;
+      const college_id = req.body?.college_id;
+      const batch_id = req.body?.batch_id;
       const searchText = new RegExp(search, `i`);
       let filter =
         batch_id !== "all"

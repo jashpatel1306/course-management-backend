@@ -20,9 +20,9 @@ module.exports = {
 
   getAllColleges: async (req, res, next) => {
     try {
-      const perPage = req.body.perPage;
-      const pageNo = req.body.pageNo;
-      const search = req.body.search;
+      const perPage = req.body?.perPage;
+      const pageNo = req.body?.pageNo;
+      const search = req.body?.search;
       const searchText = new RegExp(search, `i`);
       const status = req.params.status;
       const { college, count } = await collegeServices.getAllColleges(

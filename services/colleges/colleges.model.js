@@ -9,25 +9,25 @@ const collegeSchema = new mongoose.Schema(
     },
     collegeName: {
       type: String,
-      required: true,
+      required: [true,"college name is required."],
       unique: true,
     },
     shortName: {
       type: String,
-      required: true,
+      required: [true,"short name is required."]
     },
     collegeNo: {
       type: String,
-      required: true,
+      required:[true,"college no is required."],
       unique: true,
     },
     contactPersonName: {
       type: String,
-      required: true,
+      required: [true,"contact person name is required."]
     },
     contactPersonNo: {
       type: String,
-      required: true,
+      required: [true,"contact person no is required."]
     },
     isAdmin: {
       type: Boolean,

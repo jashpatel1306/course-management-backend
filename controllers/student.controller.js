@@ -1,4 +1,5 @@
 const { studentServices, departmentService } = require("../services");
+const { Validate } = require("../validation/validation.methods");
 
 module.exports = {
   createStudent: async (req, res, next) => {
@@ -16,10 +17,11 @@ module.exports = {
 
   createBulkStudents: async (req, res, next) => {
     try {
-      const batchId = req.body.batchId;
-      const collegeId = req.body.collegeId || req.body.college_id;
-      const studentsData = req.body.excelData;
+      const batchId = req.body?.batchId;
+      const collegeId = req.body?.collegeId || req.body?.college_id;
+      const studentsData = req.body?.excelData;
 
+      Validate();
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
         studentsData.map(async (student) => {
@@ -61,9 +63,9 @@ module.exports = {
   getAllStudents: async (req, res, next) => {
     try {
       const students = await studentServices.getAllStudents(
-        req.body.search,
-        req.body.pageNo,
-        req.body.perPage
+        req.body?.search,
+        req.body?.pageNo,
+        req.body?.perPage
       );
       res.send({
         success: true,
@@ -120,14 +122,16 @@ module.exports = {
   },
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
-      const batchId = req.body.batchId;
-      const perPage = req.body.perPage;
-      const pageNo = req.body.pageNo;
-      const search = req.body.search;
-      const college_id =
-        req.body.collegeId === "all" ? req.body.college_id : req.body.collegeId;
+      const batchId = req.body?.batchId;
+      const perPage = req.body?.perPage;
+      const pageNo = req.body?.pageNo;
+      const search = req.body?.search;
+      const college_id = req?.body?.collegeId
+        ? req.body?.collegeId === "all"
+          ? req.body?.college_id
+          : req.body?.collegeId
+        : req.body?.college_id;
       const searchText = new RegExp(search, `i`);
-
       const { students, count } = await studentServices.getBatchWiseStudents(
         batchId === "all" ? "" : batchId,
         searchText,
@@ -152,12 +156,12 @@ module.exports = {
   },
   getCollegeWiseStudents: async (req, res, next) => {
     try {
-      const collegeId = req.body.collegeId;
+      const collegeId = req.body?.collegeId;
       const students = await studentServices.getCollegeWiseStudents(
         collegeId,
-        req.body.search,
-        req.body.perPage,
-        req.body.pageNo
+        req.body?.search,
+        req.body?.perPage,
+        req.body?.pageNo
       );
       res.send({
         success: true,

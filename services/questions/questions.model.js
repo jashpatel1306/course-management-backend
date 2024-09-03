@@ -3,13 +3,13 @@ const QuestionSchema = new mongoose.Schema(
   {
     question: {
       type: String,
-      required: true,
+      required: [true, "question is required."],
     },
     answers: [
       {
         content: {
           type: String,
-          required: true,
+          required: [true, "answer is required"],
         },
         correct: {
           type: Boolean,
@@ -21,7 +21,7 @@ const QuestionSchema = new mongoose.Schema(
     ],
     marks: {
       type: Number,
-      required: true,
+      required: [true,"marks are required."],
     },
     quizId: {
       type: mongoose.Types.ObjectId,

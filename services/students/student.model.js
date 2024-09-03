@@ -9,29 +9,29 @@ const studentSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true,"name is required"]
     },
     email: {
       type: String,
-      required: true,
+      required: [true,"email is required"]
     },
     rollNo: {
       type: String,
-      required: true,
+      required: [true,"rollNo is required"]
     },
     phone: {
       type: String,
-      required: true,
+      required: [true,"phone is required"]
     },
     collegeUserId: {
       type: mongoose.Types.ObjectId,
       ref: "colleges",
-      required: true,
+      required: [true,"college id is required."]
     },
     batchId: {
       type: mongoose.Types.ObjectId,
       ref: "batches",
-      required: true,
+      required: [true,"batchId is required."]
     },
     userId: {
       type: mongoose.Types.ObjectId,
@@ -40,15 +40,15 @@ const studentSchema = new mongoose.Schema(
     department: {
       type: mongoose.Types.ObjectId,
       ref: "departments",
-      required: true,
+      required: [true,"department is required."]
     },
     section: {
       type: String,
-      required: true,
+      required: [true,"section is required."]
     },
     passoutYear: {
       type: Number,
-      required: true,
+      required: [true,"pass-out year is required."]
     },
     gender: {
       type: String,

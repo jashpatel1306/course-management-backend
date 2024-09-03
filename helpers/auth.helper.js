@@ -103,7 +103,6 @@ module.exports = {
         });
 
       if (result && isset(result.user_id)) {
-        
         const getUserData = await userServices.findUserById(result.user_id);
         if (!getUserData)
           return res.json({
@@ -150,9 +149,9 @@ module.exports = {
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        console.log("getUserData :",getUserData)
+        console.log("getUserData :", getUserData);
         if (getUserData.role === STUDENT) {
-          console.log("req.body :",result)
+          console.log("req.body :", result);
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
           req.body.batch_id = result.batch_id;

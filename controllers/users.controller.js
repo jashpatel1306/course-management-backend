@@ -29,7 +29,7 @@ module.exports = {
   },
   getUserProfileData: async (req, res, next) => {
     try {
-      const userId = req.body.user_id;
+      const userId = req.body?.user_id;
       const user = await userServices.findUserById(userId);
 
       return res.status(200).json({

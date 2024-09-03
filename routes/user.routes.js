@@ -18,6 +18,7 @@ const quizController = require("../controllers/quiz.controller");
 const assessmentController = require("../controllers/assessment.controller");
 const instructorsController = require("../controllers/instructors.controller");
 const multipartUploadController = require("../controllers/multipartUpload.controller");
+const fileUploadController = require("../controllers/fileUpload.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -344,8 +345,9 @@ router.get(
   instructorsController.getInstructorsOptions
 );
 
-//--------------------------- multipart file upload ------------------------//
+//---------------------------  file upload ------------------------//
 
+//multipart upload
 router.post(
   "/start-upload",
   // isAdminCommonAuthenticate,
@@ -354,4 +356,8 @@ router.post(
 );
 
 router.post("/upload-part", Validate(schemas.uploadPartSchema),multipartUploadController.uploadPart)
+
+router.post("/complete-upload", Validate(schemas.completeUploadSchema), multipartUploadController.completeUpload);
+
+router.post("/upload-file", Validate(schemas.uploadFileSchema), fileUploadController.uploadImage)
 module.exports = router;

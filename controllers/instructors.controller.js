@@ -30,7 +30,7 @@ module.exports = {
   createBulkInstructors: async (req, res, next) => {
     try {
       const instructors = await instructorServices.createInstructorsInBulk(
-        req.body.instructorsData
+        req.body?.instructorsData
       );
       res.send({
         success: true,
@@ -132,8 +132,8 @@ module.exports = {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id =
         req?.body?.collegeId === "all"
-          ? req.body.college_id
-          : req.body.collegeId;
+          ? req.body?.college_id
+          : req.body?.collegeId;
 
       const { instructors, count } =
         await instructorServices.getInstructorsByCollegeId(

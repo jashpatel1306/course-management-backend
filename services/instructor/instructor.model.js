@@ -8,17 +8,17 @@ const InstructorSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
+      required: [true, "email is required."],
       unique: true,
       lowercase: true,
     },
     name: {
       type: String,
-      required: true,
+      required: [true, "name is required."],
     },
     phone: {
       type: String,
-      required: true,
+      required: [true, "phone is required."],
       unique: true,
     },
     skills: {
@@ -27,11 +27,11 @@ const InstructorSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      required: true,
+      required: [true, "location is required."],
     },
     experienceInYears: {
       type: Number,
-      required: true,
+      required: [true, "experience is required."],
     },
     collegeId: {
       type: mongoose.Types.ObjectId,
@@ -68,14 +68,21 @@ InstructorSchema.pre("save", async function (next) {
 
       // Upsert user
       await mongoose
-    .model("users")
-    .updateOne({ email: userData.email }, { ...userData }, { upsert: true });
-  const createUser = await mongoose
-    .model("users")
-    .findOne({ email: userData.email }, { createdAt: 0, updatedAt: 0, __v: 0 });
-  if (!createUser) {
-    next(createError.InternalServerError("Error creating user."));
-  }
+        .model("users")
+        .updateOne(
+          { email: userData.email },
+          { ...userData },
+          { upsert: true }
+        );
+      const createUser = await mongoose
+        .model("users")
+        .findOne(
+          { email: userData.email },
+          { createdAt: 0, updatedAt: 0, __v: 0 }
+        );
+      if (!createUser) {
+        next(createError.InternalServerError("Error creating user."));
+      }
       // Associate user with instructor
       this.userId = createUser._id;
 
