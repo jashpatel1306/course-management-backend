@@ -19,6 +19,7 @@ const assessmentController = require("../controllers/assessment.controller");
 const instructorsController = require("../controllers/instructors.controller");
 const multipartUploadController = require("../controllers/multipartUpload.controller");
 const fileUploadController = require("../controllers/fileUpload.controller");
+const courseController = require("../controllers/course.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -355,9 +356,63 @@ router.post(
   multipartUploadController.startUpload
 );
 
-router.post("/upload-part", Validate(schemas.uploadPartSchema),multipartUploadController.uploadPart)
+router.post(
+  "/upload-part",
+  Validate(schemas.uploadPartSchema),
+  multipartUploadController.uploadPart
+);
 
-router.post("/complete-upload", Validate(schemas.completeUploadSchema), multipartUploadController.completeUpload);
+router.post(
+  "/complete-upload",
+  Validate(schemas.completeUploadSchema),
+  multipartUploadController.completeUpload
+);
 
-router.post("/upload-file", Validate(schemas.uploadFileSchema), fileUploadController.uploadImage)
+router.post(
+  "/upload-file",
+  Validate(schemas.uploadFileSchema),
+  fileUploadController.uploadImage
+);
+
+//--------------------------- courses -------------------------//
+
+router.post(
+  "/course",
+  Validate(schemas.courseSchema),
+  isAdminCommonAuthenticate,
+  courseController.createCourse
+);
+
+router.put(
+  "/course/:id",
+  Validate(schemas.courseSchema),
+  isAdminCommonAuthenticate,
+  courseController.updateCourse
+);
+
+router.get(
+  "/course/:id",
+  isAdminCommonAuthenticate,
+  courseController.getCourseById
+);
+
+router.put(
+  "/course/status/:id",
+  isAdminCommonAuthenticate,
+  courseController.statusToggle
+);
+
+router.put(
+  "/course/published/:id",
+  isAdminCommonAuthenticate,
+  courseController.publishToggle
+);
+
+router.post(
+  "/college-wise-courses",
+  Validate(schemas.collegeWiseDataSchema),
+  isAdminCommonAuthenticate,
+  courseController.getCoursesByCollegeId
+);
+
 module.exports = router;

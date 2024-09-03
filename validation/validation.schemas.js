@@ -172,6 +172,12 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
   }),
+  collegeWiseDataSchema: Joi.object().keys({
+    collegeId: validate.string,
+    search: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber,
+  }),
   startUploadSchema: Joi.object().keys({
     fileName: validate.reqString,
     fileType: validate.reqString,
@@ -190,4 +196,10 @@ module.exports = {
   uploadFileSchema: Joi.object().keys({
     image: validate.object.required(),
   }),
+  courseSchema: Joi.object().keys({
+    courseName: validate.reqString,
+    collegeId: validate.id,
+    courseDescription: validate.reqString,
+    coverImage: validate.string
+  })
 };

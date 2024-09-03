@@ -78,6 +78,7 @@ module.exports = {
           user_id: result.user_id,
           college_id: result.college_id,
         };
+        res.locals.userRole = result.role;
 
         return next();
       }

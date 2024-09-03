@@ -164,35 +164,35 @@ module.exports = {
       throw createError(error);
     }
   },
-  getInstructorsNameIdMappingByCollegeId: async (collegeId) => {
-    try {
-      if (!collegeId) {
-        throw createError.BadRequest("College ID is required.");
-      }
+  // getInstructorsNameIdMappingByCollegeId: async (collegeId) => {
+  //   try {
+  //     if (!collegeId) {
+  //       throw createError.BadRequest("College ID is required.");
+  //     }
 
-      // Find instructors by collegeId
-      const instructors = await InstructorModel.find({ collegeId });
-      if (!instructors || instructors.length === 0) {
-        throw createError.NotFound(
-          "No instructors found for the given college."
-        );
-      }
+  //     // Find instructors by collegeId
+  //     const instructors = await InstructorModel.find({ collegeId });
+  //     if (!instructors || instructors.length === 0) {
+  //       throw createError.NotFound(
+  //         "No instructors found for the given college."
+  //       );
+  //     }
 
-      // Transform the results into key-value pairs
-      const nameIdMapping = instructors.map((m) => {
-        return { value: m._id, key: m.name };
-      });
-      //   = instructors.reduce((acc, instructor) => {
-      //     key = instructor._id;
-      //     // value = acc[instructor.name];
-      //     return acc;
-      //   }, {});
+  //     // Transform the results into key-value pairs
+  //     const nameIdMapping = instructors.map((m) => {
+  //       return { value: m._id, key: m.name };
+  //     });
+  //     //   = instructors.reduce((acc, instructor) => {
+  //     //     key = instructor._id;
+  //     //     // value = acc[instructor.name];
+  //     //     return acc;
+  //     //   }, {});
 
-      return nameIdMapping;
-    } catch (error) {
-      throw createError(error);
-    }
-  },
+  //     return nameIdMapping;
+  //   } catch (error) {
+  //     throw createError(error);
+  //   }
+  // },
   getInstructorsOptions: async (collegeId) => {
     try {
       const instructors = await InstructorModel.find({ collegeId });

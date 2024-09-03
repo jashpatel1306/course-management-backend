@@ -9,4 +9,6 @@ module.exports = {
   questionServices: require(`./questions/questions.services`),
   studentServices: require(`./students/student.services`),
   instructorServices: require(`./instructor/instructor.services`),
+  courseServices: require(`./courses/courseServices`),
+  
 };
