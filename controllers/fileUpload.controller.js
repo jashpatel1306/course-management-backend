@@ -6,7 +6,7 @@ module.exports = {
   uploadImage: async (req, res, next) => {
     try {
       const image = req.files?.image;
-      const path = "/uploads/";
+      const path = "uploads/";
       if (!image) {
         return next(
           createError.BadRequest("Image is required, Please try again.")

@@ -20,6 +20,8 @@ const instructorsController = require("../controllers/instructors.controller");
 const multipartUploadController = require("../controllers/multipartUpload.controller");
 const fileUploadController = require("../controllers/fileUpload.controller");
 const courseController = require("../controllers/course.controller");
+const sectionController = require("../controllers/section.controller");
+const lectureController = require("../controllers/lecture.contoller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -414,5 +416,88 @@ router.post(
   isAdminCommonAuthenticate,
   courseController.getCoursesByCollegeId
 );
+
+//--------------------------- Sections -------------------------//
+
+router.post(
+  "/section",
+  Validate(schemas.sectionSchema),
+  isAdminCommonAuthenticate,
+  sectionController.createSection
+);
+
+router.put(
+  "/section/:id",
+  Validate(schemas.sectionSchema),
+  isAdminCommonAuthenticate,
+  sectionController.updateSection
+);
+
+router.get(
+  "/section/:id",
+  isAdminCommonAuthenticate,
+  sectionController.getSectionById
+);
+
+router.put(
+  "/section/status/:id",
+  isAdminCommonAuthenticate,
+  sectionController.toggleActiveStatus
+);
+
+router.put(
+  "/section/published/:id",
+  isAdminCommonAuthenticate,
+  sectionController.togglePublicStatus
+);
+
+router.post(
+  "/course-wise-sections",
+  Validate(schemas.collegeWiseDataSchema),
+  isAdminCommonAuthenticate,
+  sectionController.getSectionsByCourseId
+);
+
+//------------------------------- lectures -------------------------//
+
+router.post(
+  "/lecture",
+  Validate(schemas.lectureSchema),
+  isAdminCommonAuthenticate,
+  lectureController.createLecture
+);
+
+router.put(
+  "/lecture/:id",
+  Validate(schemas.lectureSchema),
+  isAdminCommonAuthenticate,
+  lectureController.updateLecture
+);
+
+router.get(
+  "/lecture/:id",
+  isAdminCommonAuthenticate,
+  lectureController.getLectureById
+);
+
+router.delete(
+  "/lecture/:id",
+  isAdminCommonAuthenticate,
+  lectureController.deleteLecture
+);
+
+router.put(
+  "/lecture/status/:id",
+  isAdminCommonAuthenticate,
+  lectureController.toggleLectureStatus
+);
+
+router.put(
+  "/lecture/public/:id",
+  isAdminCommonAuthenticate,
+  lectureController.toggleLecturePublicStatus
+);
+
+router.get("/lecture/")
 
 module.exports = router;

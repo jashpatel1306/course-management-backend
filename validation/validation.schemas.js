@@ -1,3 +1,5 @@
+const lectureContoller = require("../controllers/lecture.contoller");
+const lecturesModel = require("../services/lectures/lectures");
 const validate = require("./validation");
 const Joi = require("joi");
 
@@ -173,7 +175,13 @@ module.exports = {
     perPage: validate.reqNumber,
   }),
   collegeWiseDataSchema: Joi.object().keys({
-    collegeId: validate.string,
+    collegeId: validate.id,
+    search: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber,
+  }),
+  courseWiseDataSchema: Joi.object().keys({
+    courseId: validate.id,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
@@ -194,12 +202,30 @@ module.exports = {
     parts: validate.array,
   }),
   uploadFileSchema: Joi.object().keys({
-    image: validate.object.required(),
+    image: validate.object,
   }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
     collegeId: validate.id,
     courseDescription: validate.reqString,
-    coverImage: validate.string
-  })
+    coverImage: validate.string,
+  }),
+
+  sectionSchema: Joi.object().keys({
+    name: validate.reqString,
+    courseId: validate.id,
+  }),
+
+  lectureSchema: Joi.object().keys({
+    name: validate.reqString,
+    description: validate.string,
+    lectureContent: validate.array.items(
+      Joi.object().keys({
+        type: validate.reqString.allow("video", "text"),
+        content: validate.reqString,
+        title: validate.string,
+      })
+    ),
+    publishDate: validate.date,
+  }),
 };

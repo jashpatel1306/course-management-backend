@@ -427,18 +427,25 @@ module.exports = {
 
     try {
       const upload = await s3.createMultipartUpload(params).promise();
-      return { uploadId: upload.UploadId };
+      return { uploadId: upload };
     } catch (error) {
       throw new Error("Error initiating upload: " + error.message);
     }
   },
   uploadPart: async (fileName, partNumber, uploadId, fileChunk) => {
+    console.log(
+      "fileName, partNumber, uploadId, fileChunk",
+      fileName,
+      partNumber,
+      uploadId,
+      fileChunk
+    );
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
       Key: fileName,
       PartNumber: partNumber,
       UploadId: uploadId,
-      Body: fileChunk,
+      Body: fileChunk.data,
     };
 
     try {

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { ObjectId, mongoose } = require("mongoose");
 
 // Define Course Schema
 const CourseSchema = new mongoose.Schema(
@@ -11,6 +11,7 @@ const CourseSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       required: [true, "College ID is required."],
       ref: "colleges",
+      defaultValue: new ObjectId("000000000000000000000000"),
     },
     courseDescription: {
       type: String,
@@ -35,11 +36,9 @@ const CourseSchema = new mongoose.Schema(
       {
         name: {
           type: String,
-          required: [true, "Section name is required."],
         },
         id: {
           type: mongoose.Types.ObjectId,
-          required: [true, "Section ID is required."],
           ref: "sections",
         },
       },
