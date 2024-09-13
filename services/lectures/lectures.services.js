@@ -1,3 +1,4 @@
+const SectionModel = require("../section/section");
 const LecturesModel = require("./lectures"); // Adjust the path as needed
 const createError = require("http-errors");
 
@@ -42,9 +43,39 @@ module.exports = {
    * @param {Object} data - The update data
    * @returns {Promise<Object>} - The updated Lecture
    */
+  updateLectureContent: async (lectureId, newContent) => {
+    try {
+      const lecture = await LecturesModel.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            lectureContent: newContent,
+          },
+        },
+        { new: true }
+      );
+      if (!lecture) {
+        throw new Error("Lecture not found");
+      }
+
+      return lecture;
+    } catch (err) {
+      console.error("Error updating lecture content:", err);
+      throw err; // Rethrow the error to handle it in the caller function if needed
+    }
+  },
   updateLecture: async (id, data) => {
     try {
-      const lecture = await LecturesModel.findByIdAndUpdate(id, data, { new: true });
+      const lecture = await LecturesModel.findByIdAndUpdate(lectureId, data, {
+        new: true,
+      });
+      await SectionModel.findOneAndUpdate(
+        { _id: data.sectionId, "lectures.id": id }, // Query filter
+        {
+          $set: { "lectures.$.name": data.name }, // Update operation
+        },
+        { new: true, runValidators: true } // Options: return updated doc and validate
+      );
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
       }
@@ -82,7 +113,7 @@ module.exports = {
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
       }
-      
+
       lecture.active = !lecture.active;
       await lecture.save();
 
@@ -119,7 +150,10 @@ module.exports = {
    */
   getPublicLectures: async (sectionId) => {
     try {
-      const publicLectures = await LecturesModel.find({ isPublic: true,sectionId });
+      const publicLectures = await LecturesModel.find({
+        isPublic: true,
+        sectionId,
+      });
       if (!publicLectures || publicLectures.length === 0) {
         throw createError.NotFound("No public lectures found.");
       }

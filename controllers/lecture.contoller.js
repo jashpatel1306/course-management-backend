@@ -48,7 +48,25 @@ module.exports = {
    */
   updateLecture: async (req, res, next) => {
     try {
-      const lecture = await lectureServices.updateLecture(req.params.id, req.body);
+      const lecture = await lectureServices.updateLecture(
+        req.params.id,
+        req.body
+      );
+      res.send({
+        success: true,
+        message: "Lecture updated successfully",
+        data: lecture,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  updateLectureContent: async (req, res, next) => {
+    try {
+      const lecture = await lectureServices.updateLectureContent(
+        req.params.id,
+        req.body
+      );
       res.send({
         success: true,
         message: "Lecture updated successfully",
@@ -106,7 +124,9 @@ module.exports = {
    */
   toggleLecturePublicStatus: async (req, res, next) => {
     try {
-      const lecture = await lectureServices.toggleLecturePublicStatus(req.params.id);
+      const lecture = await lectureServices.toggleLecturePublicStatus(
+        req.params.id
+      );
       const message = lecture.isPublic ? "made public" : "made private";
       res.status(200).json({
         success: true,

@@ -451,9 +451,8 @@ router.put(
   sectionController.togglePublicStatus
 );
 
-router.post(
-  "/course-wise-sections",
-  Validate(schemas.collegeWiseDataSchema),
+router.get(
+  "/course-wise-sections/:id",
   isAdminCommonAuthenticate,
   sectionController.getSectionsByCourseId
 );
@@ -473,7 +472,12 @@ router.put(
   isAdminCommonAuthenticate,
   lectureController.updateLecture
 );
-
+router.put(
+  "/lecture-content/:id",
+  Validate(schemas.lectureContentSchema),
+  isAdminCommonAuthenticate,
+  lectureController.updateLectureContent
+);
 router.get(
   "/lecture/:id",
   isAdminCommonAuthenticate,
@@ -498,6 +502,5 @@ router.put(
   lectureController.toggleLecturePublicStatus
 );
 
-router.get("/lecture/")
 
 module.exports = router;

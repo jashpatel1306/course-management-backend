@@ -1,3 +1,4 @@
+const CourseModel = require("../courses/course");
 const SectionModel = require("./section"); // Adjust the path as needed
 const createError = require("http-errors");
 
@@ -26,7 +27,9 @@ module.exports = {
    */
   getSectionById: async (id) => {
     try {
-      const section = await SectionModel.findById(id).populate("courseId").populate("lectures.id");
+      const section = await SectionModel.findById(id);
+      // .populate("courseId")
+      // .populate("lectures.id");
       if (!section) {
         throw createError.NotFound("Section not found.");
       }
@@ -44,7 +47,16 @@ module.exports = {
    */
   updateSection: async (id, data) => {
     try {
-      const section = await SectionModel.findByIdAndUpdate(id, data, { new: true });
+      const section = await SectionModel.findByIdAndUpdate(id, data, {
+        new: true,
+      });
+      await CourseModel.findOneAndUpdate(
+        { _id: data.courseId, "sections.id": id }, // Query filter
+        {
+          $set: { "sections.$.name": data.name }, // Update operation
+        },
+        { new: true, runValidators: true } // Options: return updated doc and validate
+      );
       if (!section) {
         throw createError.NotFound("Section not found.");
       }
@@ -79,25 +91,16 @@ module.exports = {
    * @param {number} [perPage=10] - Number of items per page
    * @returns {Promise<Object>} - The sections and count
    */
-  getSectionsByCourseId: async (courseId, search, pageNo = 1, perPage = 10) => {
+  getSectionsByCourseId: async (courseId) => {
     try {
       let filter = { courseId };
 
-      if (search) {
-        filter.name = { $regex: search, $options: "i" };
-      }
-
-      const sections = await SectionModel.find(filter)
-        .skip((pageNo - 1) * perPage)
-        .limit(perPage);
-
-      const count = await SectionModel.countDocuments(filter);
-
+      const sections = await SectionModel.find(filter);
       if (!sections || sections.length === 0) {
         throw createError.NotFound("No sections found for the given course.");
       }
 
-      return { sections, count };
+      return { sections };
     } catch (error) {
       throw createError(error);
     }
@@ -143,8 +146,6 @@ module.exports = {
    * Get all public Sections
    * @returns {Promise<Array<Object>>} - List of public sections
    */
-
- 
 
   getPublicSections: async () => {
     try {

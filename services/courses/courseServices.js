@@ -44,7 +44,9 @@ module.exports = {
    */
   updateCourse: async (id, data) => {
     try {
-      const course = await CourseModel.findByIdAndUpdate(id, data, { new: true });
+      const course = await CourseModel.findByIdAndUpdate(id, data, {
+        new: true,
+      });
       if (!course) {
         throw createError.NotFound("Course not found.");
       }
@@ -81,12 +83,12 @@ module.exports = {
    */
   getCoursesByCollegeId: async (collegeId, search, pageNo, perPage) => {
     try {
-      let filter = { collegeId };
-
+      let filter = { collegeId: collegeId };
+      console.log("filter : ",filter)
       if (search) {
         filter = {
           $and: [
-            { collegeId },
+            { collegeId: collegeId },
             {
               $or: [
                 { courseName: { $regex: search, $options: "i" } },
@@ -134,7 +136,6 @@ module.exports = {
     }
   },
 
-
   toggleCoursePublicStatus: async (id) => {
     try {
       const course = await CourseModel.findById(id);
@@ -150,7 +151,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
 
   /**
    * Get all public courses
@@ -179,5 +179,4 @@ module.exports = {
       throw createError(500, error.message);
     }
   },
-  
 };

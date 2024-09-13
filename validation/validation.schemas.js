@@ -206,9 +206,10 @@ module.exports = {
   }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
+    courseId: validate.id,
     collegeId: validate.id,
     courseDescription: validate.reqString,
-    coverImage: validate.string,
+    active: validate.reqBoolean,
   }),
 
   sectionSchema: Joi.object().keys({
@@ -218,7 +219,18 @@ module.exports = {
 
   lectureSchema: Joi.object().keys({
     name: validate.reqString,
-    description: validate.string,
+    sectionId: validate.reqId,
+    courseId: validate.reqId,
+    // lectureContent: validate.array.items(
+    //   Joi.object().keys({
+    //     type: validate.reqString.allow("video", "text"),
+    //     content: validate.reqString,
+    //     title: validate.string,
+    //   })
+    // ),
+    // publishDate: validate.date,
+  }),
+  lectureContentSchema: Joi.object().keys({
     lectureContent: validate.array.items(
       Joi.object().keys({
         type: validate.reqString.allow("video", "text"),
@@ -226,6 +238,5 @@ module.exports = {
         title: validate.string,
       })
     ),
-    publishDate: validate.date,
   }),
 };

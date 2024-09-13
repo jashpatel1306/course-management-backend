@@ -9,9 +9,9 @@ const CourseSchema = new mongoose.Schema(
     },
     collegeId: {
       type: mongoose.Types.ObjectId,
-      required: [true, "College ID is required."],
+      // required: [true, "College ID is required."],
       ref: "colleges",
-      defaultValue: new ObjectId("000000000000000000000000"),
+      default: null,
     },
     courseDescription: {
       type: String,

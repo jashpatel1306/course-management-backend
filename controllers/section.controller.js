@@ -120,25 +120,15 @@ module.exports = {
    */
   getSectionsByCourseId: async (req, res, next) => {
     try {
-      const { search, pageNo = 1, perPage = 10 } = req.body;
-      const { courseId } = req.body;
+      const courseId = req.params.id;
 
-      const { sections, count } = await sectionServices.getSectionsByCourseId(
+      const { sections } = await sectionServices.getSectionsByCourseId(
         courseId,
-        search,
-        pageNo,
-        perPage
       );
       res.send({
         success: true,
         message: "Sections fetched successfully",
         data: sections,
-        pagination: {
-          total: count,
-          perPage,
-          pageNo,
-          pages: Math.ceil(count / perPage),
-        },
       });
     } catch (error) {
       next(error);

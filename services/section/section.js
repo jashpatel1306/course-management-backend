@@ -18,7 +18,7 @@ const SectionSchema = new mongoose.Schema(
     },
     lectures: [
       {
-        type: {
+        name: {
           type: String,
         },
         id: {
@@ -44,13 +44,38 @@ const SectionSchema = new mongoose.Schema(
 
 SectionSchema.post("save", async function (section) {
   const id = section._id;
+  if (!id) {
+    return;
+  }
+  try {
+    const sections = await mongoose.model("sections").find(
+      { courseId: section.courseId },
+      { name: 1, _id: 1 } // Projection: include only `name` and `_id`
+    );
 
-  const updateLectures = await CourseModel.findByIdAndUpdate(id, {
-    sections: {  $push:{ name: section.name, id: id } },
-    totalSections:{$inc:1}
-  });
-
-  if (!updateLectures) console.log("Error setting section array in sections.");
+    if (sections.length) {
+      const updateLectures = await CourseModel.findByIdAndUpdate(
+        section.courseId,
+        {
+          $set: {
+            sections: sections?.map((info) => {
+              return { name: info.name, id: info._id };
+            }),
+            totalSections: sections?.length,
+          },
+          // $inc: { : 1 },
+        },
+        { new: true } // Optionally return the updated document
+      );
+      if (!updateLectures) {
+        console.log("Error setting section array in sections.");
+      }
+    } else {
+      console.log("No sections found for this course.");
+    }
+  } catch (error) {
+    console.error("Error updating course:", error);
+  }
 });
 
 const SectionModel = mongoose.model("sections", SectionSchema);

@@ -1,5 +1,6 @@
 const { courseServices } = require("../services");
 const createError = require("http-errors");
+const commonUploadFunction = require("../helpers/fileUpload.helper");
 
 module.exports = {
   /**
@@ -10,7 +11,24 @@ module.exports = {
    */
   createCourse: async (req, res, next) => {
     try {
+      const image = req.files?.image;
+      const request_body = req.body;
+      console.log("req.image :", image);
+      if (image) {
+        const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
+          image,
+          `courses/coverImage/`
+        );
+        if (!movetoAWS.status)
+          return res.json({
+            status: false,
+            message: movetoAWS.message,
+            data: [],
+          });
+        if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
+      }
       const course = await courseServices.createCourse(req.body);
+      console.log("course: ", course);
       res.send({
         success: true,
         message: "Course created successfully",
@@ -21,7 +39,6 @@ module.exports = {
     }
   },
 
-  
   /**
    * Get a Course by ID
    * @param {Object} req - The request object
@@ -63,8 +80,10 @@ module.exports = {
 
   publishToggle: async (req, res, next) => {
     try {
-      const course = await courseServices.toggleCoursePublicStatus(req.params.id);
-      const message = course.published? "published" : "unpublished";
+      const course = await courseServices.toggleCoursePublicStatus(
+        req.params.id
+      );
+      const message = course.published ? "published" : "unpublished";
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,
@@ -82,7 +101,25 @@ module.exports = {
    */
   updateCourse: async (req, res, next) => {
     try {
-      const course = await courseServices.updateCourse(req.params.id, req.body);
+      const image = req.files?.image;
+      const request_body = req.body;
+      if (image) {
+        const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
+          image,
+          `courses/coverImage/`
+        );
+        if (!movetoAWS.status)
+          return res.json({
+            status: false,
+            message: movetoAWS.message,
+            data: [],
+          });
+        if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
+      }
+      const course = await courseServices.updateCourse(
+        req.params.id,
+        request_body
+      );
       res.send({
         success: true,
         message: "Course updated successfully",
@@ -121,10 +158,10 @@ module.exports = {
   getCoursesByCollegeId: async (req, res, next) => {
     try {
       const { search, pageNo = 1, perPage = 10 } = req.body;
-      const college_id = req?.body?.collegeId === "all" ? req.body?.college_id : req.body?.collegeId;
-        const filter = {}
-        const userRole = res.locals.userRole;
-        // userRole === "student" ? filter.isPublic = true : filter.
+      const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
+      const filter = {};
+      const userRole = res.locals.userRole;
+      // userRole === "student" ? filter.isPublic = true : filter.
       const { courses, count } = await courseServices.getCoursesByCollegeId(
         college_id,
         search,
