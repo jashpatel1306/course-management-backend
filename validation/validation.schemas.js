@@ -202,7 +202,7 @@ module.exports = {
     parts: validate.array,
   }),
   uploadFileSchema: Joi.object().keys({
-    image: validate.object,
+    path: validate.reqString,
   }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
@@ -231,12 +231,8 @@ module.exports = {
     // publishDate: validate.date,
   }),
   lectureContentSchema: Joi.object().keys({
-    lectureContent: validate.array.items(
-      Joi.object().keys({
-        type: validate.reqString.allow("video", "text"),
-        content: validate.reqString,
-        title: validate.string,
-      })
-    ),
+    type: validate.reqString.allow("video", "text", "file"),
+    content: validate.reqString,
+    title: validate.string,
   }),
 };

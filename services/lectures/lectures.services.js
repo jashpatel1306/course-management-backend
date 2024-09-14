@@ -45,11 +45,12 @@ module.exports = {
    */
   updateLectureContent: async (lectureId, newContent) => {
     try {
+      console.log("lectureId, newContent  :", lectureId, newContent);
       const lecture = await LecturesModel.findByIdAndUpdate(
-        id,
+        lectureId,
         {
-          $set: {
-            lectureContent: newContent,
+          $push: {
+            lectureContent: [newContent],
           },
         },
         { new: true }
