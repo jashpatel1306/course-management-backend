@@ -6,14 +6,14 @@ module.exports = {
   uploadImage: async (req, res, next) => {
     try {
       const image = req.files?.image;
-      const path = "uploads/";
+      const path = "uploads/" + req.body.path;
       if (!image) {
         return next(
-          createError.BadRequest("Image is required, Please try again.")
+          createError.BadRequest("File is required, Please try again.")
         );
       }
 
-      const uploadToAWS = await commonUploadFunction.uploadMaterialToAWS(
+      const uploadToAWS = await commonUploadFunction.uploadFileMaterialToAWS(
         image,
         path
       );
@@ -21,7 +21,7 @@ module.exports = {
       if (uploadToAWS.status) {
         return res.status(200).json({
           success: true,
-          message: "Image uploaded successfully.",
+          message: "File uploaded successfully.",
           data: uploadToAWS.data,
         });
       } else {
