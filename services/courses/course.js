@@ -1,5 +1,5 @@
-const { ObjectId, mongoose } = require("mongoose");
-
+const { ObjectId } = require("mongoose");
+const mongoose = require("mongoose");
 // Define Course Schema
 const CourseSchema = new mongoose.Schema(
   {
@@ -46,6 +46,9 @@ const CourseSchema = new mongoose.Schema(
     isPublic: {
       type: Boolean,
       default: false,
+    },
+    publishDate: {
+      type: Date,
     },
   },
   { timestamps: true, versionKey: false }

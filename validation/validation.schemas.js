@@ -239,4 +239,17 @@ module.exports = {
       })
     ),
   }),
+  addInstructorCourseSchema: Joi.object().keys({
+    name: validate.reqString,
+    coverImage: validate.string,
+    description: validate.string,
+    content: validate.array.items(
+      Joi.object().keys({
+        type: validate.reqString.allow("video", "text"),
+        url: validate.reqString,
+        title: validate.string,
+      })
+    ),
+    publishDate: validate.date,
+  }),
 };

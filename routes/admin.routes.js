@@ -7,7 +7,7 @@ const { isSuperAdminAuthenticate } = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
 const collegeController = require("../controllers/college.controller");
-
+const instructorCourseController = require("../controllers/instructorCourse.controller");
 router.post(
   "/college",
   Validate(schemas.addCollegeSchema),
@@ -45,6 +45,64 @@ router.get(
   "/batches-option/:collegeId",
   isSuperAdminAuthenticate,
   batcheController.getBatchesOption
+);
+
+//----------------------- instructor courses------------------------//
+
+router.post(
+  "/instructor-course",
+  Validate(schemas.addInstructorCourseSchema),
+  isSuperAdminAuthenticate,
+  instructorCourseController.createInstructorCourse
+);
+
+// Get an Instructor Course by ID
+router.get(
+  "/instructor-course/:id",
+  isSuperAdminAuthenticate,
+  instructorCourseController.getInstructorCourseById
+);
+
+// Update an Instructor Course by ID
+router.put(
+  "/instructor-course/:id",
+  Validate(schemas.addInstructorCourseSchema),
+  isSuperAdminAuthenticate,
+  instructorCourseController.updateInstructorCourse
+);
+
+// Delete an Instructor Course by ID
+router.delete(
+  "/instructor-course/:id",
+  isSuperAdminAuthenticate,
+  instructorCourseController.deleteInstructorCourse
+);
+
+// Toggle the 'active' status of an Instructor Course
+router.patch(
+  "/instructor-course/toggle-status/:id",
+  isSuperAdminAuthenticate,
+  instructorCourseController.toggleInstructorCourseStatus
+);
+
+// Toggle the 'isPublic' status of an Instructor Course
+router.patch(
+  "/instructor-course/toggle-public-status/:id",
+  isSuperAdminAuthenticate,
+  instructorCourseController.toggleInstructorCoursePublicStatus
+);
+
+// Get all public Instructor Courses
+router.get(
+  "/instructor-courses/public",
+  instructorCourseController.getPublicInstructorCourses
+);
+
+// Assign a Course to a College
+router.post(
+  "/instructor-course/assign/:id/:collegeId",
+  isSuperAdminAuthenticate,
+  instructorCourseController.assignCourseToCollege
 );
 
 module.exports = router;

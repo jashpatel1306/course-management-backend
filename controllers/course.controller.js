@@ -83,7 +83,7 @@ module.exports = {
       const course = await courseServices.toggleCoursePublicStatus(
         req.params.id
       );
-      const message = course.published ? "published" : "unpublished";
+      const message = course.isPublic ? "published" : "unpublished";
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,

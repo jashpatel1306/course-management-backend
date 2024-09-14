@@ -11,5 +11,6 @@ module.exports = {
   instructorServices: require(`./instructor/instructor.services`),
   courseServices: require(`./courses/courseServices`),
   sectionServices: require("./section/section.services"),
-  lectureServices: require("./lectures/lectures.services")
+  lectureServices: require("./lectures/lectures.services"),
+  instructorCourseService: require("./instructorCourses/instructorCourses.services")
 };

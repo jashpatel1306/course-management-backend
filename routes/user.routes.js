@@ -22,6 +22,7 @@ const fileUploadController = require("../controllers/fileUpload.controller");
 const courseController = require("../controllers/course.controller");
 const sectionController = require("../controllers/section.controller");
 const lectureController = require("../controllers/lecture.contoller");
+const instructorCourseController = require("../controllers/instructorCourse.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -502,5 +503,12 @@ router.put(
   lectureController.toggleLecturePublicStatus
 );
 
+//------------------------ instructor course ------------------------//
 
+// Get all Courses by College
+router.post(
+  "/instructor-courses/:collegeId",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getAllCoursesByCollege
+);
 module.exports = router;
