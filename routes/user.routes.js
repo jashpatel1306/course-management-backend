@@ -355,27 +355,28 @@ router.get(
 router.post(
   "/start-upload",
   // isAdminCommonAuthenticate,
-  Validate(schemas.startUploadSchema),
+  // Validate(schemas.startUploadSchema),
   multipartUploadController.startUpload
 );
 
 router.post(
   "/upload-part",
-  Validate(schemas.uploadPartSchema),
+  // Validate(schemas.uploadPartSchema),
   multipartUploadController.uploadPart
 );
 
 router.post(
   "/complete-upload",
-  Validate(schemas.completeUploadSchema),
+  // Validate(schemas.completeUploadSchema),
   multipartUploadController.completeUpload
 );
 
 router.post(
   "/upload-file",
-  Validate(schemas.uploadFileSchema),
+  // Validate(schemas.uploadFileSchema),
   fileUploadController.uploadImage
 );
+
 
 //--------------------------- courses -------------------------//
 
@@ -417,7 +418,26 @@ router.post(
   isAdminCommonAuthenticate,
   courseController.getCoursesByCollegeId
 );
+router.post(
+  "/assign-course",
+  Validate(schemas.assignCourseSchema),
+  isAdminCommonAuthenticate,
+  courseController.addAssignCourse
+);
+router.post(
+  "/assign-course-college",
+  Validate(schemas.assignCourseCollegeSchema),
+  isAdminCommonAuthenticate,
+  courseController.addAssignCourseCollege
+);
 
+
+
+router.get(
+  "/college-wise-courses-options/:collegeId",
+  isAdminCommonAuthenticate,
+  courseController.getCoursesOptions
+);
 //--------------------------- Sections -------------------------//
 
 router.post(
@@ -449,7 +469,7 @@ router.put(
 router.put(
   "/section/published/:id",
   isAdminCommonAuthenticate,
-  sectionController.togglePublicStatus
+  sectionController.toggleSectionPublishStatus
 );
 
 router.get(
@@ -479,6 +499,12 @@ router.put(
   isAdminCommonAuthenticate,
   lectureController.updateLectureContent
 );
+router.put(
+  "/lecture-content-drag-drop/:id",
+  Validate(schemas.lectureContentDragDropSchema),
+  isAdminCommonAuthenticate,
+  lectureController.updateLectureContentDragDrop
+);
 router.get(
   "/lecture/:id",
   isAdminCommonAuthenticate,
@@ -490,7 +516,11 @@ router.delete(
   isAdminCommonAuthenticate,
   lectureController.deleteLecture
 );
-
+router.delete(
+  "/lecture-content/:lectureId/:contentId",
+  isAdminCommonAuthenticate,
+  lectureController.deleteLectureContent
+);
 router.put(
   "/lecture/status/:id",
   isAdminCommonAuthenticate,
@@ -498,9 +528,9 @@ router.put(
 );
 
 router.put(
-  "/lecture/public/:id",
+  "/lecture/publish/:id",
   isAdminCommonAuthenticate,
-  lectureController.toggleLecturePublicStatus
+  lectureController.toggleLecturePublishStatus
 );
 
 //------------------------ instructor course ------------------------//

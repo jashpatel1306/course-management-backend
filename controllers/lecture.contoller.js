@@ -61,6 +61,21 @@ module.exports = {
       next(error);
     }
   },
+  updateLectureContentDragDrop: async (req, res, next) => {
+    try {
+      const lecture = await lectureServices.updateLectureDragDrop(
+        req.params.id,
+        req.body
+      );
+      res.send({
+        success: true,
+        message: "Lecture updated successfully",
+        data: lecture,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   updateLectureContent: async (req, res, next) => {
     try {
       const lecture = await lectureServices.updateLectureContent(
@@ -85,7 +100,22 @@ module.exports = {
    */
   deleteLecture: async (req, res, next) => {
     try {
+      console.log("req.params.id: ",req.params.id)
       const lecture = await lectureServices.deleteLecture(req.params.id);
+      res.send({
+        success: true,
+        message: "Lecture deleted successfully",
+        data: lecture,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  deleteLectureContent: async (req, res, next) => {
+    try {
+      const lectureId = req.params.lectureId
+      const contentId = req.params.contentId
+      const lecture = await lectureServices.deleteLectureContent(lectureId,contentId);
       res.send({
         success: true,
         message: "Lecture deleted successfully",
@@ -117,17 +147,17 @@ module.exports = {
   },
 
   /**
-   * Toggle the 'public' status of a Lecture by ID
+   * Toggle the 'publish' status of a Lecture by ID
    * @param {Object} req - The request object
    * @param {Object} res - The response object
    * @param {Function} next - The next middleware function
    */
-  toggleLecturePublicStatus: async (req, res, next) => {
+  toggleLecturePublishStatus: async (req, res, next) => {
     try {
-      const lecture = await lectureServices.toggleLecturePublicStatus(
+      const lecture = await lectureServices.toggleLecturePublishStatus(
         req.params.id
       );
-      const message = lecture.isPublic ? "made public" : "made private";
+      const message = lecture.isPublish ? "made publish" : "made private";
       res.status(200).json({
         success: true,
         message: `Lecture ${message} successfully`,
@@ -139,17 +169,17 @@ module.exports = {
   },
 
   /**
-   * Get all public Lectures
+   * Get all publish Lectures
    * @param {Object} req - The request object
    * @param {Object} res - The response object
    * @param {Function} next - The next middleware function
    */
-  getPublicLecturesOfCourse: async (req, res, next) => {
+  getPublishLecturesOfCourse: async (req, res, next) => {
     try {
-      const lectures = await lectureServices.getPublicLectures();
+      const lectures = await lectureServices.getPublishLectures();
       res.send({
         success: true,
-        message: "Public lectures fetched successfully",
+        message: "Publish lectures fetched successfully",
         data: lectures,
       });
     } catch (error) {

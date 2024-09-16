@@ -107,18 +107,21 @@ module.exports = {
   },
 
   /**
-   * Toggle the 'isPublic' status of a Section by ID
+   * Toggle the 'isPublish' status of a Section by ID
    * @param {string} id - The ID of the Section
    * @returns {Promise<Object>} - The updated Section
    */
-  toggleSectionPublicStatus: async (id) => {
+  toggleSectionPublishStatus: async (id) => {
     try {
       const section = await SectionModel.findById(id);
       if (!section) {
         throw createError.NotFound("Section not found.");
       }
 
-      section.isPublic = !section.isPublic;
+      section.isPublish = !section.isPublish;
+      if (section.isPublish) {
+        section.publishDate = new Date();
+      }
       await section.save();
 
       return section;
@@ -143,17 +146,17 @@ module.exports = {
   },
 
   /**
-   * Get all public Sections
-   * @returns {Promise<Array<Object>>} - List of public sections
+   * Get all publish Sections
+   * @returns {Promise<Array<Object>>} - List of publish sections
    */
 
-  getPublicSections: async () => {
+  getPublishSections: async () => {
     try {
-      const publicSections = await SectionModel.find({ isPublic: true });
-      if (!publicSections || publicSections.length === 0) {
-        throw createError.NotFound("No public sections found.");
+      const publishSections = await SectionModel.find({ isPublish: true });
+      if (!publishSections || publishSections.length === 0) {
+        throw createError.NotFound("No publish sections found.");
       }
-      return publicSections;
+      return publishSections;
     } catch (error) {
       throw createError(error);
     }

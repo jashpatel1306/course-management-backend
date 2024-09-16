@@ -3,10 +3,10 @@ const uploadService = require("../helpers/fileUpload.helper");
 
 module.exports = {
   startUpload: async (req, res, next) => {
-    const { fileName, fileType } = req.body;
-    console.log("fileDetails", fileName, fileType);
+    const { filename, filetype } = req.body;
+    // console.log("fileDetails", filename, filetype);
     try {
-      const result = await uploadService.startUpload(fileName, fileType);
+      const result = await uploadService.startUpload(filename, filetype);
       res.send(result);
     } catch (error) {
       next(error);
@@ -15,21 +15,17 @@ module.exports = {
 
   uploadPart: async (req, res, next) => {
     try {
-      console.log("req body", req.body);
-      const { fileName, partNumber, uploadId } = req.body;
-
-      console.log("fileDetails", fileName, partNumber, uploadId);
-      const fileChunk = req.files.fileChunk;
-      console.log("fileChunk", req.files);
-      if (!fileChunk) {
-        throw createError(400, "UploadPart not found.");
-      }
+      const { uploadId, key, partNumber } = req.body;
+      const part = req.files.part;
+      console.log("******************");
+      console.log(uploadId, key, partNumber, part.size);
+      console.log("******************");
 
       const result = await uploadService.uploadPart(
-        fileName,
-        partNumber,
         uploadId,
-        fileChunk.data
+        key,
+        partNumber,
+        part
       );
       res.send(result);
     } catch (error) {
@@ -37,15 +33,15 @@ module.exports = {
     }
   },
 
-  completeUpload: async (req, res) => {
-    const { fileName, uploadId, parts } = req.body;
-
+  completeUpload: async (req, res, next) => {
+    const { uploadId, key, parts } = req.body;
+    if (!parts || parts.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "No parts provided for completion." });
+    }
     try {
-      const result = await uploadService.completeUpload(
-        fileName,
-        uploadId,
-        parts
-      );
+      const result = await uploadService.completeUpload(uploadId, key, parts);
       res.send(result);
     } catch (error) {
       next(error);

@@ -19,7 +19,7 @@ module.exports = {
     try {
       const quizId = req.params.id;
       const reqData = req.body;
-      const quiz = await quizServices.updateQuiz(quizId, reqData);
+      const quiz = await quizzesServices.updateQuiz(quizId, reqData);
       return res.status(200).send({
         success: true,
         message: "Quiz updated successfully",
@@ -32,7 +32,7 @@ module.exports = {
   getQuizById: async (req, res, next) => {
     try {
       const quizId = req.params.id;
-      const quiz = await quizServices.getQuizById(quizId);
+      const quiz = await quizzesServices.getQuizById(quizId);
       return res.status(200).send({
         success: true,
         message: "Quiz fetched successfully",
@@ -46,7 +46,7 @@ module.exports = {
   deleteQuiz: async (req, res, next) => {
     try {
       const quizId = req.params.id;
-      const quiz = await quizServices.deleteQuiz(quizId);
+      const quiz = await quizzesServices.deleteQuiz(quizId);
       return res.status(200).send({
         success: true,
         message: "Quiz deleted successfully",
@@ -60,7 +60,7 @@ module.exports = {
   changeActiveStatusQuiz: async (req, res, next) => {
     try {
       const id = req.params.id;
-      const quiz = await quizServices.toggleActiveStatus(id);
+      const quiz = await quizzesServices.toggleActiveStatus(id);
       const message = quiz.active === true ? "activated" : "inactivated";
       res.status(200).json({
         success: true,
@@ -85,7 +85,7 @@ module.exports = {
       } else if (status === "inactive") {
         filter.active = false;
       }
-      const { quizzes, count } = await quizServices.getQuizzesByAssessment(
+      const { quizzes, count } = await quizzesServices.getQuizzesByAssessment(
         filter,
         perPage,
         pageNo

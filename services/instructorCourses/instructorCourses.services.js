@@ -97,18 +97,18 @@ module.exports = {
   },
 
   /**
-   * Toggle the 'isPublic' status of an Instructor Course by ID
+   * Toggle the 'isPublish' status of an Instructor Course by ID
    * @param {string} id - The ID of the Instructor Course
    * @returns {Promise<Object>} - The updated Instructor Course
    */
-  toggleInstructorCoursePublicStatus: async (id) => {
+  toggleInstructorCoursePublishStatus: async (id) => {
     try {
       const course = await InstructorCourseModel.findById(id);
       if (!course) {
         throw createError.NotFound("Instructor course not found.");
       }
 
-      course.isPublic = !course.isPublic;
+      course.isPublish = !course.isPublish;
       await course.save();
 
       return course;
@@ -118,18 +118,18 @@ module.exports = {
   },
 
   /**
-   * Get all public Instructor Courses
-   * @returns {Promise<Array<Object>>} - List of public Instructor Courses
+   * Get all publish Instructor Courses
+   * @returns {Promise<Array<Object>>} - List of publish Instructor Courses
    */
-  getPublicInstructorCourses: async () => {
+  getPublishInstructorCourses: async () => {
     try {
-      const publicCourses = await InstructorCourseModel.find({
-        isPublic: true,
+      const publishCourses = await InstructorCourseModel.find({
+        isPublish: true,
       });
-      if (!publicCourses || publicCourses.length === 0) {
-        throw createError.NotFound("No public instructor courses found.");
+      if (!publishCourses || publishCourses.length === 0) {
+        throw createError.NotFound("No publish instructor courses found.");
       }
-      return publicCourses;
+      return publishCourses;
     } catch (error) {
       throw createError(error);
     }

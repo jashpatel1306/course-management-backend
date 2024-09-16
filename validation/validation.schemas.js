@@ -180,6 +180,12 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
   }),
+  batchWiseDataSchema: Joi.object().keys({
+    batchId: validate.id,
+    search: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber,
+  }),
   courseWiseDataSchema: Joi.object().keys({
     courseId: validate.id,
     search: validate.string,
@@ -204,12 +210,25 @@ module.exports = {
   uploadFileSchema: Joi.object().keys({
     path: validate.reqString,
   }),
+  uploadSchema: Joi.object().keys({
+    fileName: validate.reqString,
+    fileType : validate.reqString,
+  }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
     courseId: validate.id,
     collegeId: validate.id,
     courseDescription: validate.reqString,
-    active: validate.reqBoolean,
+    isPublish: validate.reqBoolean,
+  }),
+  assignCourseSchema: Joi.object().keys({
+    courseId: validate.reqId,
+    collegeId: validate.reqId,
+    batchId: validate.reqId,
+  }),
+  assignCourseCollegeSchema: Joi.object().keys({
+    courseId: validate.reqId,
+    collegeId: validate.reqId,
   }),
 
   sectionSchema: Joi.object().keys({
@@ -221,19 +240,23 @@ module.exports = {
     name: validate.reqString,
     sectionId: validate.reqId,
     courseId: validate.reqId,
-    // lectureContent: validate.array.items(
-    //   Joi.object().keys({
-    //     type: validate.reqString.allow("video", "text"),
-    //     content: validate.reqString,
-    //     title: validate.string,
-    //   })
-    // ),
     // publishDate: validate.date,
+  }),
+  lectureContentDragDropSchema: Joi.object().keys({
+    lectureContent: validate.array.items(
+      Joi.object().keys({
+        type: validate.reqString.allow("video", "text", "file"),
+        content: validate.reqString,
+        title: validate.reqString,
+        _id: validate.reqId,
+      })
+    ),
   }),
   lectureContentSchema: Joi.object().keys({
     type: validate.reqString.allow("video", "text", "file"),
     content: validate.reqString,
-    title: validate.string,
+    title: validate.reqString,
+    id: validate.id,
   }),
   addInstructorCourseSchema: Joi.object().keys({
     name: validate.reqString,

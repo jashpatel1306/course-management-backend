@@ -80,10 +80,10 @@ module.exports = {
 
   publishToggle: async (req, res, next) => {
     try {
-      const course = await courseServices.toggleCoursePublicStatus(
+      const course = await courseServices.toggleCoursePublishStatus(
         req.params.id
       );
-      const message = course.isPublic ? "published" : "unpublished";
+      const message = course.isPublish ? "published" : "unpublished";
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,
@@ -161,7 +161,7 @@ module.exports = {
       const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
       const filter = {};
       const userRole = res.locals.userRole;
-      // userRole === "student" ? filter.isPublic = true : filter.
+      // userRole === "student" ? filter.isPublish = true : filter.
       const { courses, count } = await courseServices.getCoursesByCollegeId(
         college_id,
         search,
@@ -199,6 +199,53 @@ module.exports = {
         message: "Courses fetched successfully",
         data: courses,
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+  addAssignCourse: async (req, res, next) => {
+    try {
+      const ids = req.body;
+      const courses = await courseServices.addAssignCourse(
+        ids.batchId,
+        ids.collegeId,
+        ids.courseId
+      );
+      if (courses) {
+        return res.status(200).json({
+          success: true,
+          message: "Course assigned successfully",
+          data: courses,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to assign course",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+  addAssignCourseCollege: async (req, res, next) => {
+    try {
+      const ids = req.body;
+      const courses = await courseServices.addAssignCourseCollege(
+        ids.collegeId,
+        ids.courseId
+      );
+      if (courses) {
+        return res.status(200).json({
+          success: true,
+          message: "Course assigned successfully",
+          data: courses,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to assign course",
+        });
+      }
     } catch (error) {
       next(error);
     }

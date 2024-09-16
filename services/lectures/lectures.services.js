@@ -45,29 +45,38 @@ module.exports = {
    */
   updateLectureContent: async (lectureId, newContent) => {
     try {
-      console.log("lectureId, newContent  :", lectureId, newContent);
-      const lecture = await LecturesModel.findByIdAndUpdate(
-        lectureId,
-        {
-          $push: {
-            lectureContent: [newContent],
-          },
-        },
-        { new: true }
-      );
-      if (!lecture) {
-        throw new Error("Lecture not found");
+      // First check if the contentId exists within the lectureContent array
+      let lecture = null;
+      if (newContent.id) {
+        // If the content exists, update the specific item in the array
+        lecture = await LecturesModel.updateOne(
+          { _id: lectureId, "lectureContent._id": newContent.id },
+          { $set: { "lectureContent.$": newContent } }
+        );
+        console.log("Updated existing content:", lecture);
+      } else {
+        // If the contentId doesn't exist, push a new content item into the array
+        lecture = await LecturesModel.updateOne(
+          { _id: lectureId },
+          {
+            $push: {
+              lectureContent: [newContent],
+            },
+          }
+        );
+        console.log("Added new content:", lecture);
       }
-
+      if (!lecture) {
+        throw createError.NotFound("Lecture not found.");
+      }
       return lecture;
     } catch (err) {
-      console.error("Error updating lecture content:", err);
-      throw err; // Rethrow the error to handle it in the caller function if needed
+      console.error("Error upserting lecture content:", err);
     }
   },
   updateLecture: async (id, data) => {
     try {
-      const lecture = await LecturesModel.findByIdAndUpdate(lectureId, data, {
+      const lecture = await LecturesModel.findByIdAndUpdate(id, data, {
         new: true,
       });
       await SectionModel.findOneAndUpdate(
@@ -77,6 +86,21 @@ module.exports = {
         },
         { new: true, runValidators: true } // Options: return updated doc and validate
       );
+      console.log("lecture :", lecture);
+      if (!lecture) {
+        throw createError.NotFound("Lecture not found.");
+      }
+      return lecture;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+  updateLectureDragDrop: async (id, data) => {
+    try {
+      const lecture = await LecturesModel.findByIdAndUpdate(id, data, {
+        new: true,
+      });
+
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
       }
@@ -93,13 +117,46 @@ module.exports = {
    */
   deleteLecture: async (id) => {
     try {
-      const lecture = await LecturesModel.findByIdAndDelete(id);
-      if (!lecture) {
-        throw createError.NotFound("Lecture not found.");
+      // Find the lecture by id and delete it
+      const lecture = await LecturesModel.findOne({ _id: id });
+      console.log("lecture:  ", lecture);
+      if (lecture.sectionId) {
+        await SectionModel.findOneAndUpdate(
+          { _id: lecture.sectionId, "lectures.id": id }, // Query filter
+          {
+            $pull: { lectures: { id: id } }, // Update operation
+          },
+          { new: true, runValidators: true } // Options: return updated doc and validate
+        );
+        await LecturesModel.deleteOne({ _id: id });
       }
-      return lecture;
+      return true;
     } catch (error) {
-      throw createError(error);
+      // Re-throw the error if it's an instance of createError, or create a new internal server error
+      if (!error.status) {
+        throw createError(
+          500,
+          `An error occurred while deleting the lecture.${error}`
+        );
+      } else {
+        throw error;
+      }
+    }
+  },
+  deleteLectureContent: async (lectureId, contentId) => {
+    try {
+      const result = await LecturesModel.updateOne(
+        { _id: lectureId }, // Find the lecture by its _id
+        {
+          $pull: {
+            lectureContent: { _id: contentId }, // Remove the item matching the contentId
+          },
+        }
+      );
+      console.log("Deleted content result:", result);
+      return result;
+    } catch (err) {
+      console.error("Error deleting lecture content:", err);
     }
   },
 
@@ -116,6 +173,7 @@ module.exports = {
       }
 
       lecture.active = !lecture.active;
+
       await lecture.save();
 
       return lecture;
@@ -125,40 +183,46 @@ module.exports = {
   },
 
   /**
-   * Toggle the 'public' status of a Lecture by ID
+   * Toggle the 'publish' status of a Lecture by ID
    * @param {string} id - The ID of the Lecture
    * @returns {Promise<Object>} - The updated Lecture
    */
-  toggleLecturePublicStatus: async (id) => {
+  toggleLecturePublishStatus: async (id) => {
     try {
       const lecture = await LecturesModel.findById(id);
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
       }
+      const newObject = {};
+      newObject.isPublish = !lecture.isPublish;
+      if (lecture.isPublish) {
+        newObject.publishDate = new Date();
+      }
+      const updateLecture = await LecturesModel.updateOne(
+        { _id: id },
+        { $set: newObject }
+      );
 
-      lecture.isPublic = !lecture.isPublic;
-      await lecture.save();
-
-      return lecture;
+      return updateLecture;
     } catch (error) {
       throw createError(error);
     }
   },
 
   /**
-   * Get all public Lectures
-   * @returns {Promise<Array<Object>>} - List of public Lectures
+   * Get all publish Lectures
+   * @returns {Promise<Array<Object>>} - List of publish Lectures
    */
-  getPublicLectures: async (sectionId) => {
+  getPublishLectures: async (sectionId) => {
     try {
-      const publicLectures = await LecturesModel.find({
-        isPublic: true,
+      const publishLectures = await LecturesModel.find({
+        isPublish: true,
         sectionId,
       });
-      if (!publicLectures || publicLectures.length === 0) {
-        throw createError.NotFound("No public lectures found.");
+      if (!publishLectures || publishLectures.length === 0) {
+        throw createError.NotFound("No publish lectures found.");
       }
-      return publicLectures;
+      return publishLectures;
     } catch (error) {
       throw createError(error);
     }

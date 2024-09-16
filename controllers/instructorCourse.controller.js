@@ -127,18 +127,18 @@ module.exports = {
   },
 
   /**
-   * Toggle the 'isPublic' status of an Instructor Course by ID
+   * Toggle the 'isPublish' status of an Instructor Course by ID
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    * @param {Function} next - Express next middleware function
    */
-  toggleInstructorCoursePublicStatus: async (req, res, next) => {
+  toggleInstructorCoursePublishStatus: async (req, res, next) => {
     try {
       const { id } = req.params;
       const course =
-        await instructorCourseService.toggleInstructorCoursePublicStatus(id);
+        await instructorCourseService.toggleInstructorCoursePublishStatus(id);
 
-      const message = course.isPublic ? "published" : "unpublished";
+      const message = course.isPublish ? "published" : "unpublished";
 
       res.status(200).json({
         success: true,
@@ -151,18 +151,18 @@ module.exports = {
   },
 
   /**
-   * Get all public Instructor Courses
+   * Get all publish Instructor Courses
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    * @param {Function} next - Express next middleware function
    */
-  getPublicInstructorCourses: async (req, res, next) => {
+  getPublishInstructorCourses: async (req, res, next) => {
     try {
       const courses =
-        await instructorCourseService.getPublicInstructorCourses();
+        await instructorCourseService.getPublishInstructorCourses();
       res.status(200).json({
         success: true,
-        message: "Public courses fetched successfully.",
+        message: "Publish courses fetched successfully.",
         data: courses,
       });
     } catch (error) {

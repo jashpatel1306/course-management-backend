@@ -3,7 +3,7 @@ const batchSchema = new mongoose.Schema(
   {
     batchName: {
       type: String,
-      required: [true,"batchName is required."]
+      required: [true, "batchName is required."],
     },
     batchNumber: {
       type: String,
@@ -12,10 +12,10 @@ const batchSchema = new mongoose.Schema(
     collegeId: {
       type: mongoose.Types.ObjectId,
       ref: "colleges",
-      required:[ true,"collegeId is required."]
+      required: [true, "collegeId is required."],
     },
     instructorIds: [{ type: mongoose.Types.ObjectId, ref: "instructors" }],
-    courses: [{ type: mongoose.Types.ObjectId }],
+    courses: [{ type: mongoose.Types.ObjectId, ref: "courses" }],
     active: {
       type: Boolean,
       default: true,

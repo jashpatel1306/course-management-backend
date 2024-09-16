@@ -1,3 +1,4 @@
+const batchesModel = require("../batches/batches.model");
 const CourseModel = require("./course"); // Adjust the path as needed
 const createError = require("http-errors");
 
@@ -84,7 +85,7 @@ module.exports = {
   getCoursesByCollegeId: async (collegeId, search, pageNo, perPage) => {
     try {
       let filter = { collegeId: collegeId };
-      console.log("filter : ",filter)
+      console.log("filter : ", filter);
       if (search) {
         filter = {
           $and: [
@@ -136,14 +137,14 @@ module.exports = {
     }
   },
 
-  toggleCoursePublicStatus: async (id) => {
+  toggleCoursePublishStatus: async (id) => {
     try {
       const course = await CourseModel.findById(id);
       if (!course) {
         throw createError.NotFound("Course not found.");
       }
 
-      course.isPublic = !course.isPublic;
+      course.isPublish = !course.isPublish;
       await course.save();
 
       return course;
@@ -153,16 +154,16 @@ module.exports = {
   },
 
   /**
-   * Get all public courses
-   * @returns {Promise<Array<Object>>} - List of public courses
+   * Get all publish courses
+   * @returns {Promise<Array<Object>>} - List of publish courses
    */
-  getPublicCourses: async () => {
+  getPublishCourses: async () => {
     try {
-      const publicCourses = await CourseModel.find({ isPublic: true });
-      if (!publicCourses || publicCourses.length === 0) {
-        throw createError.NotFound("No public courses found.");
+      const publishCourses = await CourseModel.find({ isPublish: true });
+      if (!publishCourses || publishCourses.length === 0) {
+        throw createError.NotFound("No publish courses found.");
       }
-      return publicCourses;
+      return publishCourses;
     } catch (error) {
       throw createError(error);
     }
@@ -170,13 +171,95 @@ module.exports = {
 
   getCourseOptions: async (collegeId) => {
     try {
-      const course = await CourseModel.find({ collegeId });
-      const data = course.map((item) => {
+      console.log("collegeId : ", collegeId);
+      const courses = await CourseModel.find({
+        $and: [
+          {
+            $or: [
+              { collegeId: collegeId },
+              { collegeIds: { $in: [collegeId] } },
+            ],
+          },
+          { isPublish: true },
+        ],
+      });
+      console.log("courses : ", courses);
+      const data = courses.map((item) => {
         return { label: item.courseName, value: item._id };
       });
       return data;
     } catch (error) {
       throw createError(500, error.message);
+    }
+  },
+  addAssignCourse: async (batchId, collegeId, courseId) => {
+    try {
+      // Check if the course exists
+      const course = await CourseModel.findById(courseId);
+
+      if (!course) {
+        throw new Error("Course not found.");
+      }
+
+      // Check if collegeId is already in collegeIds and add it if not
+      if (!course.collegeIds.includes(collegeId)) {
+        await CourseModel.updateOne(
+          { _id: courseId },
+          { $addToSet: { collegeIds: collegeId } }
+        );
+      }
+
+      // Find the batch
+      const batch = await batchesModel.findOne({
+        _id: batchId,
+        collegeId: collegeId,
+      });
+
+      if (!batch) {
+        throw new Error("Batch not found or college ID does not match.");
+      }
+
+      // Check if courseId is already in the batch's courses
+      if (batch.courses.includes(courseId)) {
+        return { message: "Course ID already exists in the batch." };
+      }
+
+      // Add courseId to the batch's courses array
+      await batchesModel.updateOne(
+        { _id: batchId },
+        { $addToSet: { courses: courseId } }
+      );
+
+      return {
+        message:
+          "Course ID added to batch and college ID updated in course successfully.",
+      };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  },
+  addAssignCourseCollege: async (collegeId, courseId) => {
+    try {
+      // Check if the course exists
+      const course = await CourseModel.findById(courseId);
+
+      if (!course) {
+        throw new Error("Course not found.");
+      }
+
+      // Check if collegeId is already in collegeIds and add it if not
+      if (!course.collegeIds.includes(collegeId)) {
+        await CourseModel.updateOne(
+          { _id: courseId },
+          { $addToSet: { collegeIds: collegeId } }
+        );
+      }
+
+      return {
+        message: "Course ID added to college updated in course successfully.",
+      };
+    } catch (error) {
+      throw new Error(error.message);
     }
   },
 };

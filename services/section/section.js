@@ -12,7 +12,7 @@ const SectionSchema = new mongoose.Schema(
       ref: "courses",
       required: true,
     },
-    isPublic: {
+    isPublish: {
       type: Boolean,
       default: false,
     },

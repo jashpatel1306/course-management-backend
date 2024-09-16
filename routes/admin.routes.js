@@ -85,17 +85,17 @@ router.patch(
   instructorCourseController.toggleInstructorCourseStatus
 );
 
-// Toggle the 'isPublic' status of an Instructor Course
+// Toggle the 'isPublish' status of an Instructor Course
 router.patch(
-  "/instructor-course/toggle-public-status/:id",
+  "/instructor-course/toggle-publish-status/:id",
   isSuperAdminAuthenticate,
-  instructorCourseController.toggleInstructorCoursePublicStatus
+  instructorCourseController.toggleInstructorCoursePublishStatus
 );
 
-// Get all public Instructor Courses
+// Get all publish Instructor Courses
 router.get(
-  "/instructor-courses/public",
-  instructorCourseController.getPublicInstructorCourses
+  "/instructor-courses/publish",
+  instructorCourseController.getPublishInstructorCourses
 );
 
 // Assign a Course to a College

@@ -35,7 +35,7 @@ const lecturesSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  isPublic: {
+  isPublish: {
     type: Boolean,
     default: false,
   },

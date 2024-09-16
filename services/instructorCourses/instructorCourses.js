@@ -32,7 +32,7 @@ const InstructorCourseSchema = new mongoose.Schema(
         },
       },
     ],
-    isPublic: {
+    isPublish: {
       type: Boolean,
       default: false,
     },

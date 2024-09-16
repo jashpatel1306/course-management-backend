@@ -2,7 +2,11 @@ const userModel = require("./user.model");
 const collegesModel = require("../colleges/colleges.model");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { SUPERADMIN, STUDENT } = require("../../constants/roles.constant");
+const {
+  SUPERADMIN,
+  STUDENT,
+  ADMIN,
+} = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
@@ -32,17 +36,35 @@ module.exports = {
           role: SUPERADMIN,
           user_name: "First Admin",
         };
+        // const collageData = {
+        //   email: "lmscollage@admin.com",
+        //   password: "Admin@123",
+        //   role: ADMIN,
+        //   user_name: "First Collage Admin",
+        // };
 
         data.password = await commonFunctions.encode(data.password);
+        // collageData.password = await commonFunctions.encode(
+        //   collageData.password
+        // );
         await userModel.updateOne(
           { email: data.email },
           { ...data },
           { upsert: true }
         );
-        const userResult = await userModel.findOne({ email: data.email });
-        if (userResult._id) {
+        // await userModel.updateOne(
+        //   { email: collageData.email },
+        //   { ...collageData },
+        //   { upsert: true }
+        // );
+        const collageUserResult = await userModel.findOne({
+          email: data.email,
+        });
+        // const userResult = await userModel.findOne({ email: data.email });
+
+        if (collageUserResult?._id) {
           const collegeData = {
-            userId: userResult._id,
+            userId: collageUserResult?._id,
             collegeName: "superAdmin College",
             collegeNo: "-1",
             contactPersonName: "First Admin",
@@ -51,7 +73,7 @@ module.exports = {
             isAdmin: true,
           };
           await collegesModel.updateOne(
-            { userId: userResult._id },
+            { userId: collageUserResult._id },
             { ...collegeData },
             { upsert: true }
           );

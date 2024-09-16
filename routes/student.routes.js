@@ -8,6 +8,7 @@ const { isStudentAuthenticate } = require("../helpers/auth.helper");
 //----------------------------- college --------------------------------//
 const collegeController = require("../controllers/college.controller");
 const assessmentController = require("../controllers/assessment.controller");
+const batchesController = require("../controllers/batches.controller");
 router.post(
   "/get-all-assign-assessments",
   Validate(schemas.paginationAndFilterSchema),
@@ -16,17 +17,17 @@ router.post(
 );
 
 // router.post(
-//   "/colleges/all/:status",
+//   "/",
 //   Validate(schemas.searchPaginationScema),
 //   isStudentAuthenticate,
 //   collegeController.getAllColleges
 // );
 
-// router.get(
-//   "/college/:id",
-//   isStudentAuthenticate,
-//   collegeController.getCollegeById
-// );
+router.get(
+  "/student-wise-courses",
+  isStudentAuthenticate,
+  batchesController.getCoursesByBatchId
+);
 
 // router.patch(
 //   "/college-status/:id",

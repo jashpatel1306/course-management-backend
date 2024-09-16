@@ -3,6 +3,8 @@ const BatchModel = require("./batches.model");
 const createError = require("http-errors");
 const CollegeModel = require("../colleges/colleges.model");
 const studentsModel = require("../students/student.model");
+const batchesModel = require("./batches.model");
+const CourseModel = require("../courses/course");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -82,6 +84,7 @@ module.exports = {
     try {
       const batch = await BatchModel.find({ collegeId })
         .populate("instructorIds", "_id name")
+        .populate("courses", "_id courseName")
         .sort({ batchName: 1 });
       if (!batch) {
         throw createError(404, "Batches not found");
@@ -160,6 +163,24 @@ module.exports = {
       return batches;
     } catch (error) {
       throw error;
+    }
+  },
+  getCoursesByBatchId: async (batchId) => {
+    try {
+      const batchData = await BatchModel.findOne({ _id: batchId });
+      if (!batchData) {
+        throw createError(404, "Batches not found");
+      }
+      console.log("batchData: ", batchData);
+      const courseIds = batchData.courses;
+      const courses = await CourseModel.find({ _id: { $in: courseIds } });
+      if (!courses) {
+        throw createError.NotFound("No courses found for the given college.");
+      }
+
+      return { courses };
+    } catch (error) {
+      throw createError(error);
     }
   },
 };
