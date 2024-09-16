@@ -353,20 +353,20 @@ router.get(
 //multipart upload
 router.post(
   "/start-upload",
-  // isAdminCommonAuthenticate,
-  // Validate(schemas.startUploadSchema),
+  isAdminCommonAuthenticate,
+  Validate(schemas.startUploadSchema),
   multipartUploadController.startUpload
 );
 
 router.post(
   "/upload-part",
-  // Validate(schemas.uploadPartSchema),
+  Validate(schemas.uploadPartSchema),
   multipartUploadController.uploadPart
 );
 
 router.post(
   "/complete-upload",
-  // Validate(schemas.completeUploadSchema),
+  Validate(schemas.completeUploadSchema),
   multipartUploadController.completeUpload
 );
 

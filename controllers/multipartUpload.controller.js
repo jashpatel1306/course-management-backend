@@ -4,7 +4,7 @@ const uploadService = require("../helpers/fileUpload.helper");
 module.exports = {
   startUpload: async (req, res, next) => {
     const { filename, filetype } = req.body;
-    // console.log("fileDetails", filename, filetype);
+    console.log("fileDetails", filename, filetype);
     try {
       const result = await uploadService.startUpload(filename, filetype);
       res.send(result);
@@ -16,9 +16,9 @@ module.exports = {
   uploadPart: async (req, res, next) => {
     try {
       const { uploadId, key, partNumber } = req.body;
-      const part = req.files.part;
+      const part = req.files.file;
       console.log("******************");
-      console.log(uploadId, key, partNumber, part.size);
+      console.log(req.body, part.size);
       console.log("******************");
 
       const result = await uploadService.uploadPart(

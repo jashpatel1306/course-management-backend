@@ -194,17 +194,16 @@ module.exports = {
     perPage: validate.reqNumber,
   }),
   startUploadSchema: Joi.object().keys({
-    fileName: validate.reqString,
-    fileType: validate.reqString,
+    filename: validate.reqString,
+    filetype: validate.reqString,
   }),
   uploadPartSchema: Joi.object().keys({
-    fileName: validate.reqString,
+    key: validate.reqString,
     partNumber: validate.reqNumber,
     uploadId: validate.reqString,
-    file: validate.object,
   }),
   completeUploadSchema: Joi.object().keys({
-    fileName: validate.reqString,
+    key: validate.reqString,
     uploadId: validate.reqString,
     parts: validate.array,
   }),

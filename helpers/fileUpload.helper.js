@@ -520,7 +520,7 @@ module.exports = {
   startUpload: async (fileName, fileType) => {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
-      Key: `uploads/${uuidv4()}-${fileName}`,
+      Key: `uploads/${new Date().getTime()}-${fileName}`,
       ContentType: fileType,
       ACL: "private",
     };
@@ -539,7 +539,7 @@ module.exports = {
       partNumber,
       part,
     });
-    const buffer =  Buffer.from(part.data, `binary`);
+    const buffer = Buffer.from(part.data, `binary`);
 
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
