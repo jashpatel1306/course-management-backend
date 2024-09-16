@@ -1,13 +1,8 @@
 const { instructorCourseService } = require("../services"); // Adjust the path as needed
 const createError = require("http-errors");
+const commonUploadFunction = require("../helpers/fileUpload.helper");
 
 module.exports = {
-  /**
-   * Create a new Instructor Course
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
   createInstructorCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
@@ -39,32 +34,80 @@ module.exports = {
       next(error);
     }
   },
-  /**
-   * Get an Instructor Course by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
-  getInstructorCourseById: async (req, res, next) => {
+  updateInstructorCourse: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const course = await instructorCourseService.getInstructorCourseById(id);
-      res.status(200).json({
+      const image = req.files?.image;
+      const requestBody = req.body;
+      console.log("req.image :", image);
+      if (image) {
+        const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
+          image,
+          `courses/coverImage/`
+        );
+        if (!movetoAWS.status)
+          return res.json({
+            status: false,
+            message: movetoAWS.message,
+            data: [],
+          });
+        if (movetoAWS.data) requestBody.coverImage = movetoAWS.data;
+      }
+      const course = await instructorCourseService.updateInstructorCourse(
+        req.params.id,
+        request_body
+      );
+      //   console.log("course: ", course);
+      res.send({
         success: true,
-        message: "Instructor course fetched successfully.",
+        message: "Instructor Course updated successfully",
         data: course,
       });
     } catch (error) {
-      next(createError(error));
+      next(error);
     }
   },
 
-  /**
-   * Update an Instructor Course by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
+  getInstructorCoursesByCollegeId: async (req, res, next) => {
+    try {
+      const { search, pageNo = 1, perPage = 10 } = req.body;
+      const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
+      const filter = {};
+      const { courses, count } =
+        await instructorCourseService.getInstructorCoursesByCollegeId(
+          college_id,
+          search,
+          pageNo,
+          perPage
+        );
+      res.send({
+        success: true,
+        message: "Courses fetched successfully",
+        data: courses,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getInstructorCourseById: async (req, res, next) => {
+    try {
+      const course = await instructorCourseService.getInstructorCourseById(
+        req.params.id
+      );
+      res.send({
+        success: true,
+        message: "Instructor Course fetched successfully",
+        data: course,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   updateInstructorCourse: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -80,13 +123,39 @@ module.exports = {
       next(createError(error));
     }
   },
-
-  /**
-   * Delete an Instructor Course by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
+  updateInstructorCourseContent: async (req, res, next) => {
+    try {
+      const lecture = await instructorCourseService.updateInstructorCourseContent(
+        req.params.id,
+        req.body
+      );
+      res.send({
+        success: true,
+        message: "Course Content updated successfully",
+        data: lecture,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  deleteInstructorCourseContent: async (req, res, next) => {
+    try {
+      const courseId = req.params.courseId;
+      const contentId = req.params.contentId;
+      const lecture =
+        await instructorCourseService.deleteInstructorCourseContent(
+          courseId,
+          contentId
+        );
+      res.send({
+        success: true,
+        message: "Content Deleted Successfully",
+        data: lecture,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   deleteInstructorCourse: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -101,103 +170,40 @@ module.exports = {
       next(createError(error));
     }
   },
-
-  /**
-   * Toggle the 'active' status of an Instructor Course by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
-  toggleInstructorCourseStatus: async (req, res, next) => {
+  addAssignCourseCollege: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const course = await instructorCourseService.toggleInstructorCourseStatus(
-        id
+      const ids = req.body;
+      const courses = await instructorCourseService.assignCourseToCollege(
+        ids.courseId,
+        ids.collegeId,
       );
-      const message = course.active ? "activated" : "inactivated";
-
-      res.status(200).json({
-        success: true,
-        message: `course status ${message} successfully.`,
-        data: course,
-      });
+      if (courses) {
+        return res.status(200).json({
+          success: true,
+          message: "Course assigned successfully",
+          data: courses,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to assign course",
+        });
+      }
     } catch (error) {
-      next(createError(error));
+      next(error);
     }
   },
-
-  /**
-   * Toggle the 'isPublish' status of an Instructor Course by ID
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
-  toggleInstructorCoursePublishStatus: async (req, res, next) => {
+  getInstructorCoursesOptions: async (req, res, next) => {
     try {
-      const { id } = req.params;
-      const course =
-        await instructorCourseService.toggleInstructorCoursePublishStatus(id);
-
-      const message = course.isPublish ? "published" : "unpublished";
-
-      res.status(200).json({
+      const collegeId = req.params.collegeId;
+      const courses = await instructorCourseService.getInstructorCourseService(collegeId);
+      res.send({
         success: true,
-        message: `Course ${message} successfully`,
-        data: [],
-      });
-    } catch (error) {
-      next(createError(error));
-    }
-  },
-
-  /**
-   * Get all publish Instructor Courses
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   * @param {Function} next - Express next middleware function
-   */
-  getPublishInstructorCourses: async (req, res, next) => {
-    try {
-      const courses =
-        await instructorCourseService.getPublishInstructorCourses();
-      res.status(200).json({
-        success: true,
-        message: "Publish courses fetched successfully.",
+        message: "Courses fetched successfully",
         data: courses,
       });
     } catch (error) {
-      next(createError(error));
-    }
-  },
-
-  assignCourseToCollege: async (req, res, next) => {
-    try {
-      const { id, collegeId } = req.params;
-      const course = await instructorCourseService.assignCourseToCollege(
-        id,
-        collegeId
-      );
-      res.status(200).json({
-        success: true,
-        message: "Course assigned to college successfully.",
-        data: course,
-      });
-    } catch (error) {
-      next(createError(error));
-    }
-  },
-
-  getAllCoursesByCollege: async (req, res, next) => {
-    try {
-      const { collegeId } = req.params;
-      const course = await instructorCourseService.getCollegeCourses(collegeId);
-      res.status(200).json({
-        success: true,
-        message: "Course assigned to fetched successfully.",
-        data: course,
-      });
-    } catch (error) {
-      next(createError(error));
+      next(error);
     }
   },
 };

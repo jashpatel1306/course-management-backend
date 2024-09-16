@@ -52,7 +52,7 @@ module.exports = {
     password: validate.reqString,
     active: validate.boolean,
   }),
-  searchPaginationScema: Joi.object().keys({
+  searchPaginationSchema: Joi.object().keys({
     perPage: validate.reqNumber,
     pageNo: validate.reqNumber,
     search: validate.string,
@@ -167,6 +167,7 @@ module.exports = {
     skills: validate.array,
     location: validate.reqString,
     active: validate.reqBoolean,
+    courses: validate.array,
   }),
   instructorsCollegeIdSchema: Joi.object().keys({
     collegeId: validate.string,
@@ -212,7 +213,7 @@ module.exports = {
   }),
   uploadSchema: Joi.object().keys({
     fileName: validate.reqString,
-    fileType : validate.reqString,
+    fileType: validate.reqString,
   }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
@@ -226,6 +227,7 @@ module.exports = {
     collegeId: validate.reqId,
     batchId: validate.reqId,
   }),
+
   assignCourseCollegeSchema: Joi.object().keys({
     courseId: validate.reqId,
     collegeId: validate.reqId,
@@ -241,6 +243,12 @@ module.exports = {
     sectionId: validate.reqId,
     courseId: validate.reqId,
     // publishDate: validate.date,
+  }),
+  instructorCourseContentSchema: Joi.object().keys({
+    type: validate.reqString.allow("file"),
+    content: validate.reqString,
+    title: validate.reqString,
+    id: validate.id,
   }),
   lectureContentDragDropSchema: Joi.object().keys({
     lectureContent: validate.array.items(

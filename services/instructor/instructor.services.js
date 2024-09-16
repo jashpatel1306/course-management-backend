@@ -3,6 +3,7 @@ const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
 const UserService = require("../users/user.service"); // Adjust path as needed
+const InstructorCourseModel = require("../instructorCourses/instructorCourses");
 
 module.exports = {
   /**
@@ -148,6 +149,7 @@ module.exports = {
           path: "userId",
           select: "_id avatar",
         })
+        .populate("courses", "_id courseName")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
 
@@ -202,6 +204,28 @@ module.exports = {
       return data;
     } catch (error) {
       throw createError(500, error.message);
+    }
+  },
+  getInstructorCourses: async (instructorId) => {
+    try {
+      const instructorData = await InstructorModel.findOne({
+        userId: instructorId,
+      });
+      if (!instructorData) {
+        throw createError(404, "Batches not found");
+      }
+      console.log("instructorData: ", instructorData);
+      const courseIds = instructorData.courses;
+      const courses = await InstructorCourseModel.find({
+        _id: { $in: courseIds },
+      });
+      if (!courses) {
+        throw createError.NotFound("No courses found for the given college.");
+      }
+
+      return { courses };
+    } catch (error) {
+      throw createError(error);
     }
   },
 };

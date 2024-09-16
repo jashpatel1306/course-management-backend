@@ -195,4 +195,21 @@ module.exports = {
       next(error);
     }
   },
+  getInstructorCourses: async (req, res, next) => {
+    try {
+      const instructor_id = req.body?.user_id;
+
+      // userRole === "student" ? filter.isPublish = true : filter.
+      const { courses } = await instructorServices.getInstructorCourses(
+        instructor_id
+      );
+      res.send({
+        success: true,
+        message: "Instructor Courses fetched successfully",
+        data: courses,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

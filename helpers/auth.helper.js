@@ -172,4 +172,45 @@ module.exports = {
       });
     });
   },
+  isInstructorAuthenticate: (req, res, next) => {
+    let token = req.headers.authorization;
+    token = token.toLowerCase().includes("bearer")
+      ? token.split(" ")[1]
+      : token;
+    jwt.verify(token, JWTSecretKey, async (err, result) => {
+      if (err)
+        return res.json({
+          status: false,
+          message: `Something is wrong in Authentication.Please try again.`,
+          isAuth: false,
+        });
+      if (result && isset(result.user_id)) {
+        const getUserData = await userServices.findUserById(result.user_id);
+        if (!getUserData)
+          return res.json({
+            status: false,
+            message: `Invalid token or expired!`,
+            isAuth: false,
+          });
+        console.log("getUserData :", getUserData);
+        if (getUserData.role === INSTRUCTOR) {
+          console.log("req.body :", result);
+          req.body.user_id = result.user_id;
+          req.body.college_id = result.college_id;
+          return next();
+        } else {
+          return res.json({
+            status: false,
+            message: `Access to the target resource has been denied`,
+            isAuth: false,
+          });
+        }
+      }
+      return res.json({
+        status: false,
+        message: `Invalid token or expired!`,
+        isAuth: false,
+      });
+    });
+  },
 };

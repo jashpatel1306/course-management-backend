@@ -3,12 +3,7 @@ const createError = require("http-errors");
 const commonUploadFunction = require("../helpers/fileUpload.helper");
 
 module.exports = {
-  /**
-   * Create a new Course
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
+
   createCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
@@ -38,13 +33,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCourseById: async (req, res, next) => {
     try {
       const course = await courseServices.getCourseById(req.params.id);
@@ -57,13 +45,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Toggle the status of a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   statusToggle: async (req, res, next) => {
     try {
       const course = await courseServices.toggleCourseStatus(req.params.id);
@@ -77,7 +58,6 @@ module.exports = {
       next(error);
     }
   },
-
   publishToggle: async (req, res, next) => {
     try {
       const course = await courseServices.toggleCoursePublishStatus(
@@ -93,13 +73,7 @@ module.exports = {
       next(error);
     }
   },
-  /**
-   * Update a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
-  updateCourse: async (req, res, next) => {
+   updateCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
       const request_body = req.body;
@@ -128,14 +102,7 @@ module.exports = {
     } catch (error) {
       next(error);
     }
-  },
-
-  /**
-   * Delete a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
+  }, 
   deleteCourse: async (req, res, next) => {
     try {
       const course = await courseServices.deleteCourse(req.params.id);
@@ -148,13 +115,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get all Courses by College ID with optional search
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCoursesByCollegeId: async (req, res, next) => {
     try {
       const { search, pageNo = 1, perPage = 10 } = req.body;
@@ -183,13 +143,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get Course Options by College ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCoursesOptions: async (req, res, next) => {
     try {
       const collegeId = req.params.collegeId;

@@ -37,12 +37,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Update a Course by ID
-   * @param {string} id - The ID of the Course
-   * @param {Object} data - The update data
-   * @returns {Promise<Object>} - The updated Course
-   */
   updateCourse: async (id, data) => {
     try {
       const course = await CourseModel.findByIdAndUpdate(id, data, {
@@ -56,12 +50,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Delete a Course by ID
-   * @param {string} id - The ID of the Course
-   * @returns {Promise<Object>} - The deleted Course
-   */
   deleteCourse: async (id) => {
     try {
       const course = await CourseModel.findByIdAndDelete(id);
@@ -84,12 +72,18 @@ module.exports = {
    */
   getCoursesByCollegeId: async (collegeId, search, pageNo, perPage) => {
     try {
-      let filter = { collegeId: collegeId };
-      console.log("filter : ", filter);
+      let filter = {
+        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }],
+      };
       if (search) {
         filter = {
           $and: [
-            { collegeId: collegeId },
+            {
+              $or: [
+                { collegeId: collegeId },
+                { collegeIds: { $in: [collegeId] } },
+              ],
+            },
             {
               $or: [
                 { courseName: { $regex: search, $options: "i" } },

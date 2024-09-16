@@ -45,6 +45,7 @@ const InstructorSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    courses: [{ type: mongoose.Types.ObjectId, ref: "instructorCourses" }],
   },
   { timestamps: true, versionKey: false }
 );

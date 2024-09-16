@@ -5,7 +5,6 @@ const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
   isAuthenticate,
-  isSuperAdminAuthenticate,
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
@@ -377,7 +376,6 @@ router.post(
   fileUploadController.uploadImage
 );
 
-
 //--------------------------- courses -------------------------//
 
 router.post(
@@ -430,8 +428,6 @@ router.post(
   isAdminCommonAuthenticate,
   courseController.addAssignCourseCollege
 );
-
-
 
 router.get(
   "/college-wise-courses-options/:collegeId",
@@ -535,10 +531,61 @@ router.put(
 
 //------------------------ instructor course ------------------------//
 
-// Get all Courses by College
 router.post(
-  "/instructor-courses/:collegeId",
+  "/instructor-course",
+  Validate(schemas.courseSchema),
   isAdminCommonAuthenticate,
-  instructorCourseController.getAllCoursesByCollege
+  instructorCourseController.createInstructorCourse
+);
+router.put(
+  "/instructor-course/:id",
+  Validate(schemas.courseSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.updateInstructorCourse
+);
+
+router.post(
+  "/college-wise-instructor-courses",
+  Validate(schemas.collegeWiseDataSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCoursesByCollegeId
+);
+
+// Get an Instructor Course by ID
+router.get(
+  "/instructor-course/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCourseById
+);
+
+// // Delete an Instructor Course by ID
+router.delete(
+  "/instructor-course/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.deleteInstructorCourse
+);
+router.put(
+  "/instructor-content/:id",
+  Validate(schemas.instructorCourseContentSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.updateInstructorCourseContent
+);
+router.delete(
+  "/instructor-content/:contentId",
+  isAdminCommonAuthenticate,
+  instructorCourseController.deleteInstructorCourseContent
+);
+router.get(
+  "/college-wise-instructor-courses-options/:collegeId",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCoursesOptions
+);
+
+// Assign a Course to a College
+router.post(
+  "/assign-instructor-course-college",
+  Validate(schemas.assignCourseCollegeSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.addAssignCourseCollege
 );
 module.exports = router;
