@@ -7,7 +7,6 @@ module.exports = {
     try {
       const image = req.files?.image;
       const requestBody = req.body;
-      console.log("req.image :", image);
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
@@ -24,7 +23,6 @@ module.exports = {
       const course = await instructorCourseService.createInstructorCourse(
         requestBody
       );
-      //   console.log("course: ", course);
       res.send({
         success: true,
         message: "Instructor Course created successfully",
@@ -38,7 +36,6 @@ module.exports = {
     try {
       const image = req.files?.image;
       const requestBody = req.body;
-      console.log("req.image :", image);
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
@@ -56,7 +53,6 @@ module.exports = {
         req.params.id,
         request_body
       );
-      //   console.log("course: ", course);
       res.send({
         success: true,
         message: "Instructor Course updated successfully",

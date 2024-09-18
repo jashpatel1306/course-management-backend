@@ -64,7 +64,6 @@ InstructorSchema.pre("save", async function (next) {
         user_name: this.name,
         role: "instructor", // Adjust role as needed
       };
-      console.log("userData", userData);
       const User = mongoose.model("users");
 
       // Upsert user

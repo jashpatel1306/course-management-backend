@@ -171,7 +171,6 @@ module.exports = {
       if (!batchData) {
         throw createError(404, "Batches not found");
       }
-      console.log("batchData: ", batchData);
       const courseIds = batchData.courses;
       const courses = await CourseModel.find({ _id: { $in: courseIds } });
       if (!courses) {

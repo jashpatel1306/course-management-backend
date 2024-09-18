@@ -58,7 +58,6 @@ lecturesSchema.post("save", async function (lecture) {
       .model("lectures")
       .countDocuments({ courseId: lecture.courseId })
       .exec();
-    console.log("totalLectures :", totalLectures);
     if (lectures.length) {
       const updateSections = await mongoose
         .model("sections")

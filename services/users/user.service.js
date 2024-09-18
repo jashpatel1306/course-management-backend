@@ -152,8 +152,6 @@ module.exports = {
         college_id: collegeId,
         batch_id: batchId,
       };
-      console.log("userData: ", userData);
-      // const collegeId = collegeData?._id ? collegeData?._id : null;
       const accessToken = jwt.sign(userData, JWTSecretKey, {
         expiresIn: 86400,
       });

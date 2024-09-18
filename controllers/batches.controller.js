@@ -112,7 +112,6 @@ module.exports = {
   getCoursesByBatchId: async (req, res, next) => {
     try {
       const batch_id = req.body?.batch_id;
-
       // userRole === "student" ? filter.isPublish = true : filter.
       const { courses } = await batchServices.getCoursesByBatchId(batch_id);
       res.send({
@@ -124,5 +123,4 @@ module.exports = {
       next(err);
     }
   },
- 
 };

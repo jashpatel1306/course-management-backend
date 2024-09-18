@@ -533,12 +533,7 @@ module.exports = {
     }
   },
   uploadPart: async (uploadId, key, partNumber, part) => {
-    console.log("Uploading part:", {
-      uploadId,
-      key,
-      partNumber,
-      part,
-    });
+  
     const buffer = Buffer.from(part.data, `binary`);
 
     const params = {
@@ -551,7 +546,6 @@ module.exports = {
 
     try {
       const uploadParts = await s3.uploadPart(params).promise();
-      console.log("----------------------------------------------------");
       return { ETag: uploadParts.ETag, PartNumber: partNumber };
     } catch (error) {
       throw new Error("Error uploading part: " + error.message);
@@ -578,7 +572,6 @@ module.exports = {
 
     try {
       const complete = await s3.completeMultipartUpload(params).promise();
-      console.log("Complete Upload Result: ", complete);
       return { fileUrl: complete.Location }; // Return the URL of the uploaded file
     } catch (error) {
       console.error("Error completing upload: ", error);

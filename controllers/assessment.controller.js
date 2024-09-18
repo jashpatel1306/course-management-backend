@@ -92,7 +92,6 @@ module.exports = {
               batches: batchId,
             }
           : {};
-      console.log("batchId: ", search, batchId);
 
       if (search) {
         filter = {
@@ -104,7 +103,6 @@ module.exports = {
           ],
         };
       }
-      console.log("filter: ", filter);
       const { assessments, count } =
         await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
       return res.status(200).send({
@@ -135,8 +133,6 @@ module.exports = {
               batches: batch_id,
             }
           : {};
-      console.log("search: ", search);
-
       if (search) {
         filter = {
           $and: [
@@ -147,7 +143,6 @@ module.exports = {
           ],
         };
       }
-      console.log("filter: ", filter);
       const { assessments, count } =
         await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
       return res.status(200).send({

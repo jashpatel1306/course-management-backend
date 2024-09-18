@@ -150,9 +150,7 @@ module.exports = {
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        console.log("getUserData :", getUserData);
         if (getUserData.role === STUDENT) {
-          console.log("req.body :", result);
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
           req.body.batch_id = result.batch_id;
@@ -192,9 +190,7 @@ module.exports = {
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        console.log("getUserData :", getUserData);
         if (getUserData.role === INSTRUCTOR) {
-          console.log("req.body :", result);
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
           return next();

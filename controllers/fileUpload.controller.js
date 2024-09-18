@@ -45,16 +45,13 @@ module.exports = {
   // upload multiple image Data
   uploadMultipleImage: async (req, res, next) => {
     try {
-      //   console.log("Uploading multiple", req.files);
       const images = req.files?.images;
       const path = "implant-docz/uploads/";
-      // console.log("data : ",path);
 
       if (!images) return next(createError.BadRequest("Image is required."));
 
       const uploadToAWS =
         await commonUploadFunction.uploadMultipleMaterialToAWS(images, path);
-      console.log("uploadToAWS : ", uploadToAWS);
       return res.status(200).json(uploadToAWS);
     } catch (err) {
       next(
@@ -70,12 +67,9 @@ module.exports = {
     try {
       const originalData = req.body;
       const ImagePath = originalData.path;
-      // console.log("data : ",ImagePath);
       const movetoLocal = await commonUploadFunction.deleteMaterialToAWS(
         ImagePath
       );
-      // console.log("movetoLocal : ",movetoLocal)
-      // console.log(fileData);
       return res.json({ success: true, message: movetoLocal });
     } catch (err) {
       next(

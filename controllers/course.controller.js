@@ -8,7 +8,6 @@ module.exports = {
     try {
       const image = req.files?.image;
       const request_body = req.body;
-      console.log("req.image :", image);
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
@@ -23,7 +22,6 @@ module.exports = {
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
       }
       const course = await courseServices.createCourse(req.body);
-      console.log("course: ", course);
       res.send({
         success: true,
         message: "Course created successfully",

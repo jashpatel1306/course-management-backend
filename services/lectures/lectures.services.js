@@ -53,7 +53,6 @@ module.exports = {
           { _id: lectureId, "lectureContent._id": newContent.id },
           { $set: { "lectureContent.$": newContent } }
         );
-        console.log("Updated existing content:", lecture);
       } else {
         // If the contentId doesn't exist, push a new content item into the array
         lecture = await LecturesModel.updateOne(
@@ -64,7 +63,6 @@ module.exports = {
             },
           }
         );
-        console.log("Added new content:", lecture);
       }
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
@@ -86,7 +84,6 @@ module.exports = {
         },
         { new: true, runValidators: true } // Options: return updated doc and validate
       );
-      console.log("lecture :", lecture);
       if (!lecture) {
         throw createError.NotFound("Lecture not found.");
       }
@@ -119,7 +116,6 @@ module.exports = {
     try {
       // Find the lecture by id and delete it
       const lecture = await LecturesModel.findOne({ _id: id });
-      console.log("lecture:  ", lecture);
       if (lecture.sectionId) {
         await SectionModel.findOneAndUpdate(
           { _id: lecture.sectionId, "lectures.id": id }, // Query filter
@@ -153,7 +149,6 @@ module.exports = {
           },
         }
       );
-      console.log("Deleted content result:", result);
       return result;
     } catch (err) {
       console.error("Error deleting lecture content:", err);

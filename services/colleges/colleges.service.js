@@ -97,7 +97,6 @@ module.exports = {
       //     }),
       //   };
       // });
-      // console.log("finalCollegeData:  ", finalCollegeData);
       const count = await CollegeModel.countDocuments(filter);
       if (!college) {
         throw createError(404, "Colleges not found");

@@ -100,7 +100,6 @@ module.exports = {
    */
   deleteLecture: async (req, res, next) => {
     try {
-      console.log("req.params.id: ",req.params.id)
       const lecture = await lectureServices.deleteLecture(req.params.id);
       res.send({
         success: true,

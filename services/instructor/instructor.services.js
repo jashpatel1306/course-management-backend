@@ -214,7 +214,6 @@ module.exports = {
       if (!instructorData) {
         throw createError(404, "Batches not found");
       }
-      console.log("instructorData: ", instructorData);
       const courseIds = instructorData.courses;
       const courses = await InstructorCourseModel.find({
         _id: { $in: courseIds },

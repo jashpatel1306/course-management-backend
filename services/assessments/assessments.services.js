@@ -147,7 +147,6 @@ module.exports = {
 
   getAssessmentsByBatch: async (filter, perPage, pageNo) => {
     try {
-      console.log("filter: ",filter)
       const assessments = await AssessmentsModel.find(filter)
         .skip((pageNo - 1) * perPage)
         .limit(perPage);

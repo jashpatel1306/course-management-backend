@@ -134,7 +134,6 @@ module.exports = {
           },
         }
       );
-      console.log("Deleted content result:", result);
       return result;
     } catch (err) {
       console.error("Error deleting lecture content:", err);
@@ -243,7 +242,6 @@ module.exports = {
   },
   getInstructorCourseService: async (collegeId) => {
     try {
-      console.log("collegeId : ", collegeId);
       const courses = await InstructorCourseModel.find({
         $and: [
           {
@@ -255,7 +253,6 @@ module.exports = {
           { isPublish: true },
         ],
       });
-      console.log("courses : ", courses);
       const data = courses.map((item) => {
         return { label: item.courseName, value: item._id };
       });
