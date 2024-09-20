@@ -3,11 +3,6 @@ const LecturesModel = require("./lectures"); // Adjust the path as needed
 const createError = require("http-errors");
 
 module.exports = {
-  /**
-   * Create a new Lecture
-   * @param {Object} data - The Lecture data
-   * @returns {Promise<Object>} - The created Lecture
-   */
   createLecture: async (data) => {
     try {
       const lecture = await LecturesModel.create(data);
@@ -20,11 +15,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Get a Lecture by ID
-   * @param {string} id - The ID of the Lecture
-   * @returns {Promise<Object>} - The Lecture
-   */
   getLectureById: async (id) => {
     try {
       const lecture = await LecturesModel.findById(id);
@@ -37,12 +27,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Update a Lecture by ID
-   * @param {string} id - The ID of the Lecture
-   * @param {Object} data - The update data
-   * @returns {Promise<Object>} - The updated Lecture
-   */
   updateLectureContent: async (lectureId, newContent) => {
     try {
       // First check if the contentId exists within the lectureContent array
@@ -106,12 +90,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Delete a Lecture by ID
-   * @param {string} id - The ID of the Lecture
-   * @returns {Promise<Object>} - The deleted Lecture
-   */
   deleteLecture: async (id) => {
     try {
       // Find the lecture by id and delete it
@@ -154,12 +132,6 @@ module.exports = {
       console.error("Error deleting lecture content:", err);
     }
   },
-
-  /**
-   * Toggle the 'active' status of a Lecture by ID
-   * @param {string} id - The ID of the Lecture
-   * @returns {Promise<Object>} - The updated Lecture
-   */
   toggleLectureStatus: async (id) => {
     try {
       const lecture = await LecturesModel.findById(id);
@@ -177,11 +149,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Toggle the 'publish' status of a Lecture by ID
-   * @param {string} id - The ID of the Lecture
-   * @returns {Promise<Object>} - The updated Lecture
-   */
   toggleLecturePublishStatus: async (id) => {
     try {
       const lecture = await LecturesModel.findById(id);
@@ -204,10 +171,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Get all publish Lectures
-   * @returns {Promise<Array<Object>>} - List of publish Lectures
-   */
   getPublishLectures: async (sectionId) => {
     try {
       const publishLectures = await LecturesModel.find({
@@ -220,6 +183,20 @@ module.exports = {
       return publishLectures;
     } catch (error) {
       throw createError(error);
+    }
+  },
+  getSectionLectureOptionsByCourseId: async (sectionId) => {
+    try {
+      const lectures = await LecturesModel.find({
+        sectionId: sectionId,
+        isPublish: true,
+      });
+      const data = lectures.map((item) => {
+        return { label: item.name, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

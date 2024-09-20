@@ -3,7 +3,6 @@ const createError = require("http-errors");
 const commonUploadFunction = require("../helpers/fileUpload.helper");
 
 module.exports = {
-
   createCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
@@ -71,7 +70,7 @@ module.exports = {
       next(error);
     }
   },
-   updateCourse: async (req, res, next) => {
+  updateCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
       const request_body = req.body;
@@ -100,7 +99,7 @@ module.exports = {
     } catch (error) {
       next(error);
     }
-  }, 
+  },
   deleteCourse: async (req, res, next) => {
     try {
       const course = await courseServices.deleteCourse(req.params.id);
@@ -197,6 +196,21 @@ module.exports = {
           message: "Failed to assign course",
         });
       }
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCourseSectionOptionsByCourseId: async (req, res, next) => {
+    try {
+      const courseId = req.params.courseId;
+      const options = await courseServices.getCourseSectionOptionsByCourseId(
+        courseId
+      );
+      res.send({
+        success: true,
+        message: "Courses sections options fetched successfully",
+        data: options,
+      });
     } catch (error) {
       next(error);
     }

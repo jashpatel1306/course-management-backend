@@ -82,9 +82,11 @@ module.exports = {
   },
   getAllBatchesByCollegeId: async (collegeId) => {
     try {
-      const batch = await BatchModel.find({ collegeId })
+      const filter = collegeId ? { collegeId } : {};
+      const batch = await BatchModel.find(filter)
         .populate("instructorIds", "_id name")
         .populate("courses", "_id courseName")
+        .populate("collegeId", "_id collegeName")
         .sort({ batchName: 1 });
       if (!batch) {
         throw createError(404, "Batches not found");
@@ -180,6 +182,20 @@ module.exports = {
       return { courses };
     } catch (error) {
       throw createError(error);
+    }
+  },
+  getCourseOptionsByBatch: async (batchId) => {
+    try {
+      const batchData = await BatchModel.findOne({ _id: batchId }).populate(
+        "courses",
+        "_id courseName"
+      );
+      const data = batchData.courses.map((item) => {
+        return { label: item.courseName, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

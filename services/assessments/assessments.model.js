@@ -10,10 +10,6 @@ const assessmentSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "colleges",
     },
-    expiresAt: {
-      type: Date,
-      required: true,
-    },
     batches: [
       {
         type: mongoose.Types.ObjectId,

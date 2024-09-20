@@ -4,7 +4,6 @@ const { assessmentServices } = require("../services");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {
-      req.body = { ...req.body, collegeId: req.body?.college_id };
       const assessment = await assessmentServices.createAssessment(req.body);
       return res.status(201).send({
         success: true,
@@ -82,29 +81,25 @@ module.exports = {
 
   getAssessmentsByBatch: async (req, res, next) => {
     try {
-      const { pageNo, perPage, search, batchId } = req.body;
-
-      const college_id = req.body?.college_id;
+      const batchId = req.body?.batchId;
+      const perPage = req.body?.perPage;
+      const pageNo = req.body?.pageNo;
+      const search = req.body?.search;
+      const college_id = req?.body?.collegeId
+        ? req.body?.collegeId === "all"
+          ? req.body?.college_id
+          : req.body?.collegeId
+        : req.body?.college_id;
       const searchText = new RegExp(search, `i`);
-      let filter =
-        batchId !== "all"
-          ? {
-              batches: batchId,
-            }
-          : {};
 
-      if (search) {
-        filter = {
-          $and: [
-            filter,
-            {
-              $or: [{ title: { $regex: searchText } }],
-            },
-          ],
-        };
-      }
       const { assessments, count } =
-        await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
+        await assessmentServices.getAssessmentsByBatch(
+          batchId === "all" ? "" : batchId,
+          searchText,
+          perPage,
+          pageNo,
+          college_id
+        );
       return res.status(200).send({
         success: true,
         message: "Assessments fetched successfully",
@@ -155,6 +150,21 @@ module.exports = {
           pageNo,
           pages: Math.ceil(count / perPage),
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAssessmentOptionsByCollegeId: async (req, res, next) => {
+    try {
+      const collegeId = req.params.collegeId;
+      const assessment = await assessmentServices.getAssessmentOptionsByCollegeId(
+        collegeId
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Assessment option fetched successfully",
+        data: assessment,
       });
     } catch (error) {
       next(error);

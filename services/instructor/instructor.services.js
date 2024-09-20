@@ -123,11 +123,7 @@ module.exports = {
    */
   getInstructorsByCollegeId: async (collegeId, search, pageNo, perPage) => {
     try {
-      if (!collegeId) {
-        throw createError.BadRequest("College ID is required.");
-      }
-
-      let filter = { collegeId };
+      let filter = collegeId ? { collegeId } : {};
 
       if (search) {
         filter = {

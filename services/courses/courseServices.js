@@ -3,11 +3,6 @@ const CourseModel = require("./course"); // Adjust the path as needed
 const createError = require("http-errors");
 
 module.exports = {
-  /**
-   * Create a new Course
-   * @param {Object} data - The Course data
-   * @returns {Promise<Object>} - The created Course
-   */
   createCourse: async (data) => {
     try {
       const course = await CourseModel.create(data);
@@ -19,12 +14,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Get a Course by ID
-   * @param {string} id - The ID of the Course
-   * @returns {Promise<Object>} - The Course
-   */
   getCourseById: async (id) => {
     try {
       const course = await CourseModel.findById(id);
@@ -36,7 +25,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
   updateCourse: async (id, data) => {
     try {
       const course = await CourseModel.findByIdAndUpdate(id, data, {
@@ -61,15 +49,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Get all Courses with optional search and pagination
-   * @param {string} [collegeId] - College ID to filter courses
-   * @param {string} [search] - Search term
-   * @param {number} [pageNo=1] - Page number
-   * @param {number} [perPage=10] - Number of items per page
-   * @returns {Promise<Object>} - The courses and count
-   */
   getCoursesByCollegeId: async (collegeId, search, pageNo, perPage) => {
     try {
       let filter = {
@@ -109,12 +88,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Toggle the 'active' status of a Course by ID
-   * @param {string} id - The ID of the Course
-   * @returns {Promise<Object>} - The updated Course
-   */
   toggleCourseStatus: async (id) => {
     try {
       const course = await CourseModel.findById(id);
@@ -130,7 +103,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
   toggleCoursePublishStatus: async (id) => {
     try {
       const course = await CourseModel.findById(id);
@@ -146,11 +118,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Get all publish courses
-   * @returns {Promise<Array<Object>>} - List of publish courses
-   */
   getPublishCourses: async () => {
     try {
       const publishCourses = await CourseModel.find({ isPublish: true });
@@ -162,7 +129,6 @@ module.exports = {
       throw createError(error);
     }
   },
-
   getCourseOptions: async (collegeId) => {
     try {
       const courses = await CourseModel.find({
@@ -184,6 +150,7 @@ module.exports = {
       throw createError(500, error.message);
     }
   },
+
   addAssignCourse: async (batchId, collegeId, courseId) => {
     try {
       // Check if the course exists
@@ -252,6 +219,59 @@ module.exports = {
       };
     } catch (error) {
       throw new Error(error.message);
+    }
+  },
+  getCourseSectionOptionsByCourseId: async (courseId) => {
+    try {
+      const coursesData = await CourseModel.findOne({ _id: courseId });
+      const data = coursesData.sections.map((item) => {
+        return { label: item.name, value: item.id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
+    }
+  },
+  getCourseDataById: async (id) => {
+    try {
+      // Fetch courses where isPublish is true
+      const courses = await CourseModel.find({ isPublish: true })
+        .populate({
+          path: "sections.id", // Populate sections inside the course
+          match: { isPublish: true }, // Only fetch sections where isPublish is true
+          select: "name lecturesCount lectures", // Only select relevant fields from sections
+          populate: {
+            path: "lectures.id", // Populate lectures inside each section
+            match: { isPublish: true }, // Only fetch lectures where isPublish is true
+            select: "name lectureContent publishDate", // Only select relevant fields from lectures
+          },
+        })
+        .lean(); // lean() gives you plain JS objects instead of Mongoose documents
+
+      if (!courses || courses.length === 0) {
+        return "No published courses found.";
+      }
+
+      return courses.map((course) => ({
+        courseName: course.courseName,
+        courseDescription: course.courseDescription,
+        coverImage: course.coverImage,
+        totalSections: course.totalSections,
+        totalLectures: course.totalLectures,
+        sections: course.sections.map((section) => ({
+          name: section.name,
+          lecturesCount: section.lecturesCount,
+          lectures: section.lectures.map((lecture) => ({
+            name: lecture.name,
+            lectureContent: lecture.lectureContent,
+            publishDate: lecture.publishDate,
+          })),
+        })),
+        publishDate: course.publishDate,
+      }));
+    } catch (error) {
+      console.error("Error fetching published course data:", error);
+      throw error;
     }
   },
 };

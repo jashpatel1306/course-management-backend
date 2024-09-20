@@ -145,11 +145,31 @@ module.exports = {
     }
   },
 
-  getAssessmentsByBatch: async (filter, perPage, pageNo) => {
+  getAssessmentsByBatch: async (
+    batchId,
+    search,
+    perPage,
+    pageNo,
+    collegeId
+  ) => {
     try {
+      console.log("collegeId  ", collegeId);
+      const filter = {
+        $and: [
+          collegeId ? { collegeId } : {},
+          batchId ? { batches: { $in: [batchId] } } : {},
+          {
+            $or: [{ title: { $regex: search } }],
+          },
+        ],
+      };
+      console.log("filter: ", filter);
       const assessments = await AssessmentsModel.find(filter)
+        .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
+
         .limit(perPage);
+      console.log("assessments: ", assessments);
       const count = await AssessmentsModel.countDocuments(filter);
       if (!assessments)
         throw createError(500, "Error while Fetching assessments.");
@@ -171,6 +191,19 @@ module.exports = {
       return assessment;
     } catch (error) {
       throw createError.InternalServerError(error);
+    }
+  },
+  getAssessmentOptionsByCollegeId: async (collegeId) => {
+    try {
+      const assessment = await AssessmentsModel.find({
+        collegeId: collegeId,
+      });
+      const data = assessment.map((item) => {
+        return { label: item.title, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

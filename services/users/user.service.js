@@ -36,31 +36,31 @@ module.exports = {
           role: SUPERADMIN,
           user_name: "First Admin",
         };
-        // const collageData = {
-        //   email: "lmscollage@admin.com",
-        //   password: "Admin@123",
-        //   role: ADMIN,
-        //   user_name: "First Collage Admin",
-        // };
+        const collageData = {
+          email: "lmscollage@admin.com",
+          password: "Admin@123",
+          role: ADMIN,
+          user_name: "First Collage Admin",
+        };
 
         data.password = await commonFunctions.encode(data.password);
-        // collageData.password = await commonFunctions.encode(
-        //   collageData.password
-        // );
+        collageData.password = await commonFunctions.encode(
+          collageData.password
+        );
         await userModel.updateOne(
           { email: data.email },
           { ...data },
           { upsert: true }
         );
-        // await userModel.updateOne(
-        //   { email: collageData.email },
-        //   { ...collageData },
-        //   { upsert: true }
-        // );
+        await userModel.updateOne(
+          { email: collageData.email },
+          { ...collageData },
+          { upsert: true }
+        );
         const collageUserResult = await userModel.findOne({
-          email: data.email,
+          email: collageData.email,
         });
-        // const userResult = await userModel.findOne({ email: data.email });
+        const userResult = await userModel.findOne({ email: data.email });
 
         if (collageUserResult?._id) {
           const collegeData = {
@@ -68,7 +68,7 @@ module.exports = {
             collegeName: "superAdmin College",
             collegeNo: "-1",
             contactPersonName: "First Admin",
-            contactPersonNo: "+9199999999999",
+            contactPersonNo: "+919999999999",
             shortName: "superAdmin College",
             isAdmin: true,
           };
@@ -77,7 +77,7 @@ module.exports = {
             { ...collegeData },
             { upsert: true }
           );
-          console.log("creating college for Admin");
+          console.log("Creating college for Admin");
         }
       }
     } catch (error) {

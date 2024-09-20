@@ -112,9 +112,12 @@ module.exports = {
   },
   deleteLectureContent: async (req, res, next) => {
     try {
-      const lectureId = req.params.lectureId
-      const contentId = req.params.contentId
-      const lecture = await lectureServices.deleteLectureContent(lectureId,contentId);
+      const lectureId = req.params.lectureId;
+      const contentId = req.params.contentId;
+      const lecture = await lectureServices.deleteLectureContent(
+        lectureId,
+        contentId
+      );
       res.send({
         success: true,
         message: "Lecture deleted successfully",
@@ -180,6 +183,21 @@ module.exports = {
         success: true,
         message: "Publish lectures fetched successfully",
         data: lectures,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getSectionLectureOptionsByCourseId: async (req, res, next) => {
+    try {
+      const sectionId = req.params.sectionId;
+      const options = await lectureServices.getSectionLectureOptionsByCourseId(
+        sectionId
+      );
+      res.send({
+        success: true,
+        message: "Courses sections options fetched successfully",
+        data: options,
       });
     } catch (error) {
       next(error);

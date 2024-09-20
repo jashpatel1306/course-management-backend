@@ -2,12 +2,6 @@ const { instructorServices } = require("../services");
 const createError = require("http-errors");
 
 module.exports = {
-  /**
-   * Create a new Instructor
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   createInstructor: async (req, res, next) => {
     try {
       const instructor = await instructorServices.createInstructor(req.body);
@@ -21,12 +15,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Create Instructors in bulk
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   createBulkInstructors: async (req, res, next) => {
     try {
       const instructors = await instructorServices.createInstructorsInBulk(
@@ -42,12 +30,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Get a Instructor by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getInstructorById: async (req, res, next) => {
     try {
       const instructor = await instructorServices.getInstructorById(
@@ -78,12 +60,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Update a Instructor by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   updateInstructor: async (req, res, next) => {
     try {
       const instructor = await instructorServices.updateInstructor(
@@ -100,12 +76,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Delete a Instructor by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   deleteInstructor: async (req, res, next) => {
     try {
       const instructor = await instructorServices.deleteInstructor(
@@ -121,19 +91,11 @@ module.exports = {
     }
   },
 
-  /**
-   * Get all Instructors by College ID with optional search
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getInstructorsByCollegeId: async (req, res, next) => {
     try {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id =
-        req?.body?.collegeId === "all"
-          ? req.body?.college_id
-          : req.body?.collegeId;
+        req?.body?.collegeId === "all" ? null : req.body?.collegeId;
 
       const { instructors, count } =
         await instructorServices.getInstructorsByCollegeId(
@@ -158,12 +120,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Get Instructors Name and ID Mapping by College ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getInstructorsNameIdMappingByCollegeId: async (req, res, next) => {
     try {
       const collegeId = req.params.collegeId;
