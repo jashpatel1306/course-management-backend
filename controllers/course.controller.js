@@ -219,9 +219,23 @@ module.exports = {
     try {
       const batchId = req.params.batchId;
       const courseId = req.params.courseId;
-      const courseData = await courseServices.getCourseSidebarDataById(batchId,
+      const courseData = await courseServices.getCourseSidebarDataById(
+        batchId,
         courseId
       );
+      res.send({
+        success: true,
+        message: "Courses Data fetched successfully",
+        data: courseData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCoursepreviewById: async (req, res, next) => {
+    try {
+      const courseId = req.params.courseId;
+      const courseData = await courseServices.getCoursepreviewById(courseId);
       res.send({
         success: true,
         message: "Courses Data fetched successfully",

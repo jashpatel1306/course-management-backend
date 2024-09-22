@@ -492,9 +492,9 @@ router.get(
   courseController.getCourseSectionOptionsByCourseId
 );
 router.get(
-  "/courses-sidebar-data/:batchId/:courseId",
+  "/courses-preview/:courseId",
   isAdminCommonAuthenticate,
-  courseController.getCourseSidebarDataById
+  courseController.getCoursepreviewById
 );
 //--------------------------- Sections -------------------------//
 
