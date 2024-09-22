@@ -163,7 +163,7 @@ module.exports = {
           },
         ],
       };
-      console.log("filter: ", filter);
+      console.log("filter: ", JSON.stringify(filter));
       const assessments = await AssessmentsModel.find(filter)
         .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)

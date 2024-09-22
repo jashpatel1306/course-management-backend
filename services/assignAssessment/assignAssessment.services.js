@@ -82,6 +82,23 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  getAssessmentByBatchIdAndCourseId: async (courseId, batchId) => {
+    try {
+      const currentDate = new Date(); // Get the current date
+      console.log("currentDate: ",currentDate)
+      const assessment = await AssignAssessmentsModel.find({
+        courseId,
+        batchId,
+        type: "course",
+        startDate: { $lte: currentDate },
+        endDate: { $gte: currentDate },
+      }).populate("assessmentId");
+      if (!assessment) throw createError(400, "invalid course id");
+      return assessment;
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
   getAllAssignAssessment: async (batchId, perPage, pageNo, collegeId) => {
     try {
       console.log("collegeId  ", collegeId);

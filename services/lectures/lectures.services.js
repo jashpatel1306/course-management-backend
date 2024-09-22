@@ -199,4 +199,18 @@ module.exports = {
       throw createError(500, error.message);
     }
   },
+  getPublishLectureDataById: async (id) => {
+    try {
+      const lecture = await LecturesModel.findOne({
+        _id: id,
+        isPublish: true,
+      });
+      if (!lecture) {
+        throw createError.NotFound("Lecture not found.");
+      }
+      return lecture;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
 };

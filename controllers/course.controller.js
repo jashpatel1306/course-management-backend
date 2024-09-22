@@ -215,4 +215,20 @@ module.exports = {
       next(error);
     }
   },
+  getCourseSidebarDataById: async (req, res, next) => {
+    try {
+      const batchId = req.params.batchId;
+      const courseId = req.params.courseId;
+      const courseData = await courseServices.getCourseSidebarDataById(batchId,
+        courseId
+      );
+      res.send({
+        success: true,
+        message: "Courses Data fetched successfully",
+        data: courseData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
