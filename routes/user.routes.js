@@ -661,4 +661,9 @@ router.post(
   isAdminCommonAuthenticate,
   instructorCourseController.addAssignCourseCollege
 );
+router.get(
+  "/instructor-courses/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCourseById
+);
 module.exports = router;
