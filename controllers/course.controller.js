@@ -217,12 +217,14 @@ module.exports = {
   },
   getCourseSidebarDataById: async (req, res, next) => {
     try {
-      const batchId = req.params.batchId;
+      const user_id = req.body?.user_id;
+      const batchId = req.body?.batch_id;
       const courseId = req.params.courseId;
-      const courseData = await courseServices.getCourseSidebarDataById(
+      const courseData = await courseServices.getCourseSidebarDataById(user_id,
         batchId,
         courseId
       );
+
       res.send({
         success: true,
         message: "Courses Data fetched successfully",

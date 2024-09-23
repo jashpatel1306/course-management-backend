@@ -14,4 +14,5 @@ module.exports = {
   lectureServices: require("./lectures/lectures.services"),
   instructorCourseService: require("./instructorCourses/instructorCourses.services"),
   assignAssessmentService: require("./assignAssessment/assignAssessment.services"),
+  trackingCourseServices: require("./trackingCourse/trackingCourse.services"),
 };

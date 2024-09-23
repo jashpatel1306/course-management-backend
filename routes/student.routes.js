@@ -10,6 +10,8 @@ const collegeController = require("../controllers/college.controller");
 const assessmentController = require("../controllers/assessment.controller");
 const batchesController = require("../controllers/batches.controller");
 const courseController = require("../controllers/course.controller");
+const trackingCourseController = require("../controllers/trackingCourse.controller");
+
 router.post(
   "/get-all-assign-assessments",
   Validate(schemas.paginationAndFilterSchema),
@@ -30,7 +32,7 @@ router.get(
   batchesController.getCoursesByBatchId
 );
 router.get(
-  "/courses-sidebar-data/:batchId/:courseId",
+  "/course-view-data/:courseId",
   isStudentAuthenticate,
   courseController.getCourseSidebarDataById
 );
@@ -39,5 +41,58 @@ router.get(
 //   isStudentAuthenticate,
 //   collegeController.changeActiveStatus
 // );
+
+// Create and enroll in a course
+router.post(
+  "/course/enroll/:courseId",
+  isStudentAuthenticate,
+  trackingCourseController.createEnrollCourse
+);
+
+// Create a new tracking course
+router.post(
+  "/course/tracking",
+  Validate(schemas.createTrackingCourseSchema),
+  isStudentAuthenticate,
+  trackingCourseController.createTrackingCourse
+);
+
+// Get tracking course by userId and courseId
+router.get(
+  "/course/tracking/:userId/:courseId",
+  isStudentAuthenticate,
+  trackingCourseController.getTrackingCourseById
+);
+
+// Get tracking course by userId
+router.get(
+  "/course/tracking",
+  isStudentAuthenticate,
+  trackingCourseController.getTrackingCourseByUserId
+);
+
+// Update tracking course
+router.put(
+  "/course/tracking/:courseId",
+  Validate(schemas.updateTrackingCourseSchema),
+  isStudentAuthenticate,
+  trackingCourseController.updateTrackingCourse
+);
+
+// Delete a tracking course
+router.delete(
+  "/course/tracking/:id",
+  Validate(schemas.paginationAndFilterSchema),
+  isStudentAuthenticate,
+  trackingCourseController.deleteTrackingCourse
+);
+
+// Add tracking content
+router.post(
+  "/course/tracking/:userId/:courseId/content",
+  Validate(schemas.addTrackingContentSchema),
+  isStudentAuthenticate,
+  trackingCourseController.addTrackingContent
+);
 
 module.exports = router;

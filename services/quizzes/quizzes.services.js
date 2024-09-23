@@ -1,6 +1,7 @@
 const QuizzesModel = require("./quizzes.model");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+
 module.exports = {
   createQuiz: async (data) => {
     try {
@@ -43,6 +44,26 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  getQuizByassessmentId: async (assessmentId) => {
+    try {
+      // Fetch the quiz and populate questions
+      const quiz = await QuizzesModel.find(
+        { assessmentId, active: true },
+        { _id: 1, title: 1 }
+      );
+      if (!quiz) throw new Error("assessmentId not found");
+
+      // Reorder questions to match the original order
+      // const orderedQuestions = quiz.questions.map((qId) => {
+      //   return quiz.questions.find((question) => question._id.equals(qId));
+      // });
+
+      // Return the quiz with ordered questions
+      return quiz;
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
   getQuizQuestionsById: async (id) => {
     try {
       // Fetch the quiz and populate questions
@@ -54,8 +75,6 @@ module.exports = {
         .exec();
 
       if (!quiz) throw new Error("Quiz not found");
-
-     
 
       // Return the quiz with ordered questions
       return quiz;

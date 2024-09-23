@@ -309,4 +309,39 @@ module.exports = {
     ),
     publishDate: validate.date,
   }),
+
+  createEnrollCourseSchema: Joi.object().keys({
+    userId: validate.reqId,
+    courseId: validate.reqId,
+  }),
+
+  createTrackingCourseSchema: Joi.object().keys({
+    userId: validate.reqId,
+    courseId: validate.reqId,
+    totalcontent: validate.reqNumber,
+    trackingContent: Joi.array().items(
+      Joi.object().keys({
+        contentId: validate.reqId,
+        lectureId: validate.reqId,
+      })
+    ),
+  }),
+
+  getTrackingCourseByIdSchema: Joi.object().keys({
+    userId: validate.reqId,
+    courseId: validate.reqId,
+  }),
+
+  updateTrackingCourseSchema: Joi.object().keys({
+    totalcontent: validate.reqNumber,
+    trackingContent: Joi.object().keys({
+      contentId: validate.reqId,
+      lectureId: validate.reqId,
+    }),
+  }),
+
+  addTrackingContentSchema: Joi.object().keys({
+    contentId: validate.reqId,
+    lectureId: validate.reqId,
+  }),
 };

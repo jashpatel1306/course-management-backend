@@ -1,26 +1,41 @@
+const trackingCourseServices = require("../trackingCourse/trackingCourse.services");
 const assignAssessmentServices = require("../assignAssessment/assignAssessment.services");
+const quizzesServices = require("../quizzes/quizzes.services");
 const batchesModel = require("../batches/batches.model");
 const lecturesServices = require("../lectures/lectures.services");
 const CourseModel = require("./course"); // Adjust the path as needed
 const createError = require("http-errors");
-const getPreAssessmentDataByType = (assessmentData, positionType = "pre") => {
+const getPreAssessmentDataByType = async (
+  userId,
+  courseId,
+  assessmentData,
+  positionType = "pre"
+) => {
   const result = assessmentData.filter(
     (assessment) => assessment.positionType === positionType
   );
   console.log("result :", result);
   if (result.length >= 1) {
     // check if the assessment is submitted or not?
+    const contentstatus = await trackingCourseServices.checkContentIdExists(
+      userId,
+      courseId,
+      result[0].assessmentId._id
+    );
     return {
       type: "assessment",
+      contentType: "assessment",
       id: result[0].assessmentId._id,
       title: result[0].assessmentId.title,
-      status: false,
+      status: await contentstatus,
     };
   } else {
     return null;
   }
 };
-const getSectionAssessmentDataByType = (
+const getSectionAssessmentDataByType = async (
+  userId,
+  courseId,
   assessmentData,
   lectureId,
   sectionIndex,
@@ -43,13 +58,19 @@ const getSectionAssessmentDataByType = (
 
   // Return the assessment data or null
   if (result.length >= 1) {
+    const contentstatus = await trackingCourseServices.checkContentIdExists(
+      userId,
+      courseId,
+      result[0].assessmentId._id
+    );
     return {
       type: "assessment",
+      contentType: "assessment",
       id: result[0].assessmentId._id,
       title: result[0].assessmentId.title,
       sectionIndex: sectionIndex,
       lectureIndex: lectureIndex,
-      status: false, // Change the logic here if needed for assessment submission
+      status: await contentstatus, // Change the logic here if needed for assessment submission
     };
   } else {
     return null;
@@ -284,7 +305,7 @@ module.exports = {
       throw createError(500, error.message);
     }
   },
-  getCourseSidebarDataById: async (batchId, courseId) => {
+  getCourseSidebarDataById: async (userId, batchId, courseId) => {
     try {
       // Fetch published course by ID
       const course = await CourseModel.findOne({
@@ -296,6 +317,7 @@ module.exports = {
         return "No published courses found.";
       }
 
+      console.log("courseId : ", courseId);
       console.log("batchId : ", batchId);
 
       // Fetch assessment data based on batch and course IDs
@@ -309,9 +331,29 @@ module.exports = {
       const contentData = [];
 
       // Check for pre-assessment data and add to sidebar and content
-      const preAssessment = getPreAssessmentDataByType(assessmentData);
+      const preAssessment = await getPreAssessmentDataByType(
+        userId,
+        courseId,
+        assessmentData
+      );
       if (preAssessment) {
         sidebarData.push(preAssessment);
+        // const preAssessmentContent =
+        //   preAssessment?.contents.length > 0
+        //     ? preAssessment?.contents?.map((content, index) => {
+        //         return {
+        //           id: content._id,
+        //           title: content.title,
+        //           type: "quiz",
+        //           assessmentId: content.assessmentId,
+        //           lectureIndex: index,
+        //           sectionIndex: -1,
+        //         };
+        //       })
+        //     : null;
+        // if (preAssessmentContent?.length) {
+        //   contentData.push(preAssessmentContent);
+        // }
         contentData.push(preAssessment);
       }
 
@@ -338,25 +380,36 @@ module.exports = {
                     return null; // Handle missing lecture data
                   }
 
-                  const sectionAssessment = getSectionAssessmentDataByType(
-                    assessmentData,
-                    lecture.id,
-                    index,
-                    lectureIndex
-                  );
+                  const sectionAssessment =
+                    await getSectionAssessmentDataByType(
+                      userId,
+                      courseId,
+                      assessmentData,
+                      lecture.id,
+                      index,
+                      lectureIndex
+                    );
 
-                  const contentData = lectureData.lectureContent.map(
-                    (item) => ({
-                      type: "content",
-                      id: item._id,
-                      contentType: item.type,
-                      title: item.title,
-                      lectureId: lectureData._id,
-                      content: item.content,
-                      sectionId: section._id,
-                      sectionIndex: index,
-                      lectureIndex: lectureIndex,
-                      status: false,
+                  const contentData = await Promise.all(
+                    lectureData.lectureContent.map(async (item) => {
+                      const contentstatus =
+                        await trackingCourseServices.checkContentIdExists(
+                          userId,
+                          courseId,
+                          item._id
+                        );
+                      return {
+                        type: "content",
+                        id: item._id,
+                        contentType: item.type,
+                        title: item.title,
+                        lectureId: lectureData._id,
+                        content: item.content,
+                        sectionId: section._id,
+                        sectionIndex: index,
+                        lectureIndex: lectureIndex,
+                        status: await contentstatus,
+                      };
                     })
                   );
 
@@ -412,8 +465,61 @@ module.exports = {
         );
         sidebarData.push(...finalSectionData);
       }
-
+      const grandAssessment = await getPreAssessmentDataByType(
+        userId,
+        courseId,
+        assessmentData,
+        "grand"
+      );
+      if (grandAssessment) {
+        sidebarData.push(grandAssessment);
+        contentData.push(grandAssessment);
+      }
       // Return final structured data
+      const trackingData = await trackingCourseServices.getTrackingCourseById(
+        userId,
+        courseId
+      );
+      const lastTrackingContentData = trackingData?.trackingContent.length
+        ? trackingData?.trackingContent[
+            trackingData?.trackingContent.length - 1
+          ]
+        : {};
+
+      const finalContentData = contentData.sort((a, b) => {
+        if (a.sectionIndex !== b.sectionIndex) {
+          return a.sectionIndex - b.sectionIndex;
+        }
+        return a.lectureIndex - b.lectureIndex;
+      });
+      let activeContent = {
+        lectureId: finalContentData[0]?.lectureId
+          ? finalContentData[0]?.lectureId
+          : finalContentData[0].id,
+        contentId: finalContentData[0].id,
+      };
+      if (
+        lastTrackingContentData?.lectureId &&
+        lastTrackingContentData?.contentId
+      ) {
+        console.log(
+          "lastTrackingContentData: ",
+          finalContentData.map((ff) => {
+            return { contentId: ff.id };
+          }),
+          lastTrackingContentData
+        );
+
+        const contentIndex = finalContentData.findIndex(
+          (info) =>
+            info.id.toString() === lastTrackingContentData.contentId.toString()
+        );
+        console.log("contentIndex: ", contentIndex);
+        activeContent.lectureId = finalContentData[contentIndex + 1]?.lectureId
+          ? finalContentData[contentIndex + 1]?.lectureId
+          : finalContentData[contentIndex + 1]?.id;
+        activeContent.contentId = finalContentData[contentIndex + 1]?.id;
+      }
       return {
         courseName: course?.courseName,
         courseDescription: course?.courseDescription,
@@ -421,12 +527,8 @@ module.exports = {
         totalSections: course?.totalSections,
         totalLectures: course?.totalLectures,
         sidebarData: sidebarData,
-        contentData: contentData.sort((a, b) => {
-          if (a.sectionIndex !== b.sectionIndex) {
-            return a.sectionIndex - b.sectionIndex;
-          }
-          return a.lectureIndex - b.lectureIndex;
-        }),
+        contentData: finalContentData,
+        activeContent: activeContent,
       };
     } catch (error) {
       console.error("Error fetching published course data:", error);
