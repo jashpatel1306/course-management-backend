@@ -480,7 +480,7 @@ module.exports = {
         userId,
         courseId
       );
-      const lastTrackingContentData = trackingData?.trackingContent.length
+      const lastTrackingContentData = trackingData?.trackingContent?.length
         ? trackingData?.trackingContent[
             trackingData?.trackingContent.length - 1
           ]

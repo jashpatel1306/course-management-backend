@@ -95,4 +95,10 @@ router.post(
   trackingCourseController.addTrackingContent
 );
 
+router.get(
+  "/assessment/:id",
+  isStudentAuthenticate,
+  assessmentController.getAssessmentById
+);
+
 module.exports = router;
