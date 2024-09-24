@@ -50,7 +50,7 @@ module.exports = {
       : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       if (err) {
-        console.log("err1", err);
+        console.log("jwt error", err);
         return res.json({
           status: false,
           message: `Invalid token or expired!`,

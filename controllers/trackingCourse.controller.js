@@ -72,9 +72,6 @@ module.exports = {
       const courseId = req.params.courseId;
       const userId = req.body?.user_id;
       const updatedData = req.body;
-      console.log("updatedData :", updatedData);
-      console.log("userId :", userId);
-      console.log("courseId :", courseId);
       const trackingCourse = await trackingCourseServices.addTrackingContent(
         userId,
         courseId,

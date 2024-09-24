@@ -134,8 +134,10 @@ module.exports = {
   }),
   createQuizSchema: Joi.object().keys({
     title: validate.reqString,
-    description: validate.string,
+    description: validate.array,
     assessmentId: validate.reqId,
+    time: validate.reqNumber,
+    isPublish: validate.boolean,
     quizId: validate.id,
   }),
   createAssessmentSchema: Joi.object().keys({
@@ -313,6 +315,10 @@ module.exports = {
   createEnrollCourseSchema: Joi.object().keys({
     userId: validate.reqId,
     courseId: validate.reqId,
+  }),
+  updateQuizTrackingSchema: Joi.object().keys({
+    questionId: validate.reqId,
+    answerId: validate.reqId,
   }),
 
   createTrackingCourseSchema: Joi.object().keys({

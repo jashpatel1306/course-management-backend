@@ -14,7 +14,6 @@ const getPreAssessmentDataByType = async (
   const result = assessmentData.filter(
     (assessment) => assessment.positionType === positionType
   );
-  console.log("result :", result);
   if (result.length >= 1) {
     // check if the assessment is submitted or not?
     const contentstatus = await trackingCourseServices.checkContentIdExists(
@@ -316,10 +315,6 @@ module.exports = {
       if (!course) {
         return "No published courses found.";
       }
-
-      console.log("courseId : ", courseId);
-      console.log("batchId : ", batchId);
-
       // Fetch assessment data based on batch and course IDs
       const assessmentData =
         await assignAssessmentServices.getAssessmentByBatchIdAndCourseId(
@@ -362,7 +357,6 @@ module.exports = {
         const finalSectionData = await Promise.all(
           course.sections.map(async (info, index) => {
             const section = info.id; // Create a shallow copy to avoid mutation
-            console.log("section.name before: ", section.name);
 
             const sectionLectureContent = [];
 
@@ -454,7 +448,6 @@ module.exports = {
               lectures: validLectures,
             };
 
-            console.log("section.name after: ", section.name);
 
             // Push section data to sidebar and content arrays
 
@@ -502,19 +495,12 @@ module.exports = {
         lastTrackingContentData?.lectureId &&
         lastTrackingContentData?.contentId
       ) {
-        console.log(
-          "lastTrackingContentData: ",
-          finalContentData.map((ff) => {
-            return { contentId: ff.id };
-          }),
-          lastTrackingContentData
-        );
+        
 
         const contentIndex = finalContentData.findIndex(
           (info) =>
             info.id.toString() === lastTrackingContentData.contentId.toString()
         );
-        console.log("contentIndex: ", contentIndex);
         activeContent.lectureId = finalContentData[contentIndex + 1]?.lectureId
           ? finalContentData[contentIndex + 1]?.lectureId
           : finalContentData[contentIndex + 1]?.id;
@@ -553,7 +539,6 @@ module.exports = {
         const finalSectionData = await Promise.all(
           course?.sections?.map(async (info, index) => {
             const section = info.id; // Create a shallow copy to avoid mutation
-            console.log("section.name before: ", section.name);
 
             const sectionLectureContent = [];
 
@@ -623,8 +608,6 @@ module.exports = {
               title: section.name,
               lectures: validLectures,
             };
-
-            console.log("section.name after: ", section.name);
 
             // Push section data to sidebar and content arrays
 

@@ -42,6 +42,19 @@ module.exports = {
       next(error);
     }
   },
+  getStudentQuizById: async (req, res, next) => {
+    try {
+      const quizId = req.params.id;
+      const quiz = await quizzesServices.getStudentQuizById(quizId);
+      return res.status(200).send({
+        success: true,
+        message: "Student Quiz fetched successfully",
+        data: quiz,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   deleteQuiz: async (req, res, next) => {
     try {

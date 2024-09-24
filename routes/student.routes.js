@@ -11,6 +11,8 @@ const assessmentController = require("../controllers/assessment.controller");
 const batchesController = require("../controllers/batches.controller");
 const courseController = require("../controllers/course.controller");
 const trackingCourseController = require("../controllers/trackingCourse.controller");
+const quizController = require("../controllers/quiz.controller");
+const trackingQuizController = require("../controllers/trackingQuiz.controller");
 
 router.post(
   "/get-all-assign-assessments",
@@ -18,13 +20,6 @@ router.post(
   isStudentAuthenticate,
   assessmentController.getAssessmentsByStudentId
 );
-
-// router.post(
-//   "/",
-//   Validate(schemas.searchPaginationScema),
-//   isStudentAuthenticate,
-//   collegeController.getAllColleges
-// );
 
 router.get(
   "/student-wise-courses",
@@ -36,12 +31,6 @@ router.get(
   isStudentAuthenticate,
   courseController.getCourseSidebarDataById
 );
-// router.patch(
-//   "/college-status/:id",
-//   isStudentAuthenticate,
-//   collegeController.changeActiveStatus
-// );
-
 // Create and enroll in a course
 router.post(
   "/course/enroll/:courseId",
@@ -99,6 +88,25 @@ router.get(
   "/assessment/:id",
   isStudentAuthenticate,
   assessmentController.getAssessmentById
+);
+
+router.get(
+  "/quiz/:id",
+  isStudentAuthenticate,
+  quizController.getStudentQuizById
+);
+
+// Create and enroll in a course
+router.post(
+  "/quiz/enroll/:quizId",
+  isStudentAuthenticate,
+  trackingQuizController.createEnrollQuiz
+);
+router.put(
+  "/quiz/update/:quizId",
+  Validate(schemas.updateQuizTrackingSchema),
+  isStudentAuthenticate,
+  trackingQuizController.updateQuizTracking
 );
 
 module.exports = router;

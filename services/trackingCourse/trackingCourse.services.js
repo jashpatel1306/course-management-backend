@@ -97,14 +97,7 @@ module.exports = {
     trackingContent
   ) => {
     try {
-      console.log(
-        "userId, courseId, totalcontent, trackingContent:  ",
-        userId,
-        courseId,
-        totalcontent,
-        trackingContent
-      );
-
+      
       // Check if the tracking course exists
       const trackingCourse = await trackingCourseModel.findOne({
         userId: userId, // Convert to ObjectId

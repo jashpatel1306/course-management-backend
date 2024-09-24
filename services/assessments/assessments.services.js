@@ -153,7 +153,6 @@ module.exports = {
     collegeId
   ) => {
     try {
-      console.log("collegeId  ", collegeId);
       const filter = {
         $and: [
           collegeId ? { collegeId } : {},
@@ -163,13 +162,11 @@ module.exports = {
           },
         ],
       };
-      console.log("filter: ", JSON.stringify(filter));
       const assessments = await AssessmentsModel.find(filter)
         .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
 
         .limit(perPage);
-      console.log("assessments: ", assessments);
       const count = await AssessmentsModel.countDocuments(filter);
       if (!assessments)
         throw createError(500, "Error while Fetching assessments.");

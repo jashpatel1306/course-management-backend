@@ -85,7 +85,6 @@ module.exports = {
   getAssessmentByBatchIdAndCourseId: async (courseId, batchId) => {
     try {
       const currentDate = new Date(); // Get the current date
-      console.log("currentDate: ",currentDate)
       const assessment = await AssignAssessmentsModel.find({
         courseId,
         batchId,
@@ -101,18 +100,15 @@ module.exports = {
   },
   getAllAssignAssessment: async (batchId, perPage, pageNo, collegeId) => {
     try {
-      console.log("collegeId  ", collegeId);
       const filter = {
         $and: [collegeId ? { collegeId } : {}, batchId ? { batchId } : {}],
       };
-      console.log("filter: ", filter);
       const assessments = await AssignAssessmentsModel.find(filter)
         .populate("batchId", "_id batchName")
         .populate("courseId", "_id courseName")
         .populate("assessmentId", "_id title")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
-      console.log("assign assessments: ", assessments);
       const count = await AssignAssessmentsModel.countDocuments(filter);
       if (!assessments)
         throw createError(500, "Error while Fetching assign assessments.");
