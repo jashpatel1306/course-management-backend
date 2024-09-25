@@ -116,7 +116,7 @@ module.exports = {
       if (!assessment || assessment.length === 0)
         throw createError(404, "Assessment not found");
       let finalData = assessment[0];
-      finalData.trackingData =await trackingQuizzeseModel.find({
+      finalData.trackingData = await trackingQuizzeseModel.find({
         userId: userId,
         // quizId: item.data._id,
       });
@@ -153,30 +153,70 @@ module.exports = {
   },
 
   getAssessmentsByBatch: async (
-    batchId,
     search,
     perPage,
     pageNo,
+    batchId,
     collegeId
   ) => {
     try {
+      console.log(
+        batchId,
+
+        collegeId
+      );
       const filter = {
         $and: [
+          batchId !== "all"
+            ? {
+                batches: batchId,
+              }
+            : {},
           collegeId ? { collegeId } : {},
-          batchId ? { batches: { $in: [batchId] } } : {},
           {
             $or: [{ title: { $regex: search } }],
           },
         ],
       };
+
       const assessments = await AssessmentsModel.find(filter)
         .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
-
         .limit(perPage);
+
       const count = await AssessmentsModel.countDocuments(filter);
+
       if (!assessments)
-        throw createError(500, "Error while Fetching assessments.");
+        throw createError(500, "Error while fetching assessments.");
+
+      return { assessments, count };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+  getAssessmentsByStudentId: async (filter, perPage, pageNo) => {
+    try {
+      console.log(filter);
+      // const filter = {
+      //   $and: [
+      //     collegeId ? { collegeId } : {},
+      //     batchId ? { batches: { $in: [new ObjectId(batchId)] } } : {}, // Convert batchId to ObjectId
+      //     {
+      //       $or: [{ title: { $regex: search, $options: "i" } }], // Added 'i' for case-insensitive search
+      //     },
+      //   ],
+      // };
+
+      const assessments = await AssessmentsModel.find(filter)
+        .populate("batches", "_id batchName")
+        .skip((pageNo - 1) * perPage)
+        .limit(perPage);
+
+      const count = await AssessmentsModel.countDocuments(filter);
+
+      if (!assessments)
+        throw createError(500, "Error while fetching assessments.");
+
       return { assessments, count };
     } catch (error) {
       throw createError.InternalServerError(error);

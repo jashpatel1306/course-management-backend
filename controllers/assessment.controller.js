@@ -97,10 +97,10 @@ module.exports = {
 
       const { assessments, count } =
         await assessmentServices.getAssessmentsByBatch(
-          batchId === "all" ? "" : batchId,
           searchText,
           perPage,
           pageNo,
+          batchId,
           college_id
         );
       return res.status(200).send({
@@ -142,7 +142,11 @@ module.exports = {
         };
       }
       const { assessments, count } =
-        await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
+        await assessmentServices.getAssessmentsByStudentId(
+          filter,
+          perPage,
+          pageNo
+        );
       return res.status(200).send({
         success: true,
         message: "Assessments fetched successfully",
@@ -161,9 +165,8 @@ module.exports = {
   getAssessmentOptionsByCollegeId: async (req, res, next) => {
     try {
       const collegeId = req.params.collegeId;
-      const assessment = await assessmentServices.getAssessmentOptionsByCollegeId(
-        collegeId
-      );
+      const assessment =
+        await assessmentServices.getAssessmentOptionsByCollegeId(collegeId);
       return res.status(200).send({
         success: true,
         message: "Assessment option fetched successfully",
