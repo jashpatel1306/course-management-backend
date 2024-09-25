@@ -30,7 +30,6 @@ module.exports = {
 
   getAssessmentById: async (id, userId) => {
     try {
-      console.log("userId: ", userId);
       const assessment = await AssessmentsModel.aggregate([
         { $match: { _id: new ObjectId(id) } },
         {

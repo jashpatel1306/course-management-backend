@@ -67,7 +67,7 @@ module.exports = {
             isAuth: false,
           });
 
-        if ([INSTRUCTOR, STUDENT, STAFF].includes(getUserData?.role))
+        if ([INSTRUCTOR, STUDENT].includes(getUserData?.role))
           return res.json({
             status: false,
             message: `Access to the target resource has been denied`,

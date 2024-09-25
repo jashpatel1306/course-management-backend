@@ -4,7 +4,6 @@ const createError = require("http-errors");
 module.exports = {
   createStaff: async (data) => {
     try {
-      console.log("data: ", data);
       data.permissions = data.permissions.map((permission) => permission.value);
       const staff = await staffModel.create(data);
       if (!staff) throw createError(500, "Error while creating staff");

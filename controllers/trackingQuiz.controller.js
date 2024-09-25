@@ -74,7 +74,6 @@ module.exports = {
       const quizId = req.params.quizId;
       const userId = req.body?.user_id;
       const updatedData = req.body;
-     console.log("updatedData: ",updatedData)
       const trackingQuiz = await trackingQuizServices.updateQuizTracking(
         userId,
         quizId,

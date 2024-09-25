@@ -6,6 +6,7 @@ const {
   SUPERADMIN,
   STUDENT,
   ADMIN,
+  STAFF,
 } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
@@ -13,6 +14,7 @@ const { generateRandomOTP } = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const batchesModel = require("../batches/batches.model");
 const studentsModel = require("../students/student.model");
+const staffModel = require("../staff/staff.model");
 
 module.exports = {
   getUserByEmail: async function (email) {
@@ -143,7 +145,10 @@ module.exports = {
         const batchData = await batchesModel.findOne({ _id: batchId });
         collegeId = batchData?.collegeId ? batchData?.collegeId : null;
       }
-
+      if (!collegeId && user.role === STAFF) {
+        const staffData = await staffModel.findOne({ userId: user._id });
+        collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
+      }
       const userData = {
         user_id: user._id,
         role: user.role,

@@ -62,7 +62,6 @@ module.exports = {
           $elemMatch: { _id: answerId, correct: true }, // Check if answerId exists in the answers array
         },
       });
-      console.log("questionResult : ", questionResult);
       const result = await trackingQuizModel.findOneAndUpdate(
         {
           userId,
