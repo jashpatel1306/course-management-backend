@@ -47,7 +47,7 @@ module.exports = {
     }
   },
 
-  updateQuizTracking: async (userId, quizId, questionId, answerId) => {
+  updateQuizTracking: async (userId, quizId, questionId, answerId, time) => {
     try {
       console.log(
         "userId, quizId, questionId, answerId : ",
@@ -74,6 +74,9 @@ module.exports = {
             correctAnswers: questionResult ? 1 : 0, // Increment correctAnswers if questionResult is true
             wrongAnswers: questionResult ? 0 : 1, // Increment wrongAnswers if questionResult is false
             totalMarks: questionResult ? questionResult.marks : 0, // Increment totalMarks by the provided value
+          },
+          $set: {
+            totalTime: time,
           },
         },
         {

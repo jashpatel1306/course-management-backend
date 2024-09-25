@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 const { toggleActive } = require("../quizzes/quizzes.services");
+const trackingCourseModel = require("../trackingCourse/trackingCourse.model");
+const trackingQuizzeseModel = require("../trackingQuiz/trackingQuiz.model");
 module.exports = {
   createAssessment: async (data) => {
     try {
@@ -26,8 +28,9 @@ module.exports = {
   //   }
   // },
 
-  getAssessmentById: async (id) => {
+  getAssessmentById: async (id, userId) => {
     try {
+      console.log("userId: ", userId);
       const assessment = await AssessmentsModel.aggregate([
         { $match: { _id: new ObjectId(id) } },
         {
@@ -99,6 +102,7 @@ module.exports = {
             totalMarks: 1,
             totalQuestions: 1,
             expiresAt: 1,
+            quizTrackingData: 1,
             content: {
               $filter: {
                 input: "$contents",
@@ -112,8 +116,12 @@ module.exports = {
 
       if (!assessment || assessment.length === 0)
         throw createError(404, "Assessment not found");
-
-      return assessment[0]; // Since aggregate returns an array
+      let finalData = assessment[0];
+      finalData.trackingData =await trackingQuizzeseModel.find({
+        userId: userId,
+        // quizId: item.data._id,
+      });
+      return finalData; // Since aggregate returns an array
     } catch (error) {
       throw createError.InternalServerError(error);
     }

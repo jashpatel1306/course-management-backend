@@ -10,6 +10,8 @@ const {
 const userController = require("../controllers/users.controller");
 const batchesController = require("../controllers/batches.controller");
 const studentController = require("../controllers/student.controller");
+const staffController = require("../controllers/staff.controller");
+
 const departmentController = require("../controllers/department.controller");
 const { handleExcelData } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
@@ -666,4 +668,48 @@ router.get(
   isAdminCommonAuthenticate,
   instructorCourseController.getInstructorCourseById
 );
+
+
+
+
+router.post(
+  "/staff",
+  Validate(schemas.staffSchema),
+  isAdminCommonAuthenticate,
+  staffController.createStaff
+);
+
+router.get(
+  "/staff/all",
+  isAdminCommonAuthenticate,
+  staffController.getAllStaff
+);
+
+router.get(
+  "/staff/:id",
+  isAdminCommonAuthenticate,
+  staffController.getStaffById
+);
+
+router.put(
+  "/staff/:id",
+  Validate(schemas.staffSchema),
+  isAdminCommonAuthenticate,
+  staffController.updateStaff
+);
+
+router.put(
+  "/staff/status/:id",
+  isAdminCommonAuthenticate,
+  staffController.activeStatusChange
+);
+
+router.post(
+  "/college-wise-staff",
+  Validate(schemas.batchWiseStudentsSchema),
+  isAdminCommonAuthenticate,
+  staffController.getCollegeWiseStaff
+);
+
+
 module.exports = router;

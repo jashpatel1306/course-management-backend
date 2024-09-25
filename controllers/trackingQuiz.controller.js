@@ -74,12 +74,13 @@ module.exports = {
       const quizId = req.params.quizId;
       const userId = req.body?.user_id;
       const updatedData = req.body;
-
+     console.log("updatedData: ",updatedData)
       const trackingQuiz = await trackingQuizServices.updateQuizTracking(
         userId,
         quizId,
         updatedData.questionId,
-        updatedData.answerId
+        updatedData.answerId,
+        updatedData.time
       );
       return res.status(200).send({
         success: true,

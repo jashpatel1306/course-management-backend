@@ -319,6 +319,7 @@ module.exports = {
   updateQuizTrackingSchema: Joi.object().keys({
     questionId: validate.reqId,
     answerId: validate.reqId,
+    time: validate.reqNumber,
   }),
 
   createTrackingCourseSchema: Joi.object().keys({
@@ -349,5 +350,14 @@ module.exports = {
   addTrackingContentSchema: Joi.object().keys({
     contentId: validate.reqId,
     lectureId: validate.reqId,
+  }),
+  staffSchema: Joi.object().keys({
+    staffId: validate.string,
+    name: validate.reqString,
+    email: validate.reqEmail,
+    phone: validate.reqString,
+    collegeUserId: validate.reqId,
+    permissions: validate.array,
+    active: validate.reqBoolean,
   }),
 };

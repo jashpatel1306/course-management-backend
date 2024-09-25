@@ -35,8 +35,11 @@ module.exports = {
   getAssessmentById: async (req, res, next) => {
     try {
       const assessmentId = req.params.id;
+      const userId = req.body?.user_id;
+
       const assessment = await assessmentServices.getAssessmentById(
-        assessmentId
+        assessmentId,
+        userId
       );
       return res.status(200).send({
         success: true,

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
 
-const trackingCourseSchema = new mongoose.Schema(
+const trackingQuizzesSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Types.ObjectId,
@@ -22,6 +22,10 @@ const trackingCourseSchema = new mongoose.Schema(
       default: 0,
     },
     totalMarks: {
+      type: Number,
+      default: 0,
+    },
+    totalTime: {
       type: Number,
       default: 0,
     },
@@ -47,8 +51,8 @@ const trackingCourseSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false }
 );
 
-const trackingCourseModel = mongoose.model(
-  "trackingquiz",
-  trackingCourseSchema
+const trackingQuizzeseModel = mongoose.model(
+  "trackingquizzes",
+  trackingQuizzesSchema
 );
-module.exports = trackingCourseModel;
+module.exports = trackingQuizzeseModel;
