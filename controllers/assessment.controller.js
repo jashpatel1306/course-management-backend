@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
-const { assessmentServices } = require("../services");
+const { assessmentServices, assignAssessmentService } = require("../services");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {
@@ -120,32 +120,17 @@ module.exports = {
   },
   getAssessmentsByStudentId: async (req, res, next) => {
     try {
-      const { pageNo, perPage, search } = req.body;
-
       const college_id = req.body?.college_id;
-      const batch_id = req.body?.batch_id;
-      const searchText = new RegExp(search, `i`);
-      let filter =
-        batch_id !== "all"
-          ? {
-              batches: batch_id,
-            }
-          : {};
-      if (search) {
-        filter = {
-          $and: [
-            filter,
-            {
-              $or: [{ title: { $regex: searchText } }],
-            },
-          ],
-        };
-      }
+      const batchId = req.body?.batch_id;
+      const searchText = new RegExp(req.body?.search, `i`);
+      const perPage = req.body?.perPage;
+      const pageNo = req.body?.pageNo;
       const { assessments, count } =
-        await assessmentServices.getAssessmentsByStudentId(
-          filter,
+        await assignAssessmentService.getAllAssignAssessment(
+          batchId === "all" ? "" : batchId,
           perPage,
-          pageNo
+          pageNo,
+          college_id
         );
       return res.status(200).send({
         success: true,

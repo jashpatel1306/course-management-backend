@@ -49,13 +49,7 @@ module.exports = {
 
   updateQuizTracking: async (userId, quizId, questionId, answerId, time) => {
     try {
-      console.log(
-        "userId, quizId, questionId, answerId : ",
-        userId,
-        quizId,
-        questionId,
-        answerId
-      );
+      
       const questionResult = await QuestionsModel.findOne({
         _id: questionId,
         answers: {

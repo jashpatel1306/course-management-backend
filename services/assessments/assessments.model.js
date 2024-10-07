@@ -61,13 +61,31 @@ async function calculateTotalMarksAndQuestions(contents) {
 }
 // Pre-save hook to calculate totalMarks and totalQuestions
 assessmentSchema.pre("save", async function (next) {
-  const { totalMarks, totalQuestions } = await calculateTotalMarksAndQuestions(this.contents);
+  const { totalMarks, totalQuestions } = await calculateTotalMarksAndQuestions(
+    this.contents
+  );
 
   this.totalMarks = totalMarks;
   this.totalQuestions = totalQuestions;
 
   next();
 });
+assessmentSchema.statics.addBatchToAssessment = async function (
+  assessmentId,
+  batchId
+) {
+  const assessment = await this.findById(assessmentId);
+  if (!assessment) {
+    throw new Error("Assessment not found");
+  }
 
+  // Add batchId to the batches array if it's not already present
+  if (!assessment.batches.includes(batchId)) {
+    assessment.batches.push(batchId);
+    await assessment.save();
+  }
+
+  return assessment;
+};
 const assessmentsModel = mongoose.model("assessments", assessmentSchema);
 module.exports = assessmentsModel;

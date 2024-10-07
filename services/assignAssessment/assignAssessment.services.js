@@ -1,6 +1,7 @@
 const AssignAssessmentsModel = require("./assignAssessment.model");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const assessmentsModel = require("../assessments/assessments.model");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -21,6 +22,17 @@ module.exports = {
       data.type = "course";
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
+      if (data.assessmentId && data.batchId) {
+        console.log(
+          "data.assessmentId && data.batchId: ",
+          data.assessmentId,
+          data.batchId
+        );
+        await assessmentsModel.addBatchToAssessment(
+          data.assessmentId,
+          data.batchId
+        );
+      }
       const assessment = await AssignAssessmentsModel.create(data);
       if (!assessment)
         throw createError(500, "Error while creating assessment");
@@ -34,6 +46,17 @@ module.exports = {
       data.courseId = data.courseId ? data.courseId : null;
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
+      if (data.assessmentId && data.batchId) {
+        console.log(
+          "data.assessmentId && data.batchId: ",
+          data.assessmentId,
+          data.batchId
+        );
+        await assessmentsModel.addBatchToAssessment(
+          data.assessmentId,
+          data.batchId
+        );
+      }
       const assessment = await AssignAssessmentsModel.findOneAndUpdate(
         { _id: id },
         data,
@@ -98,7 +121,7 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
-  getAllAssignAssessment: async (batchId, perPage, pageNo, collegeId) => {
+  getAllAssignAssessment: async (batchId, perPage, pageNo, collegeId,searchText) => {
     try {
       const filter = {
         $and: [collegeId ? { collegeId } : {}, batchId ? { batchId } : {}],
@@ -106,7 +129,7 @@ module.exports = {
       const assessments = await AssignAssessmentsModel.find(filter)
         .populate("batchId", "_id batchName")
         .populate("courseId", "_id courseName")
-        .populate("assessmentId", "_id title")
+        .populate("assessmentId", "_id title totalQuestions totalMarks")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       const count = await AssignAssessmentsModel.countDocuments(filter);

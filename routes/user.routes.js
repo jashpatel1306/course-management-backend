@@ -669,9 +669,6 @@ router.get(
   instructorCourseController.getInstructorCourseById
 );
 
-
-
-
 router.post(
   "/staff",
   Validate(schemas.staffSchema),
@@ -710,6 +707,5 @@ router.post(
   isAdminCommonAuthenticate,
   staffController.getCollegeWiseStaff
 );
-
 
 module.exports = router;

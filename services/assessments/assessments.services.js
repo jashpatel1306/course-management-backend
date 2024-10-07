@@ -169,7 +169,7 @@ module.exports = {
         $and: [
           batchId !== "all"
             ? {
-                batches: batchId,
+                batches: { $in: [batchId] },
               }
             : {},
           collegeId ? { collegeId } : {},
@@ -178,7 +178,7 @@ module.exports = {
           },
         ],
       };
-
+      console.log("filter: ", JSON.stringify(filter));
       const assessments = await AssessmentsModel.find(filter)
         .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
@@ -248,6 +248,17 @@ module.exports = {
       return data;
     } catch (error) {
       throw createError(500, error.message);
+    }
+  },
+  addBatch: async (assessmentId, batchId) => {
+    try {
+      const updatedAssessment = await AssessmentsModel.addBatchToAssessment(
+        assessmentId,
+        batchId
+      );
+      console.log("Batch added successfully:", updatedAssessment);
+    } catch (error) {
+      console.error("Error adding batch:", error.message);
     }
   },
 };

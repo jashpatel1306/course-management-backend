@@ -186,10 +186,12 @@ module.exports = {
   },
   getCourseOptionsByBatch: async (batchId) => {
     try {
+      console.log("batchId : ",batchId)
       const batchData = await BatchModel.findOne({ _id: batchId }).populate(
         "courses",
         "_id courseName"
       );
+      console.log("batchData : ",batchData)
       const data = batchData.courses.map((item) => {
         return { label: item.courseName, value: item._id };
       });

@@ -3,7 +3,10 @@ const router = express.Router();
 
 const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
-const { isSuperAdminAuthenticate } = require("../helpers/auth.helper");
+const {
+  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
+} = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
 const collegeController = require("../controllers/college.controller");
@@ -37,18 +40,16 @@ router.patch(
 );
 router.get(
   "/college-option",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   collegeController.getCollegesOption
 );
 
-
 router.get(
   "/batches-option/:collegeId",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   batcheController.getBatchesOption
 );
 
 //----------------------- instructor courses------------------------//
-
 
 module.exports = router;
