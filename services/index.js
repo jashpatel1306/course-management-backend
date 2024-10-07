@@ -1,3 +1,5 @@
+const dashboardServices = require("./dashboard.services");
+
 module.exports = {
   userServices: require(`./users/user.service`),
   modulesServices: require(`./modules/modules.service`),
@@ -12,5 +14,6 @@ module.exports = {
   courseServices: require(`./courses/courseServices`),
   sectionServices: require("./section/section.services"),
   lectureServices: require("./lectures/lectures.services"),
-  instructorCourseService: require("./instructorCourses/instructorCourses.services")
+  instructorCourseService: require("./instructorCourses/instructorCourses.services"),
+  dashboardServices: require("./dashboard.services"),
 };

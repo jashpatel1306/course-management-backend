@@ -104,8 +104,25 @@ module.exports = {
   bulkStudentSchema: Joi.object().keys({
     batchId: validate.reqString,
     collegeId: validate.string,
-    // excelFile: validate.object,
+    college_id: validate.any,
+    user_id: validate.id,
+    excelData: validate.array.items(
+      validate.object.keys({
+        name: validate.reqString,
+        email: validate.reqEmail,
+        phone: validate.reqString,
+        rollNo: validate.reqString,
+        department: validate.reqString,
+        section: validate.reqString,
+        passoutYear: validate.reqNumber,
+        gender: validate.reqString.allow("male", "female", "other"),
+        semester: validate.reqNumber,
+        colCode: validate.string,
+        colName: validate.string,
+      })
+    ),
   }),
+
   questionsSchema: Joi.object().keys({
     question: validate.reqString,
     answers: validate.array.items(

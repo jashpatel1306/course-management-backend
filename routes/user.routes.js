@@ -110,9 +110,9 @@ router.post(
 
 router.post(
   "/students-bulk",
-  Validate(schemas.bulkStudentSchema),
   isAdminCommonAuthenticate,
   handleExcelData,
+  Validate(schemas.bulkStudentSchema),
   studentController.createBulkStudents
 );
 router.get(

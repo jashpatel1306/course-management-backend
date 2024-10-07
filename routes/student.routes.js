@@ -15,12 +15,12 @@ router.post(
   assessmentController.getAssessmentsByStudentId
 );
 
-// router.post(
-//   "/colleges/all/:status",
-//   Validate(schemas.searchPaginationScema),
-//   isStudentAuthenticate,
-//   collegeController.getAllColleges
-// );
+  router.post(
+    "/colleges/all/:status",
+    Validate(schemas.searchPaginationScema),
+    isStudentAuthenticate,
+    collegeController.getAllColleges
+  );
 
 // router.get(
 //   "/college/:id",

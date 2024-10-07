@@ -20,8 +20,7 @@ module.exports = {
       const batchId = req.body?.batchId;
       const collegeId = req.body?.collegeId || req.body?.college_id;
       const studentsData = req.body?.excelData;
-
-      Validate();
+      console.log("collegeId :", collegeId);
       // Use Promise.all to resolve all promises in the array
       const studentData = await Promise.all(
         studentsData.map(async (student) => {

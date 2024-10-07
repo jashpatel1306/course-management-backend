@@ -10,7 +10,7 @@ const {
 const { userServices } = require("../services");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 module.exports = {
-  // =================================== Check  authentication  ===================================
+  //=================================== Check  authentication ===================================
   isAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
     token = token.toLowerCase().includes("bearer")
@@ -26,6 +26,7 @@ module.exports = {
 
       if (result && isset(result.user_id)) {
         const getUserData = await userServices.findUserById(result.user_id);
+        console.log("getUserData :", getUserData);
         if (!getUserData)
           return res.json({
             status: false,
@@ -34,6 +35,8 @@ module.exports = {
           });
         req.body.user_id = result.user_id;
         req.body.college_id = result.college_id;
+
+        res.locals.userRole = result.role;
         return next();
       }
       return res.json({
@@ -49,6 +52,7 @@ module.exports = {
       ? token.split(" ")[1]
       : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
+      console.log("result", result);
       if (err) {
         console.log("err1", err);
         return res.json({
@@ -114,6 +118,7 @@ module.exports = {
         if (getUserData.role === SUPERADMIN) {
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
+          res.locals.userRole = SUPERADMIN;
           return next();
         } else {
           return res.json({
@@ -152,10 +157,11 @@ module.exports = {
           });
         console.log("getUserData :", getUserData);
         if (getUserData.role === STUDENT) {
-          console.log("req.body :", result);
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
           req.body.batch_id = result.batch_id;
+          res.locals.userRole = STUDENT;
+
           return next();
         } else {
           return res.json({

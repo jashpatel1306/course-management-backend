@@ -22,9 +22,14 @@ module.exports = {
           ],
         },
       });
+
+      if (!departments)
+        throw createError.BadRequest(
+          `department '${departmentName}' does not exist for this college.`
+        );
       return departments;
     } catch (error) {
-      throw createError(500, error.message);
+      throw error;
     }
   },
   getDepartmentsOptions: async (collegeId) => {

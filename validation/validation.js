@@ -29,4 +29,5 @@ module.exports = {
   positiveDecimal: Joi.number().precision(4).positive(),
   reqPositiveDecimal: Joi.number().precision(4).positive().required(),
   object: Joi.object(),
+  any: Joi.any(),
 };
