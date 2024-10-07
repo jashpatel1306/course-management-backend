@@ -4,11 +4,11 @@ const Validate = (schema) => {
     try {
       const requestData = req?.body;
       if (isset(requestData)) {
-        const data = {data:requestData};
-        // const data =
-        //   process.env.NODE_ENV === "development"
-        //     ? { data: JSON.parse(requestData.data) }
-        //     : { data: requestData };
+        // const data = {data:requestData};
+        const data =
+          process.env.NODE_ENV === "development"
+            ? { data: JSON.parse(requestData.data) }
+            : { data: requestData };
 
         const result = await schema.validate(data.data);
         if (result.error) {
