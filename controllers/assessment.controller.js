@@ -4,7 +4,6 @@ const { assessmentServices } = require("../services");
 module.exports = {
   createAssessment: async (req, res, next) => {
     try {
-      req.body = { ...req.body, collegeId: req.body?.college_id };
       const assessment = await assessmentServices.createAssessment(req.body);
       return res.status(201).send({
         success: true,
@@ -36,8 +35,11 @@ module.exports = {
   getAssessmentById: async (req, res, next) => {
     try {
       const assessmentId = req.params.id;
+      const userId = req.body?.user_id;
+
       const assessment = await assessmentServices.getAssessmentById(
-        assessmentId
+        assessmentId,
+        userId
       );
       return res.status(200).send({
         success: true,
@@ -82,31 +84,25 @@ module.exports = {
 
   getAssessmentsByBatch: async (req, res, next) => {
     try {
-      const { pageNo, perPage, search, batchId } = req.body;
-
-      const college_id = req.body?.college_id;
+      const batchId = req.body?.batchId;
+      const perPage = req.body?.perPage;
+      const pageNo = req.body?.pageNo;
+      const search = req.body?.search;
+      const college_id = req?.body?.collegeId
+        ? req.body?.collegeId === "all"
+          ? req.body?.college_id
+          : req.body?.collegeId
+        : req.body?.college_id;
       const searchText = new RegExp(search, `i`);
-      let filter =
-        batchId !== "all"
-          ? {
-              batches: batchId,
-            }
-          : {};
-      console.log("batchId: ", search, batchId);
 
-      if (search) {
-        filter = {
-          $and: [
-            filter,
-            {
-              $or: [{ title: { $regex: searchText } }],
-            },
-          ],
-        };
-      }
-      console.log("filter: ", filter);
       const { assessments, count } =
-        await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
+        await assessmentServices.getAssessmentsByBatch(
+          searchText,
+          perPage,
+          pageNo,
+          batchId,
+          college_id
+        );
       return res.status(200).send({
         success: true,
         message: "Assessments fetched successfully",
@@ -135,8 +131,6 @@ module.exports = {
               batches: batch_id,
             }
           : {};
-      console.log("search: ", search);
-
       if (search) {
         filter = {
           $and: [
@@ -147,9 +141,12 @@ module.exports = {
           ],
         };
       }
-      console.log("filter: ", filter);
       const { assessments, count } =
-        await assessmentServices.getAssessmentsByBatch(filter, perPage, pageNo);
+        await assessmentServices.getAssessmentsByStudentId(
+          filter,
+          perPage,
+          pageNo
+        );
       return res.status(200).send({
         success: true,
         message: "Assessments fetched successfully",
@@ -160,6 +157,20 @@ module.exports = {
           pageNo,
           pages: Math.ceil(count / perPage),
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAssessmentOptionsByCollegeId: async (req, res, next) => {
+    try {
+      const collegeId = req.params.collegeId;
+      const assessment =
+        await assessmentServices.getAssessmentOptionsByCollegeId(collegeId);
+      return res.status(200).send({
+        success: true,
+        message: "Assessment option fetched successfully",
+        data: assessment,
       });
     } catch (error) {
       next(error);

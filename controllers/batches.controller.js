@@ -28,10 +28,7 @@ module.exports = {
   },
   getAllBatches: async (req, res, next) => {
     try {
-      college_id =
-        req.params.collegeId !== "all"
-          ? req.params.collegeId
-          : req.body?.college_id;
+      college_id = req.params.collegeId !== "all" ? req.params.collegeId : null;
 
       const batches = await batchServices.getAllBatchesByCollegeId(college_id);
       res.status(200).send({
@@ -104,6 +101,34 @@ module.exports = {
         success: true,
         message: "batches fetched successfully",
         data: batches,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  getCoursesByBatchId: async (req, res, next) => {
+    try {
+      const batch_id = req.body?.batch_id;
+      // userRole === "student" ? filter.isPublish = true : filter.
+      const { courses } = await batchServices.getCoursesByBatchId(batch_id);
+      res.send({
+        success: true,
+        message: "Courses fetched successfully",
+        data: courses,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  getCourseOptionsByBatch: async (req, res, next) => {
+    try {
+      const batchId = req.params?.batchId;
+      // userRole === "student" ? filter.isPublish = true : filter.
+      const result = await batchServices.getCourseOptionsByBatch(batchId);
+      res.send({
+        success: true,
+        message: "Courses option fetched successfully",
+        data: result,
       });
     } catch (err) {
       next(err);

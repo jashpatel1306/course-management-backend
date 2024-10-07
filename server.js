@@ -11,7 +11,11 @@ const app = express();
 
 //postgres connection
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // You can specify allowed origins here
+  })
+);
 app.use(cookieParser());
 app.use(expressFile());
 app.use(express.static(path.join(__dirname, "public")));
@@ -32,7 +36,9 @@ app.all("/*", function (req, res, next) {
 });
 
 app.all("/", (req, res) => {
-  return res.status(200).send("Learning management system is running well. version : 1.0.2");
+  return res
+    .status(200)
+    .send("Learning management system is running well. version : 1.0.3");
 });
 
 app.all("*", async (req, res) => {
@@ -47,7 +53,7 @@ app.use((err, req, res, next) => {
   //handling mongo validation error
   if (err.code === 11000) {
     console.log("Mongo Duplication error: ", err);
-    const duplicateKey = Object.keys(err.keyValue)[0]; 
+    const duplicateKey = Object.keys(err.keyValue)[0];
     return res.status(409).send({
       success: false,
       status: 409,

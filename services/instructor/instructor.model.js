@@ -45,6 +45,7 @@ const InstructorSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    courses: [{ type: mongoose.Types.ObjectId, ref: "instructorCourses" }],
   },
   { timestamps: true, versionKey: false }
 );
@@ -63,7 +64,6 @@ InstructorSchema.pre("save", async function (next) {
         user_name: this.name,
         role: "instructor", // Adjust role as needed
       };
-      console.log("userData", userData);
       const User = mongoose.model("users");
 
       // Upsert user

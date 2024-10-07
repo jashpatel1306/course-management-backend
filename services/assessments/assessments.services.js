@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
 const { toggleActive } = require("../quizzes/quizzes.services");
+const trackingCourseModel = require("../trackingCourse/trackingCourse.model");
+const trackingQuizzeseModel = require("../trackingQuiz/trackingQuiz.model");
 module.exports = {
   createAssessment: async (data) => {
     try {
@@ -26,7 +28,7 @@ module.exports = {
   //   }
   // },
 
-  getAssessmentById: async (id) => {
+  getAssessmentById: async (id, userId) => {
     try {
       const assessment = await AssessmentsModel.aggregate([
         { $match: { _id: new ObjectId(id) } },
@@ -99,6 +101,7 @@ module.exports = {
             totalMarks: 1,
             totalQuestions: 1,
             expiresAt: 1,
+            quizTrackingData: 1,
             content: {
               $filter: {
                 input: "$contents",
@@ -112,8 +115,12 @@ module.exports = {
 
       if (!assessment || assessment.length === 0)
         throw createError(404, "Assessment not found");
-
-      return assessment[0]; // Since aggregate returns an array
+      let finalData = assessment[0];
+      finalData.trackingData = await trackingQuizzeseModel.find({
+        userId: userId,
+        // quizId: item.data._id,
+      });
+      return finalData; // Since aggregate returns an array
     } catch (error) {
       throw createError.InternalServerError(error);
     }
@@ -145,15 +152,71 @@ module.exports = {
     }
   },
 
-  getAssessmentsByBatch: async (filter, perPage, pageNo) => {
+  getAssessmentsByBatch: async (
+    search,
+    perPage,
+    pageNo,
+    batchId,
+    collegeId
+  ) => {
     try {
-      console.log("filter: ",filter)
+      console.log(
+        batchId,
+
+        collegeId
+      );
+      const filter = {
+        $and: [
+          batchId !== "all"
+            ? {
+                batches: batchId,
+              }
+            : {},
+          collegeId ? { collegeId } : {},
+          {
+            $or: [{ title: { $regex: search } }],
+          },
+        ],
+      };
+
       const assessments = await AssessmentsModel.find(filter)
+        .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
+
       const count = await AssessmentsModel.countDocuments(filter);
+
       if (!assessments)
-        throw createError(500, "Error while Fetching assessments.");
+        throw createError(500, "Error while fetching assessments.");
+
+      return { assessments, count };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+  getAssessmentsByStudentId: async (filter, perPage, pageNo) => {
+    try {
+      console.log(filter);
+      // const filter = {
+      //   $and: [
+      //     collegeId ? { collegeId } : {},
+      //     batchId ? { batches: { $in: [new ObjectId(batchId)] } } : {}, // Convert batchId to ObjectId
+      //     {
+      //       $or: [{ title: { $regex: search, $options: "i" } }], // Added 'i' for case-insensitive search
+      //     },
+      //   ],
+      // };
+
+      const assessments = await AssessmentsModel.find(filter)
+        .populate("batches", "_id batchName")
+        .skip((pageNo - 1) * perPage)
+        .limit(perPage);
+
+      const count = await AssessmentsModel.countDocuments(filter);
+
+      if (!assessments)
+        throw createError(500, "Error while fetching assessments.");
+
       return { assessments, count };
     } catch (error) {
       throw createError.InternalServerError(error);
@@ -172,6 +235,19 @@ module.exports = {
       return assessment;
     } catch (error) {
       throw createError.InternalServerError(error);
+    }
+  },
+  getAssessmentOptionsByCollegeId: async (collegeId) => {
+    try {
+      const assessment = await AssessmentsModel.find({
+        collegeId: collegeId,
+      });
+      const data = assessment.map((item) => {
+        return { label: item.title, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

@@ -30,7 +30,6 @@ module.exports = {
             collegeId,
             student?.department
           );
-          console.log("departmentData :", departmentData);
           student.department = departmentData?._id;
           const insertedStudent = await studentServices.createStudent(student);
           return insertedStudent;

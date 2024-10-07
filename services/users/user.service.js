@@ -2,13 +2,19 @@ const userModel = require("./user.model");
 const collegesModel = require("../colleges/colleges.model");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
-const { SUPERADMIN, STUDENT } = require("../../constants/roles.constant");
+const {
+  SUPERADMIN,
+  STUDENT,
+  ADMIN,
+  STAFF,
+} = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
 const { generateRandomOTP } = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const batchesModel = require("../batches/batches.model");
 const studentsModel = require("../students/student.model");
+const staffModel = require("../staff/staff.model");
 
 module.exports = {
   getUserByEmail: async function (email) {
@@ -32,30 +38,48 @@ module.exports = {
           role: SUPERADMIN,
           user_name: "First Admin",
         };
+        const collageData = {
+          email: "lmscollage@admin.com",
+          password: "Admin@123",
+          role: ADMIN,
+          user_name: "First Collage Admin",
+        };
 
         data.password = await commonFunctions.encode(data.password);
+        collageData.password = await commonFunctions.encode(
+          collageData.password
+        );
         await userModel.updateOne(
           { email: data.email },
           { ...data },
           { upsert: true }
         );
+        await userModel.updateOne(
+          { email: collageData.email },
+          { ...collageData },
+          { upsert: true }
+        );
+        const collageUserResult = await userModel.findOne({
+          email: collageData.email,
+        });
         const userResult = await userModel.findOne({ email: data.email });
-        if (userResult._id) {
+
+        if (collageUserResult?._id) {
           const collegeData = {
-            userId: userResult._id,
+            userId: collageUserResult?._id,
             collegeName: "superAdmin College",
             collegeNo: "-1",
             contactPersonName: "First Admin",
-            contactPersonNo: "+9199999999999",
+            contactPersonNo: "+919999999999",
             shortName: "superAdmin College",
             isAdmin: true,
           };
           await collegesModel.updateOne(
-            { userId: userResult._id },
+            { userId: collageUserResult._id },
             { ...collegeData },
             { upsert: true }
           );
-          console.log("creating college for Admin");
+          console.log("Creating college for Admin");
         }
       }
     } catch (error) {
@@ -121,7 +145,10 @@ module.exports = {
         const batchData = await batchesModel.findOne({ _id: batchId });
         collegeId = batchData?.collegeId ? batchData?.collegeId : null;
       }
-
+      if (!collegeId && user.role === STAFF) {
+        const staffData = await staffModel.findOne({ userId: user._id });
+        collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
+      }
       const userData = {
         user_id: user._id,
         role: user.role,
@@ -130,8 +157,6 @@ module.exports = {
         college_id: collegeId,
         batch_id: batchId,
       };
-      console.log("userData: ", userData);
-      // const collegeId = collegeData?._id ? collegeData?._id : null;
       const accessToken = jwt.sign(userData, JWTSecretKey, {
         expiresIn: 86400,
       });

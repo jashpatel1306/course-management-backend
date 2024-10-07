@@ -5,8 +5,7 @@ const randomstring = require(`randomstring`);
 const fs = require(`fs`);
 const limit = 60;
 const baseUrl = `content/images/`;
-// const resizedWidth = 800;
-// const resizedHeight = 600;
+const { v4: uuidv4 } = require("uuid");
 
 const awsConfig = {
   accessKeyId: process.env.AWS_S3_ACCESSKEYID,
@@ -123,17 +122,28 @@ module.exports = {
       try {
         // Supported MIME types and file extensions
         const acceptFiles = [
-          `application/pdf`, // PDF
-          `application/vnd.openxmlformats-officedocument.presentationml.presentation`, // PPTX
-          `application/msword`, // DOC (Word old format)
-          `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, // DOCX (Word new format)
+          // PDF
+          "application/pdf",
+
+          // Microsoft Office formats
+          "application/vnd.ms-powerpoint", // PPT (old)
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation", // PPTX (new)
+          "application/msword", // DOC (old)
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX (new)
+          "application/vnd.ms-excel", // XLS (old)
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // XLSX (new)
+
+          "text/plain", // TXT
         ];
 
         const allowedExtension = [
-          `pdf`, // PDF
-          `pptx`, // PowerPoint (PPTX)
-          `doc`, // Word (DOC)
-          `docx`, // Word (DOCX)
+          "pdf", // PDF
+          "ppt", // PowerPoint (PPT)
+          "pptx", // PowerPoint (PPTX)
+          "doc", // Word (DOC)
+          "docx", // Word (DOCX)
+          "xls", // Excel (XLS)
+          "xlsx", // Excel (XLSX)
         ];
 
         const fileExt = fileData?.name
@@ -330,7 +340,7 @@ module.exports = {
   uploadMaterialToLocal: (fileData, path) => {
     return new Promise(async (resolve, reject) => {
       try {
-        path = `public/` + path;
+        path = `publish/` + path;
         let dir = `./` + path;
         if (!fs.existsSync(dir))
           await fs.mkdir(dir, { recursive: true }, (err) => {});
@@ -510,52 +520,61 @@ module.exports = {
   startUpload: async (fileName, fileType) => {
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
-      Key: fileName,
+      Key: `uploads/${new Date().getTime()}-${fileName}`,
       ContentType: fileType,
+      ACL: "private",
     };
 
     try {
       const upload = await s3.createMultipartUpload(params).promise();
-      return { uploadId: upload };
+      return { uploadId: upload.UploadId, key: params.Key };
     } catch (error) {
       throw new Error("Error initiating upload: " + error.message);
     }
   },
-  uploadPart: async (fileName, partNumber, uploadId, fileChunk) => {
-    console.log(
-      "fileName, partNumber, uploadId, fileChunk",
-      fileName,
-      partNumber,
-      uploadId,
-      fileChunk
-    );
+  uploadPart: async (uploadId, key, partNumber, part) => {
+  
+    const buffer = Buffer.from(part.data, `binary`);
+
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
-      Key: fileName,
+      Key: key,
       PartNumber: partNumber,
       UploadId: uploadId,
-      Body: fileChunk.data,
+      Body: buffer,
     };
 
     try {
       const uploadParts = await s3.uploadPart(params).promise();
-      return { ETag: uploadParts.ETag };
+      return { ETag: uploadParts.ETag, PartNumber: partNumber };
     } catch (error) {
       throw new Error("Error uploading part: " + error.message);
     }
   },
-  completeUpload: async (fileName, uploadId, parts) => {
+  completeUpload: async (uploadId, key, parts) => {
+    // Ensure parts are correctly formatted
+    const completedParts = parts.map((part) => {
+      if (!part.ETag || !part.PartNumber) {
+        throw new Error("Invalid part data: missing ETag or PartNumber.");
+      }
+      return {
+        ETag: part.ETag.replace(/"/g, ""), // Remove quotes from ETag
+        PartNumber: part.PartNumber,
+      };
+    });
+
     const params = {
       Bucket: process.env.AWS_S3_BUCKET,
-      Key: fileName,
+      Key: key,
       UploadId: uploadId,
-      MultipartUpload: { Parts: parts },
+      MultipartUpload: { Parts: completedParts },
     };
 
     try {
       const complete = await s3.completeMultipartUpload(params).promise();
-      return { fileUrl: complete.Location };
+      return { fileUrl: complete.Location }; // Return the URL of the uploaded file
     } catch (error) {
+      console.error("Error completing upload: ", error);
       throw new Error("Error completing upload: " + error.message);
     }
   },

@@ -54,7 +54,7 @@ module.exports = {
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       console.log("result", result);
       if (err) {
-        console.log("err1", err);
+        console.log("jwt error", err);
         return res.json({
           status: false,
           message: `Invalid token or expired!`,
@@ -71,7 +71,7 @@ module.exports = {
             isAuth: false,
           });
 
-        if ([INSTRUCTOR, STUDENT, STAFF].includes(getUserData?.role))
+        if ([INSTRUCTOR, STUDENT].includes(getUserData?.role))
           return res.json({
             status: false,
             message: `Access to the target resource has been denied`,
@@ -155,13 +155,51 @@ module.exports = {
             message: `Invalid token or expired!`,
             isAuth: false,
           });
-        console.log("getUserData :", getUserData);
         if (getUserData.role === STUDENT) {
           req.body.user_id = result.user_id;
           req.body.college_id = result.college_id;
           req.body.batch_id = result.batch_id;
           res.locals.userRole = STUDENT;
 
+          return next();
+        } else {
+          return res.json({
+            status: false,
+            message: `Access to the target resource has been denied`,
+            isAuth: false,
+          });
+        }
+      }
+      return res.json({
+        status: false,
+        message: `Invalid token or expired!`,
+        isAuth: false,
+      });
+    });
+  },
+  isInstructorAuthenticate: (req, res, next) => {
+    let token = req.headers.authorization;
+    token = token.toLowerCase().includes("bearer")
+      ? token.split(" ")[1]
+      : token;
+    jwt.verify(token, JWTSecretKey, async (err, result) => {
+      if (err)
+        return res.json({
+          status: false,
+          message: `Something is wrong in Authentication.Please try again.`,
+          isAuth: false,
+        });
+      if (result && isset(result.user_id)) {
+        const getUserData = await userServices.findUserById(result.user_id);
+        if (!getUserData)
+          return res.json({
+            status: false,
+            message: `Invalid token or expired!`,
+            isAuth: false,
+          });
+        if (getUserData.role === INSTRUCTOR) {
+          req.body.user_id = result.user_id;
+          req.body.college_id = result.college_id;
           return next();
         } else {
           return res.json({

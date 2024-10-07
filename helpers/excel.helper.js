@@ -26,13 +26,11 @@ function processSheet(stream, cb) {
  */
 module.exports.handleExcelData = async (req, res, next) => {
   try {
-    console.log("req.files.excelFile", req.files);
     // Get the excel file from the request
     const myStream = req.files.excelFile;
 
     // Process the excel sheet data using the processSheet and handleWorkbook functions
     const processedData = processSheet(myStream.data, handleWorkbook);
-    console.log("processedData", processedData);
 
     // If no data is processed, return an error response
     if (!processedData) {

@@ -2,11 +2,6 @@ const InstructorCourseModel = require("../instructorCourses/instructorCourses");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 module.exports = {
-  /**
-   * Create a new Instructor Course
-   * @param {Object} data - The Instructor Course data
-   * @returns {Promise<Object>} - The created Instructor Course
-   */
   createInstructorCourse: async (data) => {
     try {
       const course = await InstructorCourseModel.create(data);
@@ -20,12 +15,64 @@ module.exports = {
       throw createError(error);
     }
   },
+  updateInstructorCourse: async (id, data) => {
+    try {
+      const course = await InstructorCourseModel.findByIdAndUpdate(id, data, {
+        new: true,
+      });
+      if (!course) {
+        throw createError.NotFound("Instructor Course not found.");
+      }
+      return course;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+  getInstructorCoursesByCollegeId: async (
+    collegeId,
+    search,
+    pageNo,
+    perPage
+  ) => {
+    try {
+      let filter = {
+        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }],
+      };
+      if (search) {
+        filter = {
+          $and: [
+            {
+              $or: [
+                { collegeId: collegeId },
+                { collegeIds: { $in: [collegeId] } },
+              ],
+            },
+            {
+              $or: [
+                { courseName: { $regex: search, $options: "i" } },
+                { courseDescription: { $regex: search, $options: "i" } },
+              ],
+            },
+          ],
+        };
+      }
 
-  /**
-   * Get an Instructor Course by ID
-   * @param {string} id - The ID of the Instructor Course
-   * @returns {Promise<Object>} - The Instructor Course
-   */
+      const courses = await InstructorCourseModel.find(filter)
+        .skip((pageNo - 1) * perPage)
+        .limit(perPage);
+
+      const count = await InstructorCourseModel.countDocuments(filter);
+
+      if (!courses) {
+        throw createError.NotFound("No courses found for the given college.");
+      }
+
+      return { courses, count };
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+
   getInstructorCourseById: async (id) => {
     try {
       const course = await InstructorCourseModel.findById(id);
@@ -38,12 +85,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Update an Instructor Course by ID
-   * @param {string} id - The ID of the Instructor Course
-   * @param {Object} data - The update data
-   * @returns {Promise<Object>} - The updated Instructor Course
-   */
   updateInstructorCourse: async (id, data) => {
     try {
       const course = await InstructorCourseModel.findByIdAndUpdate(id, data, {
@@ -57,12 +98,48 @@ module.exports = {
       throw createError(error);
     }
   },
+  updateInstructorCourseContent: async (courseId, newContent) => {
+    try {
+      // First check if the contentId exists within the content array
+      let lecture = null;
+      if (newContent.id) {
+        // If the content exists, update the specific item in the array
+        lecture = await InstructorCourseModel.updateOne(
+          { _id: courseId, "content._id": newContent.id },
+          { $set: { "content.$": newContent } }
+        );
+      } else {
+        lecture = await InstructorCourseModel.updateOne(
+          { _id: courseId },
+          {
+            $push: {
+              content: [newContent],
+            },
+          }
+        );
+      }
 
-  /**
-   * Delete an Instructor Course by ID
-   * @param {string} id - The ID of the Instructor Course
-   * @returns {Promise<Object>} - The deleted Instructor Course
-   */
+      return lecture;
+    } catch (err) {
+      console.error("Error update Instructor Course Content:", err);
+    }
+  },
+  deleteInstructorCourseContent: async (courseId, contentId) => {
+    try {
+      const result = await InstructorCourseModel.updateOne(
+        { _id: courseId }, // Find the lecture by its _id
+        {
+          $pull: {
+            content: { _id: contentId }, // Remove the item matching the contentId
+          },
+        }
+      );
+      return result;
+    } catch (err) {
+      console.error("Error deleting lecture content:", err);
+    }
+  },
+
   deleteInstructorCourse: async (id) => {
     try {
       const course = await InstructorCourseModel.findByIdAndDelete(id);
@@ -75,11 +152,6 @@ module.exports = {
     }
   },
 
-  /**
-   * Toggle the 'active' status of an Instructor Course by ID
-   * @param {string} id - The ID of the Instructor Course
-   * @returns {Promise<Object>} - The updated Instructor Course
-   */
   toggleInstructorCourseStatus: async (id) => {
     try {
       const course = await InstructorCourseModel.findById(id);
@@ -96,19 +168,14 @@ module.exports = {
     }
   },
 
-  /**
-   * Toggle the 'isPublic' status of an Instructor Course by ID
-   * @param {string} id - The ID of the Instructor Course
-   * @returns {Promise<Object>} - The updated Instructor Course
-   */
-  toggleInstructorCoursePublicStatus: async (id) => {
+  toggleInstructorCoursePublishStatus: async (id) => {
     try {
       const course = await InstructorCourseModel.findById(id);
       if (!course) {
         throw createError.NotFound("Instructor course not found.");
       }
 
-      course.isPublic = !course.isPublic;
+      course.isPublish = !course.isPublish;
       await course.save();
 
       return course;
@@ -116,57 +183,82 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  /**
-   * Get all public Instructor Courses
-   * @returns {Promise<Array<Object>>} - List of public Instructor Courses
-   */
-  getPublicInstructorCourses: async () => {
+  getPublishInstructorCourses: async () => {
     try {
-      const publicCourses = await InstructorCourseModel.find({
-        isPublic: true,
+      const publishCourses = await InstructorCourseModel.find({
+        isPublish: true,
       });
-      if (!publicCourses || publicCourses.length === 0) {
-        throw createError.NotFound("No public instructor courses found.");
+      if (!publishCourses || publishCourses.length === 0) {
+        throw createError.NotFound("No publish instructor courses found.");
       }
-      return publicCourses;
+      return publishCourses;
     } catch (error) {
       throw createError(error);
     }
   },
 
-  assignCourseToCollege: async (id, collegeId) => {
+  assignCourseToCollege: async (courseId, collegeId) => {
     try {
-      console.log("id", id, "collegeId", collegeId);
-      const assign = await InstructorCourseModel.findByIdAndUpdate(
-        id,
-        {
-          $push: { collegeIds: collegeId },
-        },
-        { new: true }
-      );
+      // Check if the course exists
+      const course = await InstructorCourseModel.findById(courseId);
 
-      if (!assign) {
-        throw createError.BadRequest("Invalid courseId.");
+      if (!course) {
+        throw new Error("Course not found.");
       }
-      return assign;
+
+      // Check if collegeId is already in collegeIds and add it if not
+      if (!course.collegeIds.includes(collegeId)) {
+        await InstructorCourseModel.updateOne(
+          { _id: courseId },
+          { $addToSet: { collegeIds: collegeId } }
+        );
+      }
+
+      return {
+        message: "Course ID added to college updated in course successfully.",
+      };
     } catch (err) {
       throw createError(err);
     }
   },
   getCollegeCourses: async (collegeId) => {
     try {
-      const courses = await InstructorCourseModel.find({
-        collegeIds: collegeId,
-      },{
-        collegeIds:0,updatedAt:0
-      });
+      const courses = await InstructorCourseModel.find(
+        {
+          collegeIds: collegeId,
+        },
+        {
+          collegeIds: 0,
+          updatedAt: 0,
+        }
+      );
       if (!courses || courses.length === 0) {
         throw createError.NotFound("No courses found.");
       }
       return courses;
     } catch (error) {
       throw createError(error);
+    }
+  },
+  getInstructorCourseService: async (collegeId) => {
+    try {
+      const courses = await InstructorCourseModel.find({
+        $and: [
+          {
+            $or: [
+              { collegeId: collegeId },
+              { collegeIds: { $in: [collegeId] } },
+            ],
+          },
+          { isPublish: true },
+        ],
+      });
+      const data = courses.map((item) => {
+        return { label: item.courseName, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

@@ -45,7 +45,6 @@ module.exports = {
   },
   createDepartmentData: async (data) => {
     try {
-      console.log("data: ", data);
       const department = await departmentModel.create(data);
       if (!department) createError(500, "Error while creating department");
       return department;

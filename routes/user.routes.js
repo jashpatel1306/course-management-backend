@@ -5,12 +5,13 @@ const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
   isAuthenticate,
-  isSuperAdminAuthenticate,
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
 const batchesController = require("../controllers/batches.controller");
 const studentController = require("../controllers/student.controller");
+const staffController = require("../controllers/staff.controller");
+
 const departmentController = require("../controllers/department.controller");
 const { handleExcelData } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
@@ -23,6 +24,7 @@ const courseController = require("../controllers/course.controller");
 const sectionController = require("../controllers/section.controller");
 const lectureController = require("../controllers/lecture.contoller");
 const instructorCourseController = require("../controllers/instructorCourse.controller");
+const assignAssessmentController = require("../controllers/assignAssement.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -97,6 +99,12 @@ router.put(
   "/batch/active/:id",
   isAdminCommonAuthenticate,
   batchesController.activeStatusChange
+);
+
+router.get(
+  "/course-option-by-batch/:batchId",
+  isAdminCommonAuthenticate,
+  batchesController.getCourseOptionsByBatch
 );
 
 //------------------------------- students ---------------------------------//
@@ -277,15 +285,9 @@ router.get(
   assessmentController.getAssessmentById
 );
 
-// router.post(
-//   "/get-assessments/:batchId",
-//   Validate(schemas.paginationAndFilterSchema),
-//   isAdminCommonAuthenticate,
-//   assessmentController.getAssessmentsByBatch
-// );
 router.post(
   "/get-all-assessments",
-  Validate(schemas.paginationAndFilterSchema),
+  Validate(schemas.batchWiseStudentsSchema),
   isAdminCommonAuthenticate,
   assessmentController.getAssessmentsByBatch
 );
@@ -300,6 +302,57 @@ router.delete(
   "/assessment/:id",
   isAdminCommonAuthenticate,
   assessmentController.deleteAssessment
+);
+router.get(
+  "/assessment-option-by-college/:collegeId",
+  isAdminCommonAuthenticate,
+  assessmentController.getAssessmentOptionsByCollegeId
+);
+
+//---------------------------------- instructors --------------------------------//
+
+router.post(
+  "/assign-batch-assessment",
+  Validate(schemas.createBatchAssignAssessmentSchema),
+  isAdminCommonAuthenticate,
+  assignAssessmentController.createAssignBatchwiseAssessment
+);
+
+router.post(
+  "/assign-course-assessment",
+  Validate(schemas.createCourseAssignAssessmentSchema),
+  isAdminCommonAuthenticate,
+  assignAssessmentController.createAssignCoursewiseAssessment
+);
+
+router.put(
+  "/assign-assessment/:assignId",
+  Validate(schemas.assignAssessmentSchema),
+  isAdminCommonAuthenticate,
+  assignAssessmentController.updateAssignAssessment
+);
+
+router.get(
+  "/assessment-batch/:batchId",
+  isAdminCommonAuthenticate,
+  assignAssessmentController.getAssessmentByBatchId
+);
+router.get(
+  "/assessment-course/:courseId",
+  isAdminCommonAuthenticate,
+  assignAssessmentController.getAssessmentByCourseId
+);
+router.post(
+  "/get-all-assign-assessments",
+  Validate(schemas.paginationAndFilterSchema),
+  isAdminCommonAuthenticate,
+  assignAssessmentController.getAllAssignAssessment
+);
+
+router.delete(
+  "/assign-assessment/:assignId",
+  isAdminCommonAuthenticate,
+  assignAssessmentController.deleteAssignAssessment
 );
 
 //---------------------------------- instructors --------------------------------//
@@ -354,7 +407,7 @@ router.get(
 //multipart upload
 router.post(
   "/start-upload",
-  // isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate,
   Validate(schemas.startUploadSchema),
   multipartUploadController.startUpload
 );
@@ -373,7 +426,7 @@ router.post(
 
 router.post(
   "/upload-file",
-  Validate(schemas.uploadFileSchema),
+  // Validate(schemas.uploadFileSchema),
   fileUploadController.uploadImage
 );
 
@@ -417,7 +470,34 @@ router.post(
   isAdminCommonAuthenticate,
   courseController.getCoursesByCollegeId
 );
+router.post(
+  "/assign-course",
+  Validate(schemas.assignCourseSchema),
+  isAdminCommonAuthenticate,
+  courseController.addAssignCourse
+);
+router.post(
+  "/assign-course-college",
+  Validate(schemas.assignCourseCollegeSchema),
+  isAdminCommonAuthenticate,
+  courseController.addAssignCourseCollege
+);
 
+router.get(
+  "/college-wise-courses-options/:collegeId",
+  isAdminCommonAuthenticate,
+  courseController.getCoursesOptions
+);
+router.get(
+  "/courses-wise-section-options/:courseId",
+  isAdminCommonAuthenticate,
+  courseController.getCourseSectionOptionsByCourseId
+);
+router.get(
+  "/courses-preview/:courseId",
+  isAdminCommonAuthenticate,
+  courseController.getCoursepreviewById
+);
 //--------------------------- Sections -------------------------//
 
 router.post(
@@ -449,7 +529,7 @@ router.put(
 router.put(
   "/section/published/:id",
   isAdminCommonAuthenticate,
-  sectionController.togglePublicStatus
+  sectionController.toggleSectionPublishStatus
 );
 
 router.get(
@@ -457,6 +537,12 @@ router.get(
   isAdminCommonAuthenticate,
   sectionController.getSectionsByCourseId
 );
+
+// router.get(
+//   "/courses-wise-section-options/:courseId",
+//   isAdminCommonAuthenticate,
+//   courseController.getCourseSectionOptionsByCourseId
+// );
 
 //------------------------------- lectures -------------------------//
 
@@ -479,6 +565,12 @@ router.put(
   isAdminCommonAuthenticate,
   lectureController.updateLectureContent
 );
+router.put(
+  "/lecture-content-drag-drop/:id",
+  Validate(schemas.lectureContentDragDropSchema),
+  isAdminCommonAuthenticate,
+  lectureController.updateLectureContentDragDrop
+);
 router.get(
   "/lecture/:id",
   isAdminCommonAuthenticate,
@@ -490,7 +582,11 @@ router.delete(
   isAdminCommonAuthenticate,
   lectureController.deleteLecture
 );
-
+router.delete(
+  "/lecture-content/:lectureId/:contentId",
+  isAdminCommonAuthenticate,
+  lectureController.deleteLectureContent
+);
 router.put(
   "/lecture/status/:id",
   isAdminCommonAuthenticate,
@@ -498,17 +594,122 @@ router.put(
 );
 
 router.put(
-  "/lecture/public/:id",
+  "/lecture/publish/:id",
   isAdminCommonAuthenticate,
-  lectureController.toggleLecturePublicStatus
+  lectureController.toggleLecturePublishStatus
+);
+router.get(
+  "/section-wise-lecture-options/:sectionId",
+  isAdminCommonAuthenticate,
+  lectureController.getSectionLectureOptionsByCourseId
 );
 
 //------------------------ instructor course ------------------------//
 
-// Get all Courses by College
 router.post(
-  "/instructor-courses/:collegeId",
+  "/instructor-course",
+  Validate(schemas.courseSchema),
   isAdminCommonAuthenticate,
-  instructorCourseController.getAllCoursesByCollege
+  instructorCourseController.createInstructorCourse
 );
+router.put(
+  "/instructor-course/:id",
+  Validate(schemas.courseSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.updateInstructorCourse
+);
+
+router.post(
+  "/college-wise-instructor-courses",
+  Validate(schemas.collegeWiseDataSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCoursesByCollegeId
+);
+
+// Get an Instructor Course by ID
+router.get(
+  "/instructor-course/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCourseById
+);
+
+// // Delete an Instructor Course by ID
+router.delete(
+  "/instructor-course/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.deleteInstructorCourse
+);
+router.put(
+  "/instructor-content/:id",
+  Validate(schemas.instructorCourseContentSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.updateInstructorCourseContent
+);
+router.delete(
+  "/instructor-content/:contentId",
+  isAdminCommonAuthenticate,
+  instructorCourseController.deleteInstructorCourseContent
+);
+router.get(
+  "/college-wise-instructor-courses-options/:collegeId",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCoursesOptions
+);
+
+// Assign a Course to a College
+router.post(
+  "/assign-instructor-course-college",
+  Validate(schemas.assignCourseCollegeSchema),
+  isAdminCommonAuthenticate,
+  instructorCourseController.addAssignCourseCollege
+);
+router.get(
+  "/instructor-courses/:id",
+  isAdminCommonAuthenticate,
+  instructorCourseController.getInstructorCourseById
+);
+
+
+
+
+router.post(
+  "/staff",
+  Validate(schemas.staffSchema),
+  isAdminCommonAuthenticate,
+  staffController.createStaff
+);
+
+router.get(
+  "/staff/all",
+  isAdminCommonAuthenticate,
+  staffController.getAllStaff
+);
+
+router.get(
+  "/staff/:id",
+  isAdminCommonAuthenticate,
+  staffController.getStaffById
+);
+
+router.put(
+  "/staff/:id",
+  Validate(schemas.staffSchema),
+  isAdminCommonAuthenticate,
+  staffController.updateStaff
+);
+
+router.put(
+  "/staff/status/:id",
+  isAdminCommonAuthenticate,
+  staffController.activeStatusChange
+);
+
+router.post(
+  "/college-wise-staff",
+  Validate(schemas.batchWiseStudentsSchema),
+  isAdminCommonAuthenticate,
+  staffController.getCollegeWiseStaff
+);
+
+
 module.exports = router;

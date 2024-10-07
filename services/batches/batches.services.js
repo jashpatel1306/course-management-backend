@@ -3,6 +3,8 @@ const BatchModel = require("./batches.model");
 const createError = require("http-errors");
 const CollegeModel = require("../colleges/colleges.model");
 const studentsModel = require("../students/student.model");
+const batchesModel = require("./batches.model");
+const CourseModel = require("../courses/course");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -80,8 +82,11 @@ module.exports = {
   },
   getAllBatchesByCollegeId: async (collegeId) => {
     try {
-      const batch = await BatchModel.find({ collegeId })
+      const filter = collegeId ? { collegeId } : {};
+      const batch = await BatchModel.find(filter)
         .populate("instructorIds", "_id name")
+        .populate("courses", "_id courseName")
+        .populate("collegeId", "_id collegeName")
         .sort({ batchName: 1 });
       if (!batch) {
         throw createError(404, "Batches not found");
@@ -160,6 +165,37 @@ module.exports = {
       return batches;
     } catch (error) {
       throw error;
+    }
+  },
+  getCoursesByBatchId: async (batchId) => {
+    try {
+      const batchData = await BatchModel.findOne({ _id: batchId });
+      if (!batchData) {
+        throw createError(404, "Batches not found");
+      }
+      const courseIds = batchData.courses;
+      const courses = await CourseModel.find({ _id: { $in: courseIds } });
+      if (!courses) {
+        throw createError.NotFound("No courses found for the given college.");
+      }
+
+      return { courses };
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+  getCourseOptionsByBatch: async (batchId) => {
+    try {
+      const batchData = await BatchModel.findOne({ _id: batchId }).populate(
+        "courses",
+        "_id courseName"
+      );
+      const data = batchData.courses.map((item) => {
+        return { label: item.courseName, value: item._id };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
     }
   },
 };

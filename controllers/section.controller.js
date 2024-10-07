@@ -41,15 +41,17 @@ module.exports = {
   },
 
   /**
-   * Toggle the public status of a Section by ID
+   * Toggle the publish status of a Section by ID
    * @param {Object} req - The request object
    * @param {Object} res - The response object
    * @param {Function} next - The next middleware function
    */
-  togglePublicStatus: async (req, res, next) => {
+  toggleSectionPublishStatus: async (req, res, next) => {
     try {
-      const section = await sectionServices.toggleSectionPublicStatus(req.params.id);
-      const message = section.isPublic ? "published" : "unpublished";
+      const section = await sectionServices.toggleSectionPublishStatus(
+        req.params.id
+      );
+      const message = section.isPublish ? "published" : "unpublished";
       res.status(200).json({
         success: true,
         message: `Section ${message} successfully`,
@@ -82,7 +84,10 @@ module.exports = {
    */
   updateSection: async (req, res, next) => {
     try {
-      const section = await sectionServices.updateSection(req.params.id, req.body);
+      const section = await sectionServices.updateSection(
+        req.params.id,
+        req.body
+      );
       res.send({
         success: true,
         message: "Section updated successfully",
@@ -123,7 +128,7 @@ module.exports = {
       const courseId = req.params.id;
 
       const { sections } = await sectionServices.getSectionsByCourseId(
-        courseId,
+        courseId
       );
       res.send({
         success: true,
@@ -136,17 +141,17 @@ module.exports = {
   },
 
   /**
-   * Get all public Sections
+   * Get all publish Sections
    * @param {Object} req - The request object
    * @param {Object} res - The response object
    * @param {Function} next - The next middleware function
    */
-  getPublicSections: async (req, res, next) => {
+  getPublishSections: async (req, res, next) => {
     try {
-      const sections = await sectionServices.getPublicSections();
+      const sections = await sectionServices.getPublishSections();
       res.send({
         success: true,
-        message: "Public sections fetched successfully",
+        message: "Publish sections fetched successfully",
         data: sections,
       });
     } catch (error) {

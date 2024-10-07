@@ -1,6 +1,13 @@
 const createHttpError = require("http-errors");
 var commonUploadFunction = require("../helpers/fileUpload.helper");
 const createError = require("http-errors");
+const AWS = require("aws-sdk");
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_KEY,
+  region: process.env.AWS_S3_REGION,
+});
 module.exports = {
   // upload image Data
   uploadImage: async (req, res, next) => {
@@ -38,16 +45,13 @@ module.exports = {
   // upload multiple image Data
   uploadMultipleImage: async (req, res, next) => {
     try {
-      //   console.log("Uploading multiple", req.files);
       const images = req.files?.images;
       const path = "implant-docz/uploads/";
-      // console.log("data : ",path);
 
       if (!images) return next(createError.BadRequest("Image is required."));
 
       const uploadToAWS =
         await commonUploadFunction.uploadMultipleMaterialToAWS(images, path);
-      console.log("uploadToAWS : ", uploadToAWS);
       return res.status(200).json(uploadToAWS);
     } catch (err) {
       next(
@@ -63,12 +67,9 @@ module.exports = {
     try {
       const originalData = req.body;
       const ImagePath = originalData.path;
-      // console.log("data : ",ImagePath);
       const movetoLocal = await commonUploadFunction.deleteMaterialToAWS(
         ImagePath
       );
-      // console.log("movetoLocal : ",movetoLocal)
-      // console.log(fileData);
       return res.json({ success: true, message: movetoLocal });
     } catch (err) {
       next(

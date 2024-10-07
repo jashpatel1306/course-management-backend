@@ -2,14 +2,20 @@ const mongoose = require("mongoose");
 
 const InstructorCourseSchema = new mongoose.Schema(
   {
-    name: {
+    courseName: {
       type: String,
       required: true,
+    },
+    collegeId: {
+      type: mongoose.Types.ObjectId,
+      // required: [true, "College ID is required."],
+      ref: "colleges",
+      default: null,
     },
     coverImage: {
       type: String,
     },
-    description: {
+    courseDescription: {
       type: String,
     },
     active: {
@@ -20,19 +26,19 @@ const InstructorCourseSchema = new mongoose.Schema(
       {
         type: {
           type: String,
-          enum: ["video", "text"],
+          enum: ["file"],
         },
         title: {
           type: String,
           required: true,
         },
-        url: {
+        content: {
           type: String,
           required: true,
         },
       },
     ],
-    isPublic: {
+    isPublish: {
       type: Boolean,
       default: false,
     },

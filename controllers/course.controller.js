@@ -3,17 +3,10 @@ const createError = require("http-errors");
 const commonUploadFunction = require("../helpers/fileUpload.helper");
 
 module.exports = {
-  /**
-   * Create a new Course
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   createCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
       const request_body = req.body;
-      console.log("req.image :", image);
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
@@ -28,7 +21,6 @@ module.exports = {
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
       }
       const course = await courseServices.createCourse(req.body);
-      console.log("course: ", course);
       res.send({
         success: true,
         message: "Course created successfully",
@@ -38,13 +30,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCourseById: async (req, res, next) => {
     try {
       const course = await courseServices.getCourseById(req.params.id);
@@ -57,13 +42,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Toggle the status of a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   statusToggle: async (req, res, next) => {
     try {
       const course = await courseServices.toggleCourseStatus(req.params.id);
@@ -77,13 +55,12 @@ module.exports = {
       next(error);
     }
   },
-
   publishToggle: async (req, res, next) => {
     try {
-      const course = await courseServices.toggleCoursePublicStatus(
+      const course = await courseServices.toggleCoursePublishStatus(
         req.params.id
       );
-      const message = course.isPublic ? "published" : "unpublished";
+      const message = course.isPublish ? "published" : "unpublished";
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,
@@ -93,12 +70,6 @@ module.exports = {
       next(error);
     }
   },
-  /**
-   * Update a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   updateCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
@@ -129,13 +100,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Delete a Course by ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   deleteCourse: async (req, res, next) => {
     try {
       const course = await courseServices.deleteCourse(req.params.id);
@@ -148,20 +112,13 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get all Courses by College ID with optional search
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCoursesByCollegeId: async (req, res, next) => {
     try {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
       const filter = {};
       const userRole = res.locals.userRole;
-      // userRole === "student" ? filter.isPublic = true : filter.
+      // userRole === "student" ? filter.isPublish = true : filter.
       const { courses, count } = await courseServices.getCoursesByCollegeId(
         college_id,
         search,
@@ -183,13 +140,6 @@ module.exports = {
       next(error);
     }
   },
-
-  /**
-   * Get Course Options by College ID
-   * @param {Object} req - The request object
-   * @param {Object} res - The response object
-   * @param {Function} next - The next middleware function
-   */
   getCoursesOptions: async (req, res, next) => {
     try {
       const collegeId = req.params.collegeId;
@@ -198,6 +148,100 @@ module.exports = {
         success: true,
         message: "Courses fetched successfully",
         data: courses,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  addAssignCourse: async (req, res, next) => {
+    try {
+      const ids = req.body;
+      const courses = await courseServices.addAssignCourse(
+        ids.batchId,
+        ids.collegeId,
+        ids.courseId
+      );
+      if (courses) {
+        return res.status(200).json({
+          success: true,
+          message: "Course assigned successfully",
+          data: courses,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to assign course",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+  addAssignCourseCollege: async (req, res, next) => {
+    try {
+      const ids = req.body;
+      const courses = await courseServices.addAssignCourseCollege(
+        ids.collegeId,
+        ids.courseId
+      );
+      if (courses) {
+        return res.status(200).json({
+          success: true,
+          message: "Course assigned successfully",
+          data: courses,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to assign course",
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCourseSectionOptionsByCourseId: async (req, res, next) => {
+    try {
+      const courseId = req.params.courseId;
+      const options = await courseServices.getCourseSectionOptionsByCourseId(
+        courseId
+      );
+      res.send({
+        success: true,
+        message: "Courses sections options fetched successfully",
+        data: options,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCourseSidebarDataById: async (req, res, next) => {
+    try {
+      const user_id = req.body?.user_id;
+      const batchId = req.body?.batch_id;
+      const courseId = req.params.courseId;
+      const courseData = await courseServices.getCourseSidebarDataById(user_id,
+        batchId,
+        courseId
+      );
+
+      res.send({
+        success: true,
+        message: "Courses Data fetched successfully",
+        data: courseData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getCoursepreviewById: async (req, res, next) => {
+    try {
+      const courseId = req.params.courseId;
+      const courseData = await courseServices.getCoursepreviewById(courseId);
+      res.send({
+        success: true,
+        message: "Courses Data fetched successfully",
+        data: courseData,
       });
     } catch (error) {
       next(error);

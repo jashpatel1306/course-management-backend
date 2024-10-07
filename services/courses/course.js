@@ -43,13 +43,14 @@ const CourseSchema = new mongoose.Schema(
         },
       },
     ],
-    isPublic: {
+    isPublish: {
       type: Boolean,
       default: false,
     },
     publishDate: {
       type: Date,
     },
+    collegeIds: [{ type: mongoose.Types.ObjectId, ref: "colleges" }],
   },
   { timestamps: true, versionKey: false }
 );

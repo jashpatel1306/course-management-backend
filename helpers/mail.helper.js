@@ -106,7 +106,6 @@ const sendMailWithResend = async (to, subject, body) => {
           message: "Could not send Email!",
         });
       }
-      console.log("email data", data);
       return resolve({ status: true, message: "Email sent!." });
     } catch (error) {
       console.log("sendMailWithResend error:", error);

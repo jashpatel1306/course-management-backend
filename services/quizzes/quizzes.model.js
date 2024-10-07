@@ -4,10 +4,10 @@ const QuizSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true,"quiz title is required."]
+      required: [true, "quiz title is required."],
     },
     description: {
-      type: String,
+      type: Array,
     },
     questions: [
       {
@@ -26,6 +26,14 @@ const QuizSchema = new mongoose.Schema(
     assessmentId: {
       type: mongoose.Types.ObjectId,
       ref: "assessments",
+    },
+    time: {
+      type: Number,
+      default: 0,
+    },
+    isPublish: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true, versionKey: false }
@@ -53,7 +61,7 @@ QuizSchema.post("save", async function (quiz) {
       throw new Error("Assessment not found");
     }
   } catch (error) {
-    console.log(error);
+    console.log("QuizSchema save error: ", error);
   }
 });
 
@@ -70,7 +78,7 @@ QuizSchema.pre("remove", async function (next) {
       throw new Error("Assessment not found");
     }
   } catch (error) {
-    console.log(error);
+    console.log("QuizSchema remove error: ", error);
   }
   next();
 });
@@ -111,7 +119,7 @@ QuizSchema.post("findOneAndUpdate", async function (quiz) {
       throw new Error("Assessment not found");
     }
   } catch (error) {
-    console.log(error);
+    console.log("QuizSchema findOneAndUpdate error: ", error);
   }
 });
 const QuizModel = mongoose.model("quizzes", QuizSchema);
