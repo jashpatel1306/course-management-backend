@@ -8,8 +8,19 @@ module.exports = {
   createAssignBatchwiseAssessment: async (data) => {
     try {
       data.type = "batch";
-
+      if (data.assessmentId && data.batchId) {
+        console.log(
+          "data.assessmentId && data.batchId: ",
+          data.assessmentId,
+          data.batchId
+        );
+        await assessmentsModel.addBatchToAssessment(
+          data.assessmentId,
+          data.batchId
+        );
+      }
       const assessment = await AssignAssessmentsModel.create(data);
+
       if (!assessment)
         throw createError(500, "Error while creating assessment");
       return assessment;
@@ -121,7 +132,13 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
-  getAllAssignAssessment: async (batchId, perPage, pageNo, collegeId,searchText) => {
+  getAllAssignAssessment: async (
+    batchId,
+    perPage,
+    pageNo,
+    collegeId,
+    searchText
+  ) => {
     try {
       const filter = {
         $and: [collegeId ? { collegeId } : {}, batchId ? { batchId } : {}],

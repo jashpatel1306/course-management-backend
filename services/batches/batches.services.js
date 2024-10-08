@@ -83,16 +83,27 @@ module.exports = {
   getAllBatchesByCollegeId: async (collegeId) => {
     try {
       const filter = collegeId ? { collegeId } : {};
-      const batch = await BatchModel.find(filter)
+      const batches = await BatchModel.find(filter)
         .populate("instructorIds", "_id name")
         .populate("courses", "_id courseName")
         .populate("collegeId", "_id collegeName")
         .sort({ batchName: 1 });
-      if (!batch) {
+
+      if (!batches) {
         throw createError(404, "Batches not found");
       }
 
-      return batch;
+      // Add total number of students for each batch
+      const batchesWithStudentCount = await Promise.all(
+        batches.map(async (batch) => {
+          const studentCount = await studentsModel.countDocuments({
+            batchId: batch._id,
+          });
+          return { ...batch.toObject(), studentCount };
+        })
+      );
+
+      return batchesWithStudentCount;
     } catch (error) {
       throw error;
     }
@@ -186,12 +197,12 @@ module.exports = {
   },
   getCourseOptionsByBatch: async (batchId) => {
     try {
-      console.log("batchId : ",batchId)
+      console.log("batchId : ", batchId);
       const batchData = await BatchModel.findOne({ _id: batchId }).populate(
         "courses",
         "_id courseName"
       );
-      console.log("batchData : ",batchData)
+      console.log("batchData : ", batchData);
       const data = batchData.courses.map((item) => {
         return { label: item.courseName, value: item._id };
       });

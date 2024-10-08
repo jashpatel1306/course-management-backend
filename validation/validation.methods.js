@@ -5,6 +5,8 @@ const Validate = (schema) => {
       const requestData = req?.body;
       if (isset(requestData)) {
         // const data = {data:requestData};
+        console.log("requestData:  ", requestData);
+
         const data =
           process.env.NODE_ENV === "development"
             ? { data: JSON.parse(requestData.data) }

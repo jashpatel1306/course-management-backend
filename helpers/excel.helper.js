@@ -28,10 +28,9 @@ module.exports.handleExcelData = async (req, res, next) => {
   try {
     // Get the excel file from the request
     const myStream = req.files.excelFile;
-
     // Process the excel sheet data using the processSheet and handleWorkbook functions
     const processedData = processSheet(myStream.data, handleWorkbook);
-
+    console.log("processedData: ", processedData);
     // If no data is processed, return an error response
     if (!processedData) {
       return res.status(500).send({
@@ -43,6 +42,24 @@ module.exports.handleExcelData = async (req, res, next) => {
 
     // Set the processed data in the request body
     req.body.excelData = processedData;
+    // req.body = {
+    //   ...req.body,
+    //   data: {
+    //     ...req.body.data,
+    //     excelData: processedData,
+    //   },
+    // };
+    const batchId = JSON.parse(req.body.data).batchId;
+    req.body = {
+      data: JSON.stringify({
+        batchId: batchId,
+        collegeId: req.body.collegeId,
+        college_id: req.body.college_id,
+        user_id: req.body.user_id,
+        excelData: processedData,
+      }),
+    };
+    console.log("========================= req.body  req.body: ", req.body);
 
     // Call the next middleware function
     next();
