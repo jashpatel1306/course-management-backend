@@ -49,11 +49,11 @@ module.exports = {
     try {
       const instructor = await instructorServices.statusChange(req.params.id);
 
-      const message = student.active === true ? "activated" : "inactivated";
+      const message = instructor.active === true ? "activated" : "inactivated";
       res.status(200).json({
         success: true,
         message: `Instructor ${message} successfully`,
-        data: student,
+        data: instructor,
       });
     } catch (error) {
       next(error);
