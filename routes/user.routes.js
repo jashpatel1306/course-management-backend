@@ -25,6 +25,7 @@ const sectionController = require("../controllers/section.controller");
 const lectureController = require("../controllers/lecture.contoller");
 const instructorCourseController = require("../controllers/instructorCourse.controller");
 const assignAssessmentController = require("../controllers/assignAssement.controller");
+const trackingQuizController = require("../controllers/trackingQuiz.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -708,4 +709,16 @@ router.post(
   staffController.getCollegeWiseStaff
 );
 
+router.post(
+  "/get-quiz-history",
+  isAdminCommonAuthenticate,
+  trackingQuizController.getAllQuizTrackingByUserIds
+);
+
+router.get(
+  "/quiz-results/:quizId",
+  Validate(schemas.quizResultsFilterSchema),
+  isAdminCommonAuthenticate,
+  trackingQuizController.getResultContentOfQuiz
+);
 module.exports = router;

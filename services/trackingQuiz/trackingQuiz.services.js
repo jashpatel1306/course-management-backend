@@ -3,6 +3,7 @@ const trackingQuizModel = require("./trackingQuiz.model");
 const createError = require("http-errors");
 const QuizModel = require("../quizzes/quizzes.model");
 const QuestionsModel = require("../questions/questions.model");
+const { ObjectId } = mongoose.Types;
 
 module.exports = {
   createEnrollQuiz: async (userId, quizId) => {
@@ -49,7 +50,6 @@ module.exports = {
 
   updateQuizTracking: async (userId, quizId, questionId, answerId, time) => {
     try {
-      
       const questionResult = await QuestionsModel.findOne({
         _id: questionId,
         answers: {
@@ -124,6 +124,161 @@ module.exports = {
       });
 
       return !!result; // Return true if answer exists, otherwise false
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+  getAllQuizTrackingByUserId: async (filter) => {
+    try {
+      const pipeline = [];
+      filter.userIds
+        ? pipeline.push({
+            $match: {
+              userId: { $in: filter.userIds },
+            },
+          })
+        : null;
+
+      pipeline.push({
+        $lookup: {
+          from: "students",
+          let: { userId: "$userId" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$userId", "$$userId"] },
+              },
+            },
+            {
+              $project: {
+                name: 1,
+                email: 1,
+                rollNo: 1,
+                batchId: 1,
+              },
+            },
+          ],
+          as: "studentData",
+        },
+      });
+
+      filter.batchIds
+        ? pipeline.push({
+            $match: {
+              "studentData.batchId": { $in: filter.batchIds },
+            },
+          })
+        : null;
+
+      pipeline.push(
+        {
+          $lookup: {
+            from: "quizzes",
+            let: { quizId: "$quizId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$quizId"] },
+                },
+              },
+              {
+                $project: {
+                  createdAt: 0,
+                  isPublish: 0,
+                  questions: 0,
+                  updatedAt: 0,
+                  active: 0,
+                },
+              },
+            ],
+            as: "quizdata",
+          },
+        },
+        {
+          $project: {
+            result: 0,
+          },
+        }
+      );
+
+      const result = await trackingQuizModel.aggregate(pipeline);
+      if (!result) throw createError(400, "No quizzes history found.");
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getContentOfQuizByTrackingId: async (id) => {
+    try {
+      const result = await trackingQuizModel.aggregate([
+        {
+          $match: {
+            _id: new ObjectId(id),
+          },
+        },
+        {
+          $unwind: "$result",
+        },
+        {
+          $lookup: {
+            from: "questions",
+            let: { questionId: "$result.questionId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$questionId"] },
+                },
+              },
+              {
+                $project: {
+                  _id: 1,
+                  question: 1,
+                  answers: 1, // Include the answers for lookup
+                },
+              },
+            ],
+            as: "questionData",
+          },
+        },
+        {
+          $addFields: {
+            "result.answerValue": {
+              $arrayElemAt: [
+                {
+                  $filter: {
+                    input: { $arrayElemAt: ["$questionData.answers", 0] },
+                    as: "answer",
+                    cond: { $eq: ["$$answer._id", "$result.answerId"] }, // Match the answerId
+                  },
+                },
+                0,
+              ],
+            },
+          },
+        },
+        {
+          $group: {
+            _id: "$_id",
+            quizId: { $first: "$quizId" },
+            correctAnswers: { $first: "$correctAnswers" },
+            wrongAnswers: { $first: "$wrongAnswers" },
+            totalMarks: { $first: "$totalMarks" },
+            totalTime: { $first: "$totalTime" },
+            isSubmit: { $first: "$isSubmit" },
+            result: {
+              $push: {
+                questionId: "$result.questionId",
+                answerId: "$result.answerId",
+                questionData: { $first: "$questionData" },
+                answerValue: "$result.answerValue", // Extracted answer value
+              },
+            },
+          },
+        },
+      ]);
+      if (!result) throw createError(400, "Invalid quiz tracking id.");
+      return result;
     } catch (error) {
       throw createError.InternalServerError(error);
     }

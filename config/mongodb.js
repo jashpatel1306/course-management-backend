@@ -18,6 +18,9 @@ switch (environment) {
   case "development":
     mongoUrl = process.env.MONGODB_DEV_URL;
     break;
+  default:
+    mongoUrl = process.env.MONGODB_DEV_URL;
+    break;
 }
 
 function mongoConnect() {

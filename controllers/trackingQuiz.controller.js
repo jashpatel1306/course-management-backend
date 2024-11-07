@@ -1,5 +1,7 @@
 const createError = require("http-errors");
+const mongoose = require("mongoose");
 const { trackingQuizServices } = require("../services");
+const { ObjectId } = mongoose.Types;
 
 module.exports = {
   createEnrollQuiz: async (req, res, next) => {
@@ -141,6 +143,51 @@ module.exports = {
         success: true,
         message: "Answer check completed.",
         data: exists,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getAllQuizTrackingByUserIds: async (req, res, next) => {
+    try {
+      const { userIds, batchIds } = req.body;
+      console.log("req body", req.body);
+      const filter = {};
+
+      if (userIds) {
+        filter.userIds = userIds.map((userId) => {
+          return new ObjectId(userId);
+        });
+      }
+
+      if (batchIds) {
+        filter.batchIds = batchIds.map((batchId) => {
+          return new ObjectId(batchId);
+        });
+      }
+
+      const trackingQuizzes =
+        await trackingQuizServices.getAllQuizTrackingByUserId(filter);
+      return res.status(200).send({
+        success: true,
+        message: "Quiz data fetched successfully.",
+        data: trackingQuizzes,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getResultContentOfQuiz: async (req, res, next) => {
+    try {
+      const { quizId } = req.params;
+      const trackingQuiz =
+        await trackingQuizServices.getContentOfQuizByTrackingId(quizId);
+      return res.status(200).send({
+        success: true,
+        message: "Quiz results fetched successfully.",
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);

@@ -176,6 +176,10 @@ module.exports = {
     batchId: validate.string,
     collegeId: validate.string,
   }),
+  quizResultsFilterSchema: Joi.object().keys({
+    batchIds: validate.array.items(validate.id),
+    collegeIds: validate.array.items(validate.id),
+  }),
   createBatchAssignAssessmentSchema: Joi.object().keys({
     collegeId: validate.reqId,
     batchId: validate.reqId,
