@@ -4,7 +4,7 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
-  isAuthenticate,
+  isAuthenticate
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
@@ -235,6 +235,12 @@ router.post(
   isAdminCommonAuthenticate,
   quizController.createQuiz
 );
+router.post(
+  "/public-quiz",
+  Validate(schemas.createPublicQuizSchema),
+  isAdminCommonAuthenticate,
+  quizController.createPublicQuiz
+);
 
 router.put(
   "/quiz/:id",
@@ -251,7 +257,12 @@ router.post(
   isAdminCommonAuthenticate,
   quizController.getQuizzesByAssessment
 );
-
+router.post(
+  "/get-public-quizzes",
+  Validate(schemas.paginationAndFilterSchema),
+  isAdminCommonAuthenticate,
+  quizController.getPublicQuizzes
+);
 router.put(
   "/quiz/status/:id",
   isAdminCommonAuthenticate,

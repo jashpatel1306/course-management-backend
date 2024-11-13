@@ -132,6 +132,7 @@ module.exports = {
     ),
     marks: validate.reqNumber,
     quizId: validate.reqId,
+    questionType: validate.string,
   }),
 
   quizSchema: Joi.object().keys({
@@ -151,6 +152,13 @@ module.exports = {
     title: validate.reqString,
     description: validate.array,
     assessmentId: validate.reqId,
+    time: validate.reqNumber,
+    isPublish: validate.boolean,
+    quizId: validate.id,
+  }),
+  createPublicQuizSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.array,
     time: validate.reqNumber,
     isPublish: validate.boolean,
     quizId: validate.id,

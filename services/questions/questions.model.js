@@ -3,35 +3,39 @@ const QuestionSchema = new mongoose.Schema(
   {
     question: {
       type: String,
-      required: [true, "question is required."],
+      required: [true, "question is required."]
     },
     answers: [
       {
         content: {
           type: String,
-          required: [true, "answer is required"],
+          required: [true, "answer is required"]
         },
         correct: {
-          type: Boolean,
+          type: Boolean
         },
         reason: {
-          type: String,
-        },
-      },
+          type: String
+        }
+      }
     ],
     marks: {
       type: Number,
-      required: [true,"marks are required."],
+      required: [true, "marks are required."]
     },
     quizId: {
       type: mongoose.Types.ObjectId,
       ref: "quizzes",
-      required: true,
+      required: true
     },
     active: {
       type: Boolean,
-      default: true,
+      default: true
     },
+    questionType: {
+      type: String,
+      default: "mcq"
+    }
   },
   { timestamps: true, versionKey: false }
 );
@@ -84,15 +88,15 @@ const handlePostTotalMarkOperation = async function (question) {
     const quizData = await mongoose.model("questions").aggregate([
       {
         $match: {
-          quizId: new mongoose.Types.ObjectId(quizId),
-        },
+          quizId: new mongoose.Types.ObjectId(quizId)
+        }
       },
       {
         $group: {
           _id: "$quizId",
-          totalMarks: { $sum: "$marks" },
-        },
-      },
+          totalMarks: { $sum: "$marks" }
+        }
+      }
     ]);
     const quiz = await mongoose
       .model("quizzes")

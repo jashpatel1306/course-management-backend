@@ -168,6 +168,7 @@ module.exports = {
   },
   findUserById: async (userId) => {
     try {
+      console.log("userId : ",userId)
       const user = await userModel.findOne({ _id: userId });
       if (!user) {
         throw createError(404, "User not found");

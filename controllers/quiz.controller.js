@@ -8,7 +8,21 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Quiz created successfully.",
-        data: quiz,
+        data: quiz
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  createPublicQuiz: async (req, res, next) => {
+    try {
+      const req_body = { ...req.body, isPublic: true };
+
+      const quiz = await quizzesServices.createQuiz(req_body);
+      return res.status(201).send({
+        success: true,
+        message: "Quiz created successfully.",
+        data: quiz
       });
     } catch (error) {
       next(error);
@@ -23,7 +37,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz updated successfully",
-        data: quiz,
+        data: quiz
       });
     } catch (error) {
       next(error);
@@ -36,7 +50,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz fetched successfully",
-        data: quiz,
+        data: quiz
       });
     } catch (error) {
       next(error);
@@ -49,7 +63,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Student Quiz fetched successfully",
-        data: quiz,
+        data: quiz
       });
     } catch (error) {
       next(error);
@@ -63,7 +77,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz deleted successfully",
-        data: [],
+        data: []
       });
     } catch (error) {
       next(error);
@@ -78,7 +92,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Quiz ${message} successfully`,
-        data: quiz,
+        data: quiz
       });
     } catch (error) {
       next(error);
@@ -90,7 +104,7 @@ module.exports = {
       const { pageNo, perPage, status } = req.body;
       const assessmentId = req.params.assessmentId;
       const filter = {
-        assessmentId: { $eq: new mongoose.Types.ObjectId(assessmentId) },
+        assessmentId: { $eq: new mongoose.Types.ObjectId(assessmentId) }
       };
 
       if (status === "active") {
@@ -111,11 +125,44 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
     }
   },
+  getPublicQuizzes: async (req, res, next) => {
+    try {
+      const { pageNo, perPage, status } = req.body;
+      const assessmentId = null;
+      const filter = {
+        assessmentId: null
+      };
+
+      // if (status === "active") {
+      //   filter.active = true;
+      // } else if (status === "inactive") {
+      //   filter.active = false;
+      // }
+      const { quizzes, count } = await quizzesServices.getQuizzesByAssessment(
+        filter,
+        perPage,
+        pageNo
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Quizzes fetched successfully",
+        data: quizzes,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage)
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };
