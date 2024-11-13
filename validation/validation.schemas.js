@@ -6,40 +6,40 @@ const Joi = require("joi");
 module.exports = {
   logInSchema: Joi.object().keys({
     email: validate.reqEmail,
-    password: validate.reqString,
+    password: validate.reqString
   }),
 
   queryIdSchema: Joi.object().keys({
-    id: validate.reqId,
+    id: validate.reqId
   }),
 
   activeInactiveSchema: Joi.object().keys({
     id: validate.reqId,
-    status: validate.reqBoolean,
+    status: validate.reqBoolean
   }),
 
   forgotPasswordSchema: Joi.object().keys({
-    email: validate.email,
+    email: validate.email
   }),
 
   resetForgotPasswordSchema: Joi.object().keys({
     oldPassword: validate.reqString,
-    newPassword: validate.reqString,
+    newPassword: validate.reqString
   }),
   editUserSchemas: Joi.object().keys({
     user_id: validate.string,
     user_name: validate.reqString,
     email: validate.email,
     password: validate.string,
-    active: validate.reqBoolean,
+    active: validate.reqBoolean
   }),
   otpSchema: Joi.object().keys({
     email: validate.email,
-    otp: validate.reqString,
+    otp: validate.reqString
   }),
   changePasswordSchema: Joi.object().keys({
     user_id: validate.reqString,
-    password: validate.reqString,
+    password: validate.reqString
   }),
   addCollegeSchema: Joi.object().keys({
     userId: validate.string,
@@ -50,12 +50,12 @@ module.exports = {
     contactPersonNo: validate.reqString,
     email: validate.reqEmail,
     password: validate.reqString,
-    active: validate.boolean,
+    active: validate.boolean
   }),
   searchPaginationSchema: Joi.object().keys({
     perPage: validate.reqNumber,
     pageNo: validate.reqNumber,
-    search: validate.string,
+    search: validate.string
   }),
   batchSchema: Joi.object().keys({
     batchId: validate.string,
@@ -64,7 +64,7 @@ module.exports = {
     collegeId: validate.string,
     instructorIds: validate.array,
     courses: validate.array,
-    active: validate.boolean,
+    active: validate.boolean
   }),
   studentSchema: Joi.object().keys({
     studentId: validate.string,
@@ -81,25 +81,25 @@ module.exports = {
     semester: validate.reqNumber,
     active: validate.boolean,
     colCode: validate.string,
-    colName: validate.string,
+    colName: validate.string
   }),
   batchWiseStudentsSchema: Joi.object().keys({
     batchId: validate.string,
     collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   collegeWiseStudentsSchema: Joi.object().keys({
     collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   departmentSchema: Joi.object().keys({
     department: validate.reqString,
     collegeId: validate.id,
-    active: validate.boolean,
+    active: validate.boolean
   }),
   bulkStudentSchema: Joi.object().keys({
     batchId: validate.reqString,
@@ -116,9 +116,9 @@ module.exports = {
         section: validate.reqString,
         passoutYear: validate.any,
         gender: validate.reqString.allow("male", "female", "other"),
-        semester: validate.any,
+        semester: validate.any
       })
-    ),
+    )
   }),
 
   questionsSchema: Joi.object().keys({
@@ -127,12 +127,12 @@ module.exports = {
       validate.object.keys({
         content: validate.reqString,
         correct: validate.boolean,
-        reason: validate.string,
+        reason: validate.string
       })
     ),
     marks: validate.reqNumber,
     quizId: validate.reqId,
-    questionType: validate.string,
+    questionType: validate.string
   }),
 
   quizSchema: Joi.object().keys({
@@ -140,13 +140,13 @@ module.exports = {
     description: validate.string,
     totalMarks: validate.reqNumber,
     questions: validate.array,
-    assessmentId: validate.reqId,
+    assessmentId: validate.reqId
   }),
   updateQuizSchema: Joi.object().keys({
     title: validate.reqString,
     description: validate.string,
     totalMarks: validate.reqNumber,
-    questions: validate.array,
+    questions: validate.array
   }),
   createQuizSchema: Joi.object().keys({
     title: validate.reqString,
@@ -154,18 +154,18 @@ module.exports = {
     assessmentId: validate.reqId,
     time: validate.reqNumber,
     isPublish: validate.boolean,
-    quizId: validate.id,
+    quizId: validate.id
   }),
   createPublicQuizSchema: Joi.object().keys({
     title: validate.reqString,
     description: validate.array,
     time: validate.reqNumber,
     isPublish: validate.boolean,
-    quizId: validate.id,
+    quizId: validate.id
   }),
   createAssessmentSchema: Joi.object().keys({
     title: validate.reqString,
-    collegeId: validate.reqId,
+    collegeId: validate.reqId
   }),
   assessmentSchema: Joi.object().keys({
     assessmentId: validate.id,
@@ -173,7 +173,7 @@ module.exports = {
     description: validate.string,
     totalMarks: validate.reqNumber,
     expiresAt: validate.reqDate,
-    batches: validate.array,
+    batches: validate.array
   }),
 
   paginationAndFilterSchema: Joi.object().keys({
@@ -182,11 +182,11 @@ module.exports = {
     status: validate.string,
     search: validate.string,
     batchId: validate.string,
-    collegeId: validate.string,
+    collegeId: validate.string
   }),
   quizResultsFilterSchema: Joi.object().keys({
     batchIds: validate.array.items(validate.id),
-    collegeIds: validate.array.items(validate.id),
+    collegeIds: validate.array.items(validate.id)
   }),
   createBatchAssignAssessmentSchema: Joi.object().keys({
     collegeId: validate.reqId,
@@ -194,7 +194,7 @@ module.exports = {
     positionType: validate.string,
     assessmentId: validate.reqId,
     startDate: validate.reqDate,
-    endDate: validate.reqDate,
+    endDate: validate.reqDate
   }),
   createCourseAssignAssessmentSchema: Joi.object().keys({
     collegeId: validate.reqId,
@@ -205,7 +205,7 @@ module.exports = {
     lectureId: validate.string,
     assessmentId: validate.reqId,
     startDate: validate.reqDate,
-    endDate: validate.reqDate,
+    endDate: validate.reqDate
   }),
   assignAssessmentSchema: Joi.object().keys({
     collegeId: validate.reqId,
@@ -216,7 +216,7 @@ module.exports = {
     lectureId: validate.string,
     assessmentId: validate.reqId,
     startDate: validate.reqDate,
-    endDate: validate.reqDate,
+    endDate: validate.reqDate
   }),
   instructorSchema: Joi.object().keys({
     name: validate.reqString,
@@ -227,87 +227,87 @@ module.exports = {
     skills: validate.array,
     location: validate.reqString,
     active: validate.reqBoolean,
-    courses: validate.array,
+    courses: validate.array
   }),
   instructorsCollegeIdSchema: Joi.object().keys({
     collegeId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   collegeWiseDataSchema: Joi.object().keys({
     collegeId: validate.id,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   batchWiseDataSchema: Joi.object().keys({
     batchId: validate.id,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   courseWiseDataSchema: Joi.object().keys({
     courseId: validate.id,
     search: validate.string,
     pageNo: validate.reqNumber,
-    perPage: validate.reqNumber,
+    perPage: validate.reqNumber
   }),
   startUploadSchema: Joi.object().keys({
     filename: validate.reqString,
-    filetype: validate.reqString,
+    filetype: validate.reqString
   }),
   uploadPartSchema: Joi.object().keys({
     key: validate.reqString,
     partNumber: validate.reqNumber,
-    uploadId: validate.reqString,
+    uploadId: validate.reqString
   }),
   completeUploadSchema: Joi.object().keys({
     key: validate.reqString,
     uploadId: validate.reqString,
-    parts: validate.array,
+    parts: validate.array
   }),
   uploadFileSchema: Joi.object().keys({
-    path: validate.reqString,
+    path: validate.reqString
   }),
   uploadSchema: Joi.object().keys({
     fileName: validate.reqString,
-    fileType: validate.reqString,
+    fileType: validate.reqString
   }),
   courseSchema: Joi.object().keys({
     courseName: validate.reqString,
     courseId: validate.id,
     collegeId: validate.id,
     courseDescription: validate.reqString,
-    isPublish: validate.reqBoolean,
+    isPublish: validate.reqBoolean
   }),
   assignCourseSchema: Joi.object().keys({
     courseId: validate.reqId,
     collegeId: validate.reqId,
-    batchId: validate.reqId,
+    batchId: validate.reqId
   }),
 
   assignCourseCollegeSchema: Joi.object().keys({
     courseId: validate.reqId,
-    collegeId: validate.reqId,
+    collegeId: validate.reqId
   }),
 
   sectionSchema: Joi.object().keys({
     name: validate.reqString,
-    courseId: validate.id,
+    courseId: validate.id
   }),
 
   lectureSchema: Joi.object().keys({
     name: validate.reqString,
     sectionId: validate.reqId,
-    courseId: validate.reqId,
+    courseId: validate.reqId
     // publishDate: validate.date,
   }),
   instructorCourseContentSchema: Joi.object().keys({
     type: validate.reqString.allow("file"),
     content: validate.reqString,
     title: validate.reqString,
-    id: validate.id,
+    id: validate.id
   }),
   lectureContentDragDropSchema: Joi.object().keys({
     lectureContent: validate.array.items(
@@ -315,15 +315,15 @@ module.exports = {
         type: validate.reqString.allow("video", "text", "file"),
         content: validate.reqString,
         title: validate.reqString,
-        _id: validate.reqId,
+        _id: validate.reqId
       })
-    ),
+    )
   }),
   lectureContentSchema: Joi.object().keys({
     type: validate.reqString.allow("video", "text", "file"),
     content: validate.reqString,
     title: validate.reqString,
-    id: validate.id,
+    id: validate.id
   }),
   addInstructorCourseSchema: Joi.object().keys({
     name: validate.reqString,
@@ -333,20 +333,20 @@ module.exports = {
       Joi.object().keys({
         type: validate.reqString.allow("video", "text"),
         url: validate.reqString,
-        title: validate.string,
+        title: validate.string
       })
     ),
-    publishDate: validate.date,
+    publishDate: validate.date
   }),
 
   createEnrollCourseSchema: Joi.object().keys({
     userId: validate.reqId,
-    courseId: validate.reqId,
+    courseId: validate.reqId
   }),
   updateQuizTrackingSchema: Joi.object().keys({
     questionId: validate.reqId,
     answerId: validate.reqId,
-    time: validate.reqNumber,
+    time: validate.reqNumber
   }),
 
   createTrackingCourseSchema: Joi.object().keys({
@@ -356,27 +356,27 @@ module.exports = {
     trackingContent: Joi.array().items(
       Joi.object().keys({
         contentId: validate.reqId,
-        lectureId: validate.reqId,
+        lectureId: validate.reqId
       })
-    ),
+    )
   }),
 
   getTrackingCourseByIdSchema: Joi.object().keys({
     userId: validate.reqId,
-    courseId: validate.reqId,
+    courseId: validate.reqId
   }),
 
   updateTrackingCourseSchema: Joi.object().keys({
     totalcontent: validate.reqNumber,
     trackingContent: Joi.object().keys({
       contentId: validate.reqId,
-      lectureId: validate.reqId,
-    }),
+      lectureId: validate.reqId
+    })
   }),
 
   addTrackingContentSchema: Joi.object().keys({
     contentId: validate.reqId,
-    lectureId: validate.reqId,
+    lectureId: validate.reqId
   }),
   staffSchema: Joi.object().keys({
     staffId: validate.string,
@@ -385,6 +385,16 @@ module.exports = {
     phone: validate.reqString,
     collegeUserId: validate.reqId,
     permissions: validate.array,
-    active: validate.reqBoolean,
+    active: validate.reqBoolean
   }),
+  publicLinkSchema: Joi.object().keys({
+    publicLinkId: validate.string,
+    quizId: validate.reqId,
+    password: validate.reqString,
+    noofHits: validate.reqNumber,
+    startDate: validate.reqDate,
+    endDate: validate.reqDate,
+    specificField: validate.array,
+    active: validate.reqBoolean
+  })
 };

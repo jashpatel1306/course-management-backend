@@ -164,5 +164,27 @@ module.exports = {
     } catch (error) {
       next(error);
     }
+  },
+  getPublicQuizzesOptions: async (req, res, next) => {
+    try {
+      const assessmentId = null;
+      const filter = {
+        assessmentId: null,
+        isPublish: true,
+        isPublic: true
+      };
+
+      const  quizzes = await quizzesServices.getQuizzesOptions(
+        filter
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Quizzes options fetched successfully",
+        data: quizzes,
+       
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 };

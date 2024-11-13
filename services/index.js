@@ -20,4 +20,5 @@ module.exports = {
   trackingCourseServices: require("./trackingCourse/trackingCourse.services"),
   trackingQuizServices: require("./trackingQuiz/trackingQuiz.services"),
   staffServices: require("./staff/staff.services"),
+  publicLinkServices: require("./publicLink/publicLink.services"),
 };

@@ -5,13 +5,14 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isSuperAdminAuthenticate,
-  isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate
 } = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
 const collegeController = require("../controllers/college.controller");
 const instructorCourseController = require("../controllers/instructorCourse.controller");
 const batcheController = require("../controllers/batches.controller");
+const publicLinkController = require("../controllers/publicLink.controller");
 
 router.post(
   "/college",
@@ -50,6 +51,46 @@ router.get(
   batcheController.getBatchesOption
 );
 
-//----------------------- instructor courses------------------------//
+//----------------------- publiclink courses------------------------//
+
+router.post(
+  "/public-link",
+  Validate(schemas.publicLinkSchema),
+  isAdminCommonAuthenticate,
+  publicLinkController.createPublicLink
+);
+
+router.post(
+  "/public-link/all",
+  Validate(schemas.paginationAndFilterSchema),
+
+  isAdminCommonAuthenticate,
+  publicLinkController.getAllPublicLink
+);
+
+router.post(
+  "/public-link/:id",
+  
+  isAdminCommonAuthenticate,
+  publicLinkController.getPublicLinkById
+);
+
+router.put(
+  "/public-link/:id",
+  Validate(schemas.publicLinkSchema),
+  isAdminCommonAuthenticate,
+  publicLinkController.updatePublicLink
+);
+
+router.put(
+  "/public-link/status/:id",
+  isAdminCommonAuthenticate,
+  publicLinkController.activeStatusChange
+);
+router.delete(
+  "/public-link/:id",
+  isAdminCommonAuthenticate,
+  publicLinkController.deletePublicLink
+);
 
 module.exports = router;

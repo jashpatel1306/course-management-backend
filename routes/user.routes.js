@@ -263,6 +263,11 @@ router.post(
   isAdminCommonAuthenticate,
   quizController.getPublicQuizzes
 );
+router.get(
+  "/get-public-quizzes-option",
+  isAdminCommonAuthenticate,
+  quizController.getPublicQuizzesOptions
+);
 router.put(
   "/quiz/status/:id",
   isAdminCommonAuthenticate,

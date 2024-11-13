@@ -24,7 +24,7 @@ module.exports = {
       const quiz = await QuizzesModel.findById(id)
         .populate({
           path: "questions",
-          match: { active: true }, // Optional: Filter to include only active questions
+          match: { active: true } // Optional: Filter to include only active questions
         })
         .exec();
 
@@ -37,7 +37,7 @@ module.exports = {
 
       // Return the quiz with ordered questions
       return {
-        ...quiz.toObject(),
+        ...quiz.toObject()
         // questions: orderedQuestions,
       };
     } catch (error) {
@@ -51,7 +51,7 @@ module.exports = {
         .populate({
           path: "questions",
           match: { active: true }, // Optional: Filter to include only active questions
-          select: "_id question answers.content answers._id marks", // Specify the fields you want to include
+          select: "_id question answers.content answers._id marks" // Specify the fields you want to include
         })
         .exec();
 
@@ -64,7 +64,7 @@ module.exports = {
 
       // Return the quiz with ordered questions
       return {
-        ...quiz.toObject(),
+        ...quiz.toObject()
         // questions: orderedQuestions, // Uncomment if reordering is necessary
       };
     } catch (error) {
@@ -98,7 +98,7 @@ module.exports = {
       const quiz = await QuizzesModel.findById(id)
         .populate({
           path: "questions",
-          match: { active: true }, // Optional: Filter to include only active questions
+          match: { active: true } // Optional: Filter to include only active questions
         })
         .exec();
 
@@ -114,7 +114,7 @@ module.exports = {
   updateQuiz: async (id, data) => {
     try {
       const quiz = await QuizzesModel.findOneAndUpdate({ _id: id }, data, {
-        new: true,
+        new: true
       });
       if (!quiz) throw createError(400, "invalid quiz id");
       return quiz;
@@ -150,6 +150,17 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  getQuizzesOptions: async (filter) => {
+    try {
+      const quiz = await QuizzesModel.find(filter);
+      const data = quiz.map((item) => {
+        return { label: item.title, value: item._id, time: item.time };
+      });
+      return data;
+    } catch (error) {
+      throw createError(500, error.message);
+    }
+  },
 
   toggleActiveStatus: async (id, active) => {
     try {
@@ -162,5 +173,5 @@ module.exports = {
     } catch (error) {
       throw createError.InternalServerError(error);
     }
-  },
+  }
 };
