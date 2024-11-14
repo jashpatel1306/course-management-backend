@@ -1,6 +1,6 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
-const { quizzesServices } = require("../services");
+const { quizzesServices, publicLinkServices } = require("../services");
 module.exports = {
   createQuiz: async (req, res, next) => {
     try {
@@ -63,6 +63,37 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Student Quiz fetched successfully",
+        data: quiz
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getPublicQuizById: async (req, res, next) => {
+    try {
+      const publicQuizId = req.params.id;
+      const quiz = await publicLinkServices.getPublicLinkByQuizData(
+        publicQuizId
+      );
+      return res.status(200).send({
+        success: true,
+        message: "public Quiz fetched successfully",
+        data: quiz
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getPublicQuizLogin: async (req, res, next) => {
+    try {
+      const { publicQuizId, password } = req.body;
+      const quiz = await publicLinkServices.getPublicQuizLogin(
+        publicQuizId,
+        password
+      );
+      return res.status(200).send({
+        success: true,
+        message: "public Quiz login successfully",
         data: quiz
       });
     } catch (error) {
@@ -174,14 +205,11 @@ module.exports = {
         isPublic: true
       };
 
-      const  quizzes = await quizzesServices.getQuizzesOptions(
-        filter
-      );
+      const quizzes = await quizzesServices.getQuizzesOptions(filter);
       return res.status(200).send({
         success: true,
         message: "Quizzes options fetched successfully",
-        data: quizzes,
-       
+        data: quizzes
       });
     } catch (error) {
       next(error);

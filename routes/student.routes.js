@@ -59,12 +59,12 @@ router.get(
   isStudentAuthenticate,
   trackingCourseController.getTrackingCourseByUserId
 );
-  router.post(
-    "/colleges/all/:status",
-    Validate(schemas.searchPaginationScema),
-    isStudentAuthenticate,
-    collegeController.getAllColleges
-  );
+router.post(
+  "/colleges/all/:status",
+  Validate(schemas.searchPaginationScema),
+  isStudentAuthenticate,
+  collegeController.getAllColleges
+);
 
 // Update tracking course
 router.put(
@@ -101,13 +101,21 @@ router.get(
   isStudentAuthenticate,
   quizController.getStudentQuizById
 );
+router.get("/public-quiz/:id", quizController.getPublicQuizById);
+router.post(
+  "/public-quiz/:id",
+  Validate(schemas.quizLoginSchema),
+  quizController.getPublicQuizLogin
+);
 
 // Create and enroll in a course
+
 router.post(
   "/quiz/enroll/:quizId",
   isStudentAuthenticate,
   trackingQuizController.createEnrollQuiz
 );
+
 router.put(
   "/quiz/update/:quizId",
   Validate(schemas.updateQuizTrackingSchema),

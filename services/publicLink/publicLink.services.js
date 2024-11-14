@@ -24,6 +24,31 @@ module.exports = {
     }
   },
 
+  getPublicLinkByQuizData: async (id) => {
+    try {
+      const publicLink = await publicLinkModel
+        .findOne({ _id: id }, { password: 0 })
+        .populate("quizId");
+        // .populate("quizId", "_id title");
+      if (!publicLink)
+        throw createError(500, "Error while retrieving publicLink");
+      return publicLink;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+  getPublicQuizLogin: async (id, password) => {
+    try {
+      const publicLink = await publicLinkModel
+        .findOne({ _id: id, password: password }, { password: 0 })
+        .populate("quizId");
+      if (!publicLink)
+        throw createError(500, "Error while retrieving publicLink");
+      return publicLink;
+    } catch (error) {
+      throw createError(error);
+    }
+  },
   updatePublicLink: async (id, data) => {
     try {
       const publicLink = await publicLinkModel.findOneAndUpdate(

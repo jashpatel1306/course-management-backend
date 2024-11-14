@@ -6,6 +6,10 @@ const publicLinkSchema = new mongoose.Schema(
       ref: "quizzes",
       required: true
     },
+    publicLinkName: {
+      type: String,
+      required: [true, "publicLink Name is required"]
+    },
     password: {
       type: String,
       required: [true, "password is required"]
@@ -22,6 +26,9 @@ const publicLinkSchema = new mongoose.Schema(
     startDate: {
       type: Date,
       required: [true, "startDate is required"]
+    },
+    instruction: {
+      type: Array
     },
     endDate: {
       type: Date,

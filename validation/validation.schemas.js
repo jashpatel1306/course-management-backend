@@ -8,6 +8,10 @@ module.exports = {
     email: validate.reqEmail,
     password: validate.reqString
   }),
+  quizLoginSchema: Joi.object().keys({
+    publicQuizId: validate.reqString,
+    password: validate.reqString
+  }),
 
   queryIdSchema: Joi.object().keys({
     id: validate.reqId
@@ -389,12 +393,14 @@ module.exports = {
   }),
   publicLinkSchema: Joi.object().keys({
     publicLinkId: validate.string,
+    publicLinkName: validate.string,
     quizId: validate.reqId,
     password: validate.reqString,
     noofHits: validate.reqNumber,
     startDate: validate.reqDate,
     endDate: validate.reqDate,
     specificField: validate.array,
+    instruction: validate.array,
     active: validate.reqBoolean
   })
 };
