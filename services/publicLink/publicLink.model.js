@@ -1,11 +1,13 @@
 const mongoose = require("mongoose");
 const publicLinkSchema = new mongoose.Schema(
   {
-    quizId: {
-      type: mongoose.Types.ObjectId,
-      ref: "quizzes",
-      required: true
-    },
+    quizId: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "quizzes",
+        required: true
+      }
+    ],
     publicLinkName: {
       type: String,
       required: [true, "publicLink Name is required"]
@@ -46,6 +48,9 @@ const publicLinkSchema = new mongoose.Schema(
   },
   { timestamps: true, versionKey: false }
 );
-
+publicLinkSchema.methods.increaseHits = async function () {
+  this.hits += 1; // Increment hits by 1
+  await this.save(); // Save the updated document
+};
 const publicLinkModel = mongoose.model("publicLink", publicLinkSchema);
 module.exports = publicLinkModel;

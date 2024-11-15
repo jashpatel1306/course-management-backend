@@ -1,6 +1,36 @@
+const QuizModel = require("../quizzes/quizzes.model");
 const publicLinkModel = require("./publicLink.model");
 const createError = require("http-errors");
+async function getMultipleQuizDetailsSimple(quizIds) {
+  const quizzes = await QuizModel.find({ _id: { $in: quizIds } }).select(
+    "questions time totalMarks"
+  );
 
+  return quizzes.map((quiz) => ({
+    quizId: quiz._id,
+    totalQuestions: quiz.questions.length, // Count of questions
+    questionIds: quiz.questions, // Array of question IDs
+    totalTime: quiz.time, // Quiz total time
+    totalMarks: quiz.totalMarks // Quiz total time
+  }));
+}
+async function mergeQuizDetails(quizIds) {
+  const quizzes = await getMultipleQuizDetailsSimple(quizIds); // Assume this fetches the details
+
+  // Merge all values into one object
+  const mergedDetails = quizzes.reduce(
+    (acc, quiz) => {
+      acc.totalQuestions += quiz.totalQuestions;
+      acc.questionIds = acc.questionIds.concat(quiz.questionIds); // Merge question IDs
+      acc.totalTime += quiz.totalTime;
+      acc.totalMarks += quiz.totalMarks;
+      return acc;
+    },
+    { totalQuestions: 0, questionIds: [], totalTime: 0, totalMarks: 0 } // Initial values
+  );
+
+  return mergedDetails;
+}
 module.exports = {
   createPublicLink: async (data) => {
     try {
@@ -23,28 +53,36 @@ module.exports = {
       throw createError(error);
     }
   },
-
-  getPublicLinkByQuizData: async (id) => {
+  increaseHitCount: async (id) => {
     try {
-      const publicLink = await publicLinkModel
-        .findOne({ _id: id }, { password: 0 })
-        .populate("quizId");
-        // .populate("quizId", "_id title");
-      if (!publicLink)
-        throw createError(500, "Error while retrieving publicLink");
-      return publicLink;
+      const publicLink = await publicLinkModel.findOne({ _id: id });
+      if (!publicLink) throw createError(400, "Invalid publicLink ID");
+
+      await publicLink.increaseHits();
+      console.log("Hit count increased successfully");
     } catch (error) {
       throw createError(error);
     }
   },
-  getPublicQuizLogin: async (id, password) => {
+
+  getPublicLinkByQuizData: async (id) => {
     try {
-      const publicLink = await publicLinkModel
-        .findOne({ _id: id, password: password }, { password: 0 })
-        .populate("quizId");
+      const publicLink = await publicLinkModel.findOne(
+        { _id: id },
+        { createdAt: 0, updatedAt: 0, active: 0 }
+      );
       if (!publicLink)
         throw createError(500, "Error while retrieving publicLink");
-      return publicLink;
+      const quizdetails = await mergeQuizDetails(publicLink.quizId);
+      const result = {
+        ...publicLink.toObject(),
+        soltStatus: publicLink.hits >= publicLink.noofHits ? false : true,
+
+        quizdetails
+      };
+      delete result.hits;
+      delete result.noofHits;
+      return result;
     } catch (error) {
       throw createError(error);
     }
@@ -85,8 +123,8 @@ module.exports = {
         .find(filter)
         .sort({ name: 1 })
         .skip((pageNo - 1) * perPage)
-        .limit(perPage)
-        .populate("quizId", "_id title");
+        .limit(perPage);
+      // .populate("quizId", "_id title");
       const count = await publicLinkModel.countDocuments(filter);
       if (!publicLink) throw createError(404, "PublicLink not found");
 

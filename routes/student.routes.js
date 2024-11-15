@@ -115,6 +115,11 @@ router.post(
   isStudentAuthenticate,
   trackingQuizController.createEnrollQuiz
 );
+router.post(
+  "/quiz/public-enroll/:quizId",
+  Validate(schemas.publicErollSchema),
+  trackingQuizController.createPublicEnrollQuiz
+);
 
 router.put(
   "/quiz/update/:quizId",

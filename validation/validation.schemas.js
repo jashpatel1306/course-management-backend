@@ -394,7 +394,7 @@ module.exports = {
   publicLinkSchema: Joi.object().keys({
     publicLinkId: validate.string,
     publicLinkName: validate.string,
-    quizId: validate.reqId,
+    quizId: validate.reqArray,
     password: validate.reqString,
     noofHits: validate.reqNumber,
     startDate: validate.reqDate,
@@ -402,5 +402,8 @@ module.exports = {
     specificField: validate.array,
     instruction: validate.array,
     active: validate.reqBoolean
+  }),
+  publicErollSchema: Joi.object().keys({
+    specificField: validate.object,
   })
 };

@@ -6,21 +6,26 @@ const QuestionsModel = require("../questions/questions.model");
 const { ObjectId } = mongoose.Types;
 
 module.exports = {
-  createEnrollQuiz: async (userId, quizId) => {
+  createEnrollQuiz: async (body, quizId) => {
     try {
-      // Check if the tracking quiz already exists for this user and quiz
-      const existingTrackingQuiz = await trackingQuizModel.findOne({
-        userId,
-        quizId,
-      });
+      const userId = body?.user_id ? body.user_id : "000000000000000000000000";
 
-      // If it exists, throw an error or return a message
-      if (existingTrackingQuiz) {
-        throw createError(400, "You have already taken this quiz.");
+      if (body.user_id) {
+        const existingTrackingQuiz = await trackingQuizModel.findOne({
+          userId: body.user_id,
+          quizId
+        });
+        if (existingTrackingQuiz) {
+          throw createError(400, "You have already taken this quiz.");
+        }
+      } else {
+        body.specificField;
       }
-
       // If it doesn't exist, create a new tracking quiz
-      const data = { userId, quizId };
+      console.log("body: ",body)
+      const data = body?.user_id
+        ? { userId, quizId }
+        : { userId, quizId, ...body, quizType: "public" };
       const result = await trackingQuizModel.create(data);
 
       if (!result) throw createError(500, "Error while creating tracking quiz");
@@ -35,11 +40,11 @@ module.exports = {
       const result = await trackingQuizModel
         .findOne({
           userId,
-          quizId,
+          quizId
         })
         .populate({
           path: "result.question",
-          select: "question",
+          select: "question"
         });
       if (!result) throw createError(400, "Invalid quiz tracking id");
       return result;
@@ -53,27 +58,27 @@ module.exports = {
       const questionResult = await QuestionsModel.findOne({
         _id: questionId,
         answers: {
-          $elemMatch: { _id: answerId, correct: true }, // Check if answerId exists in the answers array
-        },
+          $elemMatch: { _id: answerId, correct: true } // Check if answerId exists in the answers array
+        }
       });
       const result = await trackingQuizModel.findOneAndUpdate(
         {
           userId,
-          quizId,
+          quizId
         },
         {
           $push: { result: { questionId, answerId } }, // Push new result (question and answerId) to the result array
           $inc: {
             correctAnswers: questionResult ? 1 : 0, // Increment correctAnswers if questionResult is true
             wrongAnswers: questionResult ? 0 : 1, // Increment wrongAnswers if questionResult is false
-            totalMarks: questionResult ? questionResult.marks : 0, // Increment totalMarks by the provided value
+            totalMarks: questionResult ? questionResult.marks : 0 // Increment totalMarks by the provided value
           },
           $set: {
-            totalTime: time,
-          },
+            totalTime: time
+          }
         },
         {
-          new: true, // Return the updated document
+          new: true // Return the updated document
         }
       );
 
@@ -90,10 +95,10 @@ module.exports = {
       const quizTracking = await trackingQuizModel.findOneAndUpdate(
         {
           userId,
-          quizId,
+          quizId
         },
         {
-          $set: { result: resultData, isSubmit: true },
+          $set: { result: resultData, isSubmit: true }
         },
         { new: true }
       );
@@ -120,7 +125,7 @@ module.exports = {
       const result = await trackingQuizModel.findOne({
         userId,
         quizId,
-        "result.answerId": answerId,
+        "result.answerId": answerId
       });
 
       return !!result; // Return true if answer exists, otherwise false
@@ -134,8 +139,8 @@ module.exports = {
       filter.userIds
         ? pipeline.push({
             $match: {
-              userId: { $in: filter.userIds },
-            },
+              userId: { $in: filter.userIds }
+            }
           })
         : null;
 
@@ -146,27 +151,27 @@ module.exports = {
           pipeline: [
             {
               $match: {
-                $expr: { $eq: ["$userId", "$$userId"] },
-              },
+                $expr: { $eq: ["$userId", "$$userId"] }
+              }
             },
             {
               $project: {
                 name: 1,
                 email: 1,
                 rollNo: 1,
-                batchId: 1,
-              },
-            },
+                batchId: 1
+              }
+            }
           ],
-          as: "studentData",
-        },
+          as: "studentData"
+        }
       });
 
       filter.batchIds
         ? pipeline.push({
             $match: {
-              "studentData.batchId": { $in: filter.batchIds },
-            },
+              "studentData.batchId": { $in: filter.batchIds }
+            }
           })
         : null;
 
@@ -178,8 +183,8 @@ module.exports = {
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ["$_id", "$$quizId"] },
-                },
+                  $expr: { $eq: ["$_id", "$$quizId"] }
+                }
               },
               {
                 $project: {
@@ -187,17 +192,17 @@ module.exports = {
                   isPublish: 0,
                   questions: 0,
                   updatedAt: 0,
-                  active: 0,
-                },
-              },
+                  active: 0
+                }
+              }
             ],
-            as: "quizdata",
-          },
+            as: "quizdata"
+          }
         },
         {
           $project: {
-            result: 0,
-          },
+            result: 0
+          }
         }
       );
 
@@ -214,11 +219,11 @@ module.exports = {
       const result = await trackingQuizModel.aggregate([
         {
           $match: {
-            _id: new ObjectId(id),
-          },
+            _id: new ObjectId(id)
+          }
         },
         {
-          $unwind: "$result",
+          $unwind: "$result"
         },
         {
           $lookup: {
@@ -227,19 +232,19 @@ module.exports = {
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ["$_id", "$$questionId"] },
-                },
+                  $expr: { $eq: ["$_id", "$$questionId"] }
+                }
               },
               {
                 $project: {
                   _id: 1,
                   question: 1,
-                  answers: 1, // Include the answers for lookup
-                },
-              },
+                  answers: 1 // Include the answers for lookup
+                }
+              }
             ],
-            as: "questionData",
-          },
+            as: "questionData"
+          }
         },
         {
           $addFields: {
@@ -249,13 +254,13 @@ module.exports = {
                   $filter: {
                     input: { $arrayElemAt: ["$questionData.answers", 0] },
                     as: "answer",
-                    cond: { $eq: ["$$answer._id", "$result.answerId"] }, // Match the answerId
-                  },
+                    cond: { $eq: ["$$answer._id", "$result.answerId"] } // Match the answerId
+                  }
                 },
-                0,
-              ],
-            },
-          },
+                0
+              ]
+            }
+          }
         },
         {
           $group: {
@@ -271,16 +276,16 @@ module.exports = {
                 questionId: "$result.questionId",
                 answerId: "$result.answerId",
                 questionData: { $first: "$questionData" },
-                answerValue: "$result.answerValue", // Extracted answer value
-              },
-            },
-          },
-        },
+                answerValue: "$result.answerValue" // Extracted answer value
+              }
+            }
+          }
+        }
       ]);
       if (!result) throw createError(400, "Invalid quiz tracking id.");
       return result;
     } catch (error) {
       throw createError.InternalServerError(error);
     }
-  },
+  }
 };
