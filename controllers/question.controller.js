@@ -46,6 +46,19 @@ module.exports = {
       next(error);
     }
   },
+  getPublicQuestionById: async (req, res, next) => {
+    try {
+      const questionId = req.params.id;
+      const question = await questionServices.getPublicQuestionById(questionId);
+      return res.status(200).send({
+        success: true,
+        message: "Question fetched successfully",
+        data: question,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   deleteQuestion: async (req, res, next) => {
     try {

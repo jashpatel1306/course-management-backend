@@ -53,6 +53,9 @@ const trackingQuizzesSchema = new mongoose.Schema(
         answerId: {
           type: mongoose.Types.ObjectId,
           required: [true, "answerId is required"]
+        },
+        fillAnswer: {
+          type: String,
         }
       }
     ],

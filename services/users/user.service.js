@@ -137,7 +137,6 @@ module.exports = {
         throw createError.Unauthorized("Invalid password.");
       }
       const collegeData = await collegesModel.findOne({ userId: user._id });
-      console.log("collegeData: ", collegeData);
       let collegeId = collegeData?._id ? collegeData?._id : null;
       let batchId = null;
       if (!collegeId && user.role === STUDENT) {
@@ -168,7 +167,6 @@ module.exports = {
   },
   findUserById: async (userId) => {
     try {
-      console.log("userId : ",userId)
       const user = await userModel.findOne({ _id: userId });
       if (!user) {
         throw createError(404, "User not found");

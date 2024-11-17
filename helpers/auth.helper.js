@@ -26,7 +26,6 @@ module.exports = {
 
       if (result && isset(result.user_id)) {
         const getUserData = await userServices.findUserById(result.user_id);
-        console.log("getUserData :", getUserData);
         if (!getUserData)
           return res.json({
             status: false,
@@ -52,7 +51,6 @@ module.exports = {
       ? token.split(" ")[1]
       : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
-      console.log("result", result);
       if (err) {
         console.log("jwt error", err);
         return res.json({

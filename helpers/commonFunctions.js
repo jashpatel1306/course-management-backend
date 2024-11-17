@@ -1,5 +1,7 @@
 const CryptoJS = require(`crypto-js`);
 const secretKey = process.env.JWT_SECRET_KEY;
+const { ObjectId } = require("bson");
+
 // =================================== Encode request Data =================================== //
 module.exports.encode = async (text) => {
   return new Promise(async (resolve, reject) => {
@@ -13,7 +15,7 @@ module.exports.encode = async (text) => {
       console.log(`encode error:`, error);
       return reject({
         status: false,
-        message: `Something is wrong while send request.`,
+        message: `Something is wrong while send request.`
       });
     }
   });
@@ -34,7 +36,7 @@ module.exports.decode = async (text, option = 0) => {
       console.log(`decode error:`, error);
       return reject({
         status: false,
-        message: `Something is wrong while send request.`,
+        message: `Something is wrong while send request.`
       });
     }
   });
@@ -56,8 +58,19 @@ module.exports.responseDataEncode = async (data) => {
       console.log(`responseDataEncode error:`, error);
       return reject({
         status: false,
-        message: `Something is wrong while send request.`,
+        message: `Something is wrong while send request.`
       });
+    }
+  });
+};
+module.exports.generateMongoId = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const uniqueId = new ObjectId().toHexString();
+      resolve(uniqueId);
+    } catch (error) {
+      console.log(`responseDataEncode error:`, error);
+      return reject(false);
     }
   });
 };

@@ -207,6 +207,10 @@ router.get(
   isAdminCommonAuthenticate,
   questionController.getQuestionById
 );
+router.get(
+  "/public-question/:id",
+  questionController.getPublicQuestionById
+);
 
 router.post(
   "/get-questions/:quizId",

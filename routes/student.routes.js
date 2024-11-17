@@ -124,8 +124,8 @@ router.post(
 router.put(
   "/quiz/update/:quizId",
   Validate(schemas.updateQuizTrackingSchema),
-  isStudentAuthenticate,
   trackingQuizController.updateQuizTracking
 );
+
 
 module.exports = router;

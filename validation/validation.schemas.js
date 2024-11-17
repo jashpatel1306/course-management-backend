@@ -349,8 +349,10 @@ module.exports = {
   }),
   updateQuizTrackingSchema: Joi.object().keys({
     questionId: validate.reqId,
-    answerId: validate.reqId,
-    time: validate.reqNumber
+    answerId: validate.reqString,
+    time: validate.reqNumber,
+    questionType: validate.reqString,
+    trackingId: validate.reqId
   }),
 
   createTrackingCourseSchema: Joi.object().keys({
@@ -404,6 +406,6 @@ module.exports = {
     active: validate.reqBoolean
   }),
   publicErollSchema: Joi.object().keys({
-    specificField: validate.object,
+    specificField: validate.object
   })
 };

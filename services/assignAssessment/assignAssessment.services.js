@@ -9,11 +9,7 @@ module.exports = {
     try {
       data.type = "batch";
       if (data.assessmentId && data.batchId) {
-        console.log(
-          "data.assessmentId && data.batchId: ",
-          data.assessmentId,
-          data.batchId
-        );
+      
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId
@@ -34,11 +30,7 @@ module.exports = {
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
       if (data.assessmentId && data.batchId) {
-        console.log(
-          "data.assessmentId && data.batchId: ",
-          data.assessmentId,
-          data.batchId
-        );
+      
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId
@@ -58,11 +50,7 @@ module.exports = {
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
       if (data.assessmentId && data.batchId) {
-        console.log(
-          "data.assessmentId && data.batchId: ",
-          data.assessmentId,
-          data.batchId
-        );
+       
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId

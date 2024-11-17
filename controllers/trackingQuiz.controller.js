@@ -89,14 +89,16 @@ module.exports = {
   updateQuizTracking: async (req, res, next) => {
     try {
       const quizId = req.params.quizId;
-      const userId = req.body?.user_id;
+      const trackingId = req.body?.trackingId;
       const updatedData = req.body;
+      
       const trackingQuiz = await trackingQuizServices.updateQuizTracking(
-        userId,
+        trackingId,
         quizId,
         updatedData.questionId,
         updatedData.answerId,
-        updatedData.time
+        updatedData.time,
+        updatedData.questionType
       );
       return res.status(200).send({
         success: true,
@@ -167,7 +169,6 @@ module.exports = {
   getAllQuizTrackingByUserIds: async (req, res, next) => {
     try {
       const { userIds, batchIds } = req.body;
-      console.log("req body", req.body);
       const filter = {};
 
       if (userIds) {
