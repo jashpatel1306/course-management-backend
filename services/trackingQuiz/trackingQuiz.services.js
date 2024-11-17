@@ -360,5 +360,23 @@ module.exports = {
     } catch (error) {
       throw createError.InternalServerError(error);
     }
+  },
+  getAllResultByQuiz: async (quizId, perPage, pageNo) => {
+    try {
+      console.log("quizId: ", quizId);
+      const result = await trackingQuizModel
+        .find({ quizId: new ObjectId(quizId) })
+        .skip((pageNo - 1) * perPage)
+        .limit(perPage);
+      if (!result) throw createError(500, "Error while Fetching result.");
+
+      const count = await trackingQuizModel.countDocuments({
+        quizId: new ObjectId(quizId)
+      });
+
+      return { result, count };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
   }
 };

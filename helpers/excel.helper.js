@@ -36,7 +36,7 @@ module.exports.handleExcelData = async (req, res, next) => {
       return res.status(500).send({
         status: false,
         message: "Error processing the sheet, please try again.",
-        data: [],
+        data: []
       });
     }
 
@@ -56,8 +56,8 @@ module.exports.handleExcelData = async (req, res, next) => {
         collegeId: req.body.collegeId,
         college_id: req.body.college_id,
         user_id: req.body.user_id,
-        excelData: processedData,
-      }),
+        excelData: processedData
+      })
     };
     console.log("========================= req.body  req.body: ", req.body);
 
@@ -69,7 +69,52 @@ module.exports.handleExcelData = async (req, res, next) => {
     return res.status(500).send({
       status: false,
       message: "Error processing the sheet, please try again.",
-      data: [],
+      data: []
+    });
+  }
+};
+module.exports.handleExcelQuestionData = async (req, res, next) => {
+  try {
+    // Get the excel file from the request
+    const myStream = req.files.excelFile;
+    // Process the excel sheet data using the processSheet and handleWorkbook functions
+    const processedData = processSheet(myStream.data, handleWorkbook);
+    // console.log("processedData: ", processedData);
+    // If no data is processed, return an error response
+    if (!processedData) {
+      return res.status(500).send({
+        status: false,
+        message: "Error processing the sheet, please try again.",
+        data: []
+      });
+    }
+
+    // Set the processed data in the request body
+    req.body.excelData = processedData;
+
+    // req.body = {
+    //   data: JSON.stringify({
+    //     excelData: processedData,
+    //   }),
+    // };
+    console.log("req.body: ", req.body);
+    req.body = {
+      data: JSON.stringify({
+        quizId: req.body.data
+          ? JSON.parse(req.body.data)?.quizId
+          : req.body.quizId,
+        excelData: processedData
+      })
+    };
+
+    next();
+  } catch (err) {
+    // Log the error and return an error response
+    console.error(err);
+    return res.status(500).send({
+      status: false,
+      message: "Error processing the sheet, please try again.",
+      data: []
     });
   }
 };

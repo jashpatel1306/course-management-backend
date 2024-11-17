@@ -91,7 +91,7 @@ module.exports = {
       const quizId = req.params.quizId;
       const trackingId = req.body?.trackingId;
       const updatedData = req.body;
-      
+
       const trackingQuiz = await trackingQuizServices.updateQuizTracking(
         trackingId,
         quizId,
@@ -197,13 +197,38 @@ module.exports = {
 
   getResultContentOfQuiz: async (req, res, next) => {
     try {
-      const { quizId } = req.params;
+      const { trackingId } = req.params;
       const trackingQuiz =
-        await trackingQuizServices.getContentOfQuizByTrackingId(quizId);
+        await trackingQuizServices.getContentOfQuizByTrackingId(trackingId);
       return res.status(200).send({
         success: true,
         message: "Quiz results fetched successfully.",
         data: trackingQuiz
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getAllResultByQuiz: async (req, res, next) => {
+    try {
+      const { quizId } = req.params;
+      const { pageNo, perPage } = req.body;
+      console.log("quizId: ",quizId)
+      const { result, count } = await trackingQuizServices.getAllResultByQuiz(
+        quizId,
+        perPage,
+        pageNo
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Quiz results fetched successfully.",
+        data: result,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);

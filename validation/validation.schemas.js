@@ -352,7 +352,23 @@ module.exports = {
     answerId: validate.reqString,
     time: validate.reqNumber,
     questionType: validate.reqString,
-    trackingId: validate.reqId
+    trackingId: validate.string
+  }),
+  bulkQuestionSchema: Joi.object().keys({
+    quizId: validate.reqId,
+    excelData: validate.array.items(
+      validate.object.keys({
+        question: validate.reqString,
+        type: validate.reqString.allow("mcq", "fill"),
+        mark: validate.any,
+        correctAnswer: validate.string,
+        answerExplanation: validate.string,
+        answer1: validate.string,
+        answer2: validate.string,
+        answer3: validate.string,
+        answer4: validate.string
+      })
+    )
   }),
 
   createTrackingCourseSchema: Joi.object().keys({

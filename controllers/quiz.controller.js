@@ -28,7 +28,6 @@ module.exports = {
       next(error);
     }
   },
-
   updateQuiz: async (req, res, next) => {
     try {
       const quizId = req.params.id;
@@ -100,7 +99,6 @@ module.exports = {
       next(error);
     }
   },
-
   deleteQuiz: async (req, res, next) => {
     try {
       const quizId = req.params.id;
@@ -114,7 +112,6 @@ module.exports = {
       next(error);
     }
   },
-
   changeActiveStatusQuiz: async (req, res, next) => {
     try {
       const id = req.params.id;
@@ -129,7 +126,6 @@ module.exports = {
       next(error);
     }
   },
-
   getQuizzesByAssessment: async (req, res, next) => {
     try {
       const { pageNo, perPage, status } = req.body;

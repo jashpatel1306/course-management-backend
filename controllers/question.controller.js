@@ -1,6 +1,32 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 const { questionServices, quizzesServices } = require("../services");
+const transformData = async (quizId, data) => {
+  return await data.map((item) => {
+    const answers = [];
+    let i = 1;
+    while (item[`answer${i}`]) {
+      answers.push({
+        content: `<p>${item[`answer${i}`]}</p>`,
+        reason: `${
+          item.correctAnswer === item[`answer${i}`]
+            ? item.answerExplanation || ""
+            : ""
+        }`,
+        correct: item.correctAnswer === item[`answer${i}`]
+      });
+      i++;
+    }
+
+    return {
+      quizId: quizId,
+      question: `<p>${item.question}</p>`,
+      questionType: item.type,
+      marks: item.mark,
+      answers
+    };
+  });
+};
 module.exports = {
   createQuestion: async (req, res, next) => {
     try {
@@ -9,13 +35,31 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Question created successfully.",
-        data: question,
+        data: question
       });
     } catch (error) {
       next(error);
     }
   },
-
+  createBulkQuestion: async (req, res, next) => {
+    try {
+      const questionData = req.body;
+      const questionObject = await transformData(
+        questionData.quizId,
+        questionData.excelData
+      );
+      const result = await questionServices.createQuestionsInBulk(
+        questionObject
+      );
+      res.send({
+        success: true,
+        message: "students created successfully",
+        data: questionObject
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
   updateQuestion: async (req, res, next) => {
     try {
       const questionId = req.params.id;
@@ -27,7 +71,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Question updated successfully",
-        data: question,
+        data: question
       });
     } catch (error) {
       next(error);
@@ -40,7 +84,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Question fetched successfully",
-        data: question,
+        data: question
       });
     } catch (error) {
       next(error);
@@ -53,7 +97,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Question fetched successfully",
-        data: question,
+        data: question
       });
     } catch (error) {
       next(error);
@@ -67,7 +111,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Question deleted successfully",
-        data: [],
+        data: []
       });
     } catch (error) {
       next(error);
@@ -82,7 +126,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Question ${message} successfully`,
-        data: question,
+        data: question
       });
     } catch (error) {
       next(error);
@@ -94,7 +138,7 @@ module.exports = {
       const { pageNo, perPage, status } = req.body;
       const quizId = req.params.quizId;
       const filter = {
-        quizId: { $eq: new mongoose.Types.ObjectId(quizId) },
+        quizId: { $eq: new mongoose.Types.ObjectId(quizId) }
       };
       const quizData = await quizzesServices.getQuizById(quizId);
       if (status === "active") {
@@ -116,11 +160,11 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };

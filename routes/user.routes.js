@@ -13,7 +13,10 @@ const studentController = require("../controllers/student.controller");
 const staffController = require("../controllers/staff.controller");
 
 const departmentController = require("../controllers/department.controller");
-const { handleExcelData } = require("../helpers/excel.helper");
+const {
+  handleExcelData,
+  handleExcelQuestionData
+} = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
 const quizController = require("../controllers/quiz.controller");
 const assessmentController = require("../controllers/assessment.controller");
@@ -194,7 +197,13 @@ router.post(
   isAdminCommonAuthenticate,
   questionController.createQuestion
 );
-
+router.post(
+  "/question-bulk",
+  isAdminCommonAuthenticate,
+  handleExcelQuestionData,
+  Validate(schemas.bulkQuestionSchema),
+  questionController.createBulkQuestion
+);
 router.put(
   "/question/:id",
   Validate(schemas.questionsSchema),
@@ -207,10 +216,7 @@ router.get(
   isAdminCommonAuthenticate,
   questionController.getQuestionById
 );
-router.get(
-  "/public-question/:id",
-  questionController.getPublicQuestionById
-);
+router.get("/public-question/:id", questionController.getPublicQuestionById);
 
 router.post(
   "/get-questions/:quizId",
@@ -258,7 +264,7 @@ router.get("/quiz/:id", isAdminCommonAuthenticate, quizController.getQuizById);
 router.post(
   "/get-quizzes/:assessmentId",
   Validate(schemas.paginationAndFilterSchema),
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   quizController.getQuizzesByAssessment
 );
 router.post(
@@ -734,9 +740,15 @@ router.post(
   isAdminCommonAuthenticate,
   trackingQuizController.getAllQuizTrackingByUserIds
 );
+router.post(
+  "/quiz-results-by-quizid/:quizId",
+  Validate(schemas.paginationAndFilterSchema),
+  // isAdminCommonAuthenticate,
+  trackingQuizController.getAllResultByQuiz
+);
 
 router.get(
-  "/quiz-results/:quizId",
+  "/quiz-results/:trackingId",
   Validate(schemas.quizResultsFilterSchema),
   isAdminCommonAuthenticate,
   trackingQuizController.getResultContentOfQuiz
