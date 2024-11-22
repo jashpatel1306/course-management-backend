@@ -161,21 +161,20 @@ module.exports = {
   },
   getPublicQuizzes: async (req, res, next) => {
     try {
-      const { pageNo, perPage, status } = req.body;
+      const { pageNo, perPage, search } = req.body;
       const assessmentId = null;
-      const filter = {
+      let filter = {
         assessmentId: null
       };
-
-      // if (status === "active") {
-      //   filter.active = true;
-      // } else if (status === "inactive") {
-      //   filter.active = false;
-      // }
+      if (search) {
+        const searchText = new RegExp(search, `i`);
+        filter.title = { $regex: searchText };
+      }
       const { quizzes, count } = await quizzesServices.getQuizzesByAssessment(
         filter,
         perPage,
-        pageNo
+        pageNo,
+        searchText
       );
       return res.status(200).send({
         success: true,
