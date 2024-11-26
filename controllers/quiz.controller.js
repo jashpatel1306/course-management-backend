@@ -166,8 +166,9 @@ module.exports = {
       let filter = {
         assessmentId: null
       };
+      const searchText = new RegExp(search, `i`);
+
       if (search) {
-        const searchText = new RegExp(search, `i`);
         filter.title = { $regex: searchText };
       }
       const { quizzes, count } = await quizzesServices.getQuizzesByAssessment(
