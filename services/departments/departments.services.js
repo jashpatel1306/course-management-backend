@@ -18,11 +18,11 @@ module.exports = {
         $expr: {
           $eq: [
             { $toLower: { $trim: { input: "$department" } } },
-            departmentName.trim().toLowerCase(),
-          ],
-        },
+            departmentName.trim().toLowerCase()
+          ]
+        }
       });
-
+      console.log("departments: ", collegeId, departmentName, departments);
       if (!departments)
         throw createError.BadRequest(
           `department '${departmentName}' does not exist for this college.`
@@ -65,4 +65,13 @@ module.exports = {
       throw error;
     }
   },
+  deleteDepartmentData: async (id) => {
+    try {
+      const department = await departmentModel.findOneAndDelete({ _id: id });
+      if (!department) createError(500, "Error while deleting department");
+      return department;
+    } catch (error) {
+      throw error;
+    }
+  }
 };

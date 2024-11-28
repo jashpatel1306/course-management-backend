@@ -7,6 +7,7 @@ const {
   STUDENT,
   ADMIN,
   STAFF,
+  INSTRUCTOR
 } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
@@ -15,6 +16,7 @@ const { sendMailWithServices } = require("../../helpers/mail.helper");
 const batchesModel = require("../batches/batches.model");
 const studentsModel = require("../students/student.model");
 const staffModel = require("../staff/staff.model");
+const InstructorModel = require("../instructor/instructor.model");
 
 module.exports = {
   getUserByEmail: async function (email) {
@@ -36,13 +38,13 @@ module.exports = {
           email: "lms@admin.com",
           password: "Admin@123",
           role: SUPERADMIN,
-          user_name: "First Admin",
+          user_name: "First Admin"
         };
         const collageData = {
           email: "lmscollage@admin.com",
           password: "Admin@123",
           role: ADMIN,
-          user_name: "First Collage Admin",
+          user_name: "First Collage Admin"
         };
 
         data.password = await commonFunctions.encode(data.password);
@@ -60,7 +62,7 @@ module.exports = {
           { upsert: true }
         );
         const collageUserResult = await userModel.findOne({
-          email: collageData.email,
+          email: collageData.email
         });
         const userResult = await userModel.findOne({ email: data.email });
 
@@ -72,7 +74,7 @@ module.exports = {
             contactPersonName: "First Admin",
             contactPersonNo: "+919999999999",
             shortName: "superAdmin College",
-            isAdmin: true,
+            isAdmin: true
           };
           await collegesModel.updateOne(
             { userId: collageUserResult._id },
@@ -132,6 +134,47 @@ module.exports = {
           "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
         );
       }
+      if (user.role === INSTRUCTOR) {
+        const instructorData = await InstructorModel.findOne({
+          userId: user._id
+        });
+        if (instructorData && !instructorData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === ADMIN) {
+        const collegeData = await collegesModel.findOne({
+          userId: user._id
+        });
+        if (collegeData && !collegeData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === STUDENT) {
+        const studentData = await studentsModel.findOne({
+          userId: user._id
+        });
+        if (studentData && !studentData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === STAFF) {
+        const staffData = await staffModel.findOne({
+          userId: user._id
+        });
+        if (staffData && !staffData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+
       const dbPassword = await commonFunctions.decode(user.password);
       if (dbPassword !== password) {
         throw createError.Unauthorized("Invalid password.");
@@ -155,10 +198,10 @@ module.exports = {
         email: user.email,
         permissions: user.permissions,
         college_id: collegeId,
-        batch_id: batchId,
+        batch_id: batchId
       };
       const accessToken = jwt.sign(userData, JWTSecretKey, {
-        expiresIn: 86400,
+        expiresIn: 86400
       });
       return { accessToken, user, collegeId, batchId };
     } catch (error) {
@@ -247,5 +290,5 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  },
+  }
 };

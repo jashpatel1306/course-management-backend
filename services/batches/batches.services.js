@@ -33,7 +33,7 @@ module.exports = {
       const batch = await BatchModel.findOne({ _id: id }).populate(
         "instructorIds",
         "_id name"
-      );
+      ).populate("courses","_id courseName");
       if (!batch) createError.BadRequest("Invalid batch id.");
       return batch;
     } catch (error) {

@@ -8,7 +8,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "departments fetched successfully",
-        data: departments,
+        data: departments
       });
     } catch (error) {
       next(error);
@@ -23,7 +23,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "departments fetched successfully",
-        data: departments,
+        data: departments
       });
     } catch (error) {
       next(error);
@@ -37,7 +37,7 @@ module.exports = {
       res.status(201).send({
         success: true,
         message: "department created successfully",
-        data: department,
+        data: department
       });
     } catch (error) {
       next(error);
@@ -54,10 +54,23 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "department updated successfully",
-        data: department,
+        data: department
       });
     } catch (error) {
       next(error);
     }
   },
+  deleteDepartment: async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const department = await departmentService.deleteDepartmentData(id);
+      res.status(200).send({
+        success: true,
+        message: "department deleted successfully",
+        data: department
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };

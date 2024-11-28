@@ -50,10 +50,11 @@ module.exports.handleExcelData = async (req, res, next) => {
     //   },
     // };
     const batchId = JSON.parse(req.body.data).batchId;
+    const collegeId = JSON.parse(req.body.data).collegeId;
     req.body = {
       data: JSON.stringify({
         batchId: batchId,
-        collegeId: req.body.collegeId,
+        collegeId: collegeId,
         college_id: req.body.college_id,
         user_id: req.body.user_id,
         excelData: processedData

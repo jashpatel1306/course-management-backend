@@ -183,6 +183,11 @@ router.put(
   isAdminCommonAuthenticate,
   departmentController.updateDepartment
 );
+router.delete(
+  "/department/:id",
+  isAdminCommonAuthenticate,
+  departmentController.deleteDepartment
+);
 
 router.get(
   "/department-options/:collegeId",
@@ -622,6 +627,11 @@ router.put(
 
 router.put(
   "/lecture/publish/:id",
+  isAdminCommonAuthenticate,
+  lectureController.toggleLecturePublishStatus
+);
+router.put(
+  "/lecture/unpublish/:id",
   isAdminCommonAuthenticate,
   lectureController.toggleLecturePublishStatus
 );

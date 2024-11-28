@@ -114,10 +114,10 @@ module.exports = {
       validate.object.keys({
         name: validate.reqString,
         email: validate.reqEmail,
-        phone: validate.reqString,
+        phone: validate.any,
         rollNo: validate.any,
         department: validate.reqString,
-        section: validate.reqString,
+        section: validate.any,
         passoutYear: validate.any,
         gender: validate.reqString.allow("male", "female", "other"),
         semester: validate.any
