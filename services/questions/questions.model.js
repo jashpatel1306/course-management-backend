@@ -64,15 +64,19 @@ QuestionSchema.post("findOneAndDelete", async function (question) {
 
   const { quizId } = question;
   try {
-    const quiz = await mongoose
+    console.log("findOneAndDelete question: ", question);
+
+    const quizData = await mongoose
       .model("quizzes")
       .findOneAndUpdate(
         { _id: quizId },
         { $pull: { questions: question._id } },
         { new: true }
       );
+    console.log("findOneAndDelete quizData : ", quizData);
+
     handlePostTotalMarkOperation(question);
-    if (!quiz) {
+    if (!quizData) {
       throw new Error("Quiz not found");
     }
   } catch (error) {
@@ -85,6 +89,7 @@ QuestionSchema.post("findOneAndUpdate", async function (question) {
 const handlePostTotalMarkOperation = async function (question) {
   const { quizId } = question;
   try {
+    console.log("handlePostTotalMarkOperation question: ", question);
     const quizData = await mongoose.model("questions").aggregate([
       {
         $match: {
@@ -98,11 +103,12 @@ const handlePostTotalMarkOperation = async function (question) {
         }
       }
     ]);
+    console.log("handlePostTotalMarkOperation quizData: ", quizData);
     const quiz = await mongoose
       .model("quizzes")
       .findOneAndUpdate(
         { _id: quizId },
-        { totalMarks: quizData[0].totalMarks }
+        { totalMarks: quizData[0]?.totalMarks ? quizData[0]?.totalMarks : 0 }
       );
     if (!quiz) {
       throw new Error("Quiz not found");
