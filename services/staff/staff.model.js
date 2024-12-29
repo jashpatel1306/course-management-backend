@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const { STAFF } = require("../../constants/roles.constant");
+const { STAFF, SUPERADMIN } = require("../../constants/roles.constant");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
@@ -9,39 +9,51 @@ const staffSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "name is required"],
+      required: [true, "name is required"]
     },
     email: {
       type: String,
-      required: [true, "email is required"],
+      required: [true, "email is required"]
     },
     phone: {
       type: String,
-      required: [true, "phone is required"],
+      required: [true, "phone is required"]
     },
     collegeUserId: {
       type: mongoose.Types.ObjectId,
-      ref: "colleges",
-      required: [true, "college id is required."],
+      ref: "colleges"
     },
     userId: {
       type: mongoose.Types.ObjectId,
-      ref: "users",
+      ref: "users"
     },
     permissions: [
       {
-        type: String,
-      },
+        type: String
+      }
     ],
+    isSuperAdmin: {
+      type: Boolean,
+      default: true
+    },
     active: {
       type: Boolean,
-      default: true,
-    },
+      default: true
+    }
   },
   { timestamps: true, versionKey: false }
 );
 
 staffSchema.pre("save", async function (next) {
+  if (this.email) {
+    const existingStaff = await mongoose
+      .model("users")
+      .findOne({ email: this.email });
+    console.log("existingStaff: ", existingStaff);
+    if (existingStaff && existingStaff._id.toString() !== this._id.toString()) {
+      next(createError.Conflict("Email already exists."));
+    }
+  }
   // const password = commonHelpers.generateRandomPassword();
   const password = "Admin@123";
 
@@ -50,7 +62,7 @@ staffSchema.pre("save", async function (next) {
     password,
     user_name: this.name,
     permissions: this.permissions,
-    role: STAFF,
+    role: this.isSuperAdmin ? SUPERADMIN : STAFF
   };
   if (userData.password) {
     userData.password = await commonFunctions.encode(userData.password);

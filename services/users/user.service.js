@@ -38,7 +38,20 @@ module.exports = {
           email: "lms@admin.com",
           password: "Admin@123",
           role: SUPERADMIN,
-          user_name: "First Admin"
+          user_name: "First Admin",
+          permissions: [
+            "dashboard",
+            "students",
+            "batches",
+            "contentHub",
+            "assessment",
+            "publiccontent",
+            "instructors",
+            "colleges",
+            "staff",
+            "policy",
+            "configuration",
+          ]
         };
         const collageData = {
           email: "lmscollage@admin.com",
@@ -192,6 +205,7 @@ module.exports = {
         const staffData = await staffModel.findOne({ userId: user._id });
         collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
       }
+      console.log("user : ", user);
       const userData = {
         user_id: user._id,
         role: user.role,

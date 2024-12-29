@@ -1,3 +1,4 @@
+const { generateMongoId } = require("../../helpers/commonFunctions");
 const staffModel = require("./staff.model");
 const createError = require("http-errors");
 
@@ -5,6 +6,11 @@ module.exports = {
   createStaff: async (data) => {
     try {
       data.permissions = data.permissions.map((permission) => permission.value);
+
+      if (data.isSuperAdmin) {
+        data.collegeUserId = await generateMongoId();
+      }
+
       const staff = await staffModel.create(data);
       if (!staff) throw createError(500, "Error while creating staff");
       return staff;
@@ -35,8 +41,11 @@ module.exports = {
 
   updateStaff: async (id, data) => {
     try {
+      if (data.isSuperAdmin) {
+        data.collegeUserId = await generateMongoId();
+      }
       const staff = await staffModel.findOneAndUpdate({ _id: id }, data, {
-        new: true,
+        new: true
       });
       if (!staff) throw createError(500, "Error while updating staff");
       return staff;
@@ -63,8 +72,8 @@ module.exports = {
           $or: [
             { name: { $regex: search, $options: "i" } },
             { email: { $regex: search, $options: "i" } },
-            { phone: { $regex: search, $options: "i" } },
-          ],
+            { phone: { $regex: search, $options: "i" } }
+          ]
         };
       }
 
@@ -96,13 +105,18 @@ module.exports = {
 
   getCollegeWiseStaff: async (search, perPage, pageNo, collegeUserId) => {
     try {
+      console.log("collegeUserId: ", collegeUserId);
       const filter = {
         $and: [
-          collegeUserId ? { collegeUserId } : {},
+          collegeUserId
+            ? collegeUserId !== "own"
+              ? { collegeUserId }
+              : { isSuperAdmin: true }
+            : {},
           {
-            $or: [{ name: { $regex: search } }, { email: { $regex: search } }],
-          },
-        ],
+            $or: [{ name: { $regex: search } }, { email: { $regex: search } }]
+          }
+        ]
       };
       const staff = await staffModel
         .find(filter)
@@ -115,5 +129,5 @@ module.exports = {
     } catch (error) {
       throw createError(error);
     }
-  },
+  }
 };

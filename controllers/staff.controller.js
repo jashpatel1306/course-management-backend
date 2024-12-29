@@ -5,10 +5,11 @@ module.exports = {
   createStaff: async (req, res, next) => {
     try {
       const staff = await staffServices.createStaff(req.body);
+
       res.send({
         success: true,
         message: "Staff member created successfully",
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -35,7 +36,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Staff members created successfully",
-        data: staffList,
+        data: staffList
       });
     } catch (error) {
       next(error);
@@ -48,7 +49,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Staff member fetched successfully",
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -65,7 +66,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Staff members fetched successfully",
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -78,7 +79,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Staff member updated successfully",
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -91,7 +92,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Staff member deleted successfully",
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -106,7 +107,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Staff member ${message} successfully`,
-        data: staff,
+        data: staff
       });
     } catch (error) {
       next(error);
@@ -138,8 +139,8 @@ module.exports = {
           total: count,
           perPage: perPage,
           pageNo: pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -172,11 +173,11 @@ module.exports = {
           total: count,
           perPage: perPage,
           pageNo: pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };

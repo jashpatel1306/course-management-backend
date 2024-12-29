@@ -5,7 +5,20 @@ const QuizModel = require("../quizzes/quizzes.model");
 const QuestionsModel = require("../questions/questions.model");
 const { generateMongoId } = require("../../helpers/commonFunctions");
 const { ObjectId } = mongoose.Types;
+const upsertQuestion = (data, newRecord) => {
+  const existingIndex = data.findIndex((entry) =>
+    entry.questionId.equals(new ObjectId(newRecord.questionId))
+  );
 
+  if (existingIndex !== -1) {
+    // Update existing record
+    data[existingIndex] = { ...data[existingIndex], ...newRecord };
+  } else {
+    // Add new record
+    data.push({ ...newRecord, _id: new ObjectId() });
+  }
+  return data;
+};
 module.exports = {
   createEnrollQuiz: async (body, quizId) => {
     try {
@@ -85,27 +98,36 @@ module.exports = {
           (answer) => answer.content === answerId
         )[0]?._id;
         pushData = {
-          result: { questionId, answerId: fillAnswerId, fillAnswer: answerId }
+          result: {
+            questionId,
+            answerId: fillAnswerId,
+            fillAnswer: answerId,
+            status: true
+          }
         };
       } else {
         pushData = {
-          result: { questionId, answerId: answerId, fillAnswer: "" }
+          result: {
+            questionId,
+            answerId: answerId,
+            fillAnswer: "",
+            status: true
+          }
         };
       }
+      const existingEntry = await trackingQuizModel.findOne({
+        _id: trackingId,
+        quizId
+      });
       const result = await trackingQuizModel.findOneAndUpdate(
         {
           _id: trackingId,
           quizId
         },
         {
-          $push: pushData, // Push new result (question and answerId) to the result array
-          $inc: {
-            correctAnswers: questionResult ? 1 : 0, // Increment correctAnswers if questionResult is true
-            wrongAnswers: questionResult ? 0 : 1, // Increment wrongAnswers if questionResult is false
-            totalMarks: questionResult ? questionResult.marks : 0 // Increment totalMarks by the provided value
-          },
           $set: {
-            totalTime: time
+            totalTime: time,
+            result: upsertQuestion(existingEntry.result, pushData.result) // Update the result array with the new result
           }
         },
         {
@@ -375,6 +397,146 @@ module.exports = {
       });
 
       return { result, count };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+  getAllResult: async (filter, perPage, pageNo) => {
+    try {
+      console.log("ggg");
+      const firstCond = { quizType: "quiz" };
+      const secondeCond = {};
+
+      if (filter?.quizId) {
+        firstCond.quizId = {
+          $eq: new ObjectId(filter.quizId)
+        };
+      }
+      if (filter?.collegeId) {
+        secondeCond.collegeId = {
+          $eq: new ObjectId(filter.collegeId)
+        };
+      }
+      if (filter?.batchId) {
+        secondeCond.batchId = {
+          $eq: new ObjectId(filter.batchId)
+        };
+      }
+      if (filter?.assessmentId) {
+        secondeCond.assessmentId = {
+          $eq: new ObjectId(filter.assessmentId)
+        };
+      }
+      const pipeline = [
+        {
+          $match: {
+            ...firstCond
+          }
+        },
+        {
+          $project: {
+            trackingId: "$_id",
+            userId: "$userId",
+            quizId: "$quizId",
+            correctAnswers: "$correctAnswers",
+            wrongAnswers: "$wrongAnswers",
+            totalMarks: "$totalMarks",
+            totalTime: "$totalTime",
+            takenTime: "$takenTime",
+            quizType: "$quizType",
+            specificField: "$specificField"
+          }
+        },
+        {
+          $lookup: {
+            from: "students",
+            let: { userId: "$userId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$userId", "$$userId"] }
+                }
+              },
+              {
+                $project: {
+                  _id: 1,
+                  name: 1,
+                  batchId: 1,
+                  collegeUserId: 1,
+                  rollNo: 1,
+                  phone: 1,
+                  email: 1 // Include the answers for lookup
+                }
+              }
+            ],
+            as: "userData"
+          }
+        },
+        {
+          $lookup: {
+            from: "quizzes",
+            let: { quizId: "$quizId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$_id", "$$quizId"] }
+                }
+              },
+              {
+                $project: {
+                  _id: 1,
+                  totalMarks: 1,
+                  title: 1,
+                  time: 1,
+                  assessmentId: 1,
+                  questionsLength: { $size: "$questions" }
+                }
+              }
+            ],
+            as: "quizData"
+          }
+        },
+        {
+          $project: {
+            trackingId: "$trackingId",
+            userId: "$userId",
+            quizId: "$quizId",
+            correctAnswers: "$correctAnswers",
+            wrongAnswers: "$wrongAnswers",
+            totalMarks: "$totalMarks",
+            totalTime: "$totalTime",
+            takenTime: "$takenTime",
+            userName: { $arrayElemAt: ["$userData.name", 0] },
+            userEmail: { $arrayElemAt: ["$userData.email", 0] },
+            userRollNo: { $arrayElemAt: ["$userData.rollNo", 0] },
+            userPhone: { $arrayElemAt: ["$userData.phone", 0] },
+            collegeId: { $arrayElemAt: ["$userData.collegeUserId", 0] },
+            batchId: { $arrayElemAt: ["$userData.batchId", 0] },
+            quizTitle: { $arrayElemAt: ["$quizData.title", 0] },
+            quizTotalMarks: { $arrayElemAt: ["$quizData.totalMarks", 0] },
+            quizTime: { $arrayElemAt: ["$quizData.time", 0] },
+            assessmentId: { $arrayElemAt: ["$quizData.assessmentId", 0] },
+            quizQuestionsLength: {
+              $arrayElemAt: ["$quizData.questionsLength", 0]
+            }
+          }
+        },
+        {
+          $match: { ...secondeCond }
+        }
+      ];
+      console.log("filter: ", filter);
+      console.log("secondeCond: ", secondeCond);
+      const result = await trackingQuizModel.aggregate([
+        ...pipeline,
+        { $skip: (pageNo - 1) * perPage },
+        { $limit: perPage }
+      ]);
+      const countResult = await trackingQuizModel.aggregate([...pipeline]);
+
+      if (!result) throw createError(500, "Error while Fetching result.");
+
+      return { result, count: countResult.length };
     } catch (error) {
       throw createError.InternalServerError(error);
     }

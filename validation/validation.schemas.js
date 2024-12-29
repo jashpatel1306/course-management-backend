@@ -94,6 +94,14 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber
   }),
+  allResultSchema: Joi.object().keys({
+    quizId: validate.string,
+    collegeId: validate.string,
+    batchId: validate.string,
+    assessmentId: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber
+  }),
   collegeWiseStudentsSchema: Joi.object().keys({
     collegeId: validate.string,
     search: validate.string,
@@ -405,8 +413,9 @@ module.exports = {
     name: validate.reqString,
     email: validate.reqEmail,
     phone: validate.reqString,
-    collegeUserId: validate.reqId,
+    collegeUserId: validate.string,
     permissions: validate.array,
+    isSuperAdmin: validate.reqBoolean,
     active: validate.reqBoolean
   }),
   publicLinkSchema: Joi.object().keys({

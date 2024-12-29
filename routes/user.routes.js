@@ -744,7 +744,12 @@ router.post(
   isAdminCommonAuthenticate,
   staffController.getCollegeWiseStaff
 );
-
+router.post(
+  "/get-all-result",
+  Validate(schemas.allResultSchema),
+  isAdminCommonAuthenticate,
+  trackingQuizController.getAllResult
+);
 router.post(
   "/get-quiz-history",
   isAdminCommonAuthenticate,
@@ -757,7 +762,7 @@ router.post(
   trackingQuizController.getAllResultByQuiz
 );
 
-router.get(
+router.post(
   "/quiz-results/:trackingId",
   Validate(schemas.quizResultsFilterSchema),
   isAdminCommonAuthenticate,

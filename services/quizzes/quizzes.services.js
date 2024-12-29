@@ -47,13 +47,13 @@ module.exports = {
   getStudentQuizById: async (id) => {
     try {
       // Fetch the quiz and populate questions with projection
-      const quiz = await QuizzesModel.findById(id)
-        .populate({
-          path: "questions",
-          match: { active: true }, // Optional: Filter to include only active questions
-          select: "_id question answers.content answers._id marks" // Specify the fields you want to include
-        })
-        .exec();
+      const quiz = await QuizzesModel.findById(id);
+      // .populate({
+      //   path: "questions",
+      //   match: { active: true }, // Optional: Filter to include only active questions
+      //   select: "_id question answers.content answers._id marks" // Specify the fields you want to include
+      // })
+      // .exec();
 
       if (!quiz) throw new Error("Quiz not found");
 
