@@ -750,6 +750,13 @@ router.post(
   isAdminCommonAuthenticate,
   trackingQuizController.getAllResult
 );
+
+router.post(
+  "/get-quiz-results",
+  Validate(schemas.allQuizResultSchema),
+  isAdminCommonAuthenticate,
+  studentController.getStudentQuizData
+);
 router.post(
   "/get-quiz-history",
   isAdminCommonAuthenticate,

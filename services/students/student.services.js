@@ -4,6 +4,21 @@ const createError = require("http-errors");
 const commonHelpers = require("../../helpers/common.helper");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const { userServices } = require("..");
+const mongoose = require("mongoose");
+const assignAssessmentsModel = require("../assignAssessment/assignAssessment.model");
+const studentsModel = require("./student.model");
+const QuizModel = require("../quizzes/quizzes.model");
+
+const getFilter = (filterObj, key) => {
+  if (filterObj[key]) {
+    return {
+      [key]: {
+        $in: filterObj[key].map((value) => new mongoose.Types.ObjectId(value)),
+      },
+    };
+  }
+  return {};
+};
 
 module.exports = {
   createStudent: async (data) => {
@@ -167,6 +182,166 @@ module.exports = {
         throw createError(404, "Students not found");
       }
       return { student, count };
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // ...
+
+  getQuizDataOfAllStudents: async (filterObj, page, perPage) => {
+    try {
+      let filter = {
+        ...getFilter(filterObj, "collegeId"),
+        ...getFilter(filterObj, "batchId"),
+        ...getFilter(filterObj, "assessmentId"),
+      };
+
+      //get assessment ids based on all three filters
+      if (filterObj?.quizId?.length > 0) {
+        const quizAggResult = await QuizModel.aggregate([
+          {
+            $match: {
+              _id: {
+                $in: filterObj?.quizId.map(
+                  (id) => new mongoose.Types.ObjectId(id)
+                ),
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              assessmentIds: { $push: "$assessmentId" },
+            },
+          },
+        ]);
+        console.log("quizAggResult", quizAggResult);
+        console.log("assessmentIds", quizAggResult[0]?.assessmentIds?.length);
+
+        if (quizAggResult[0]?.assessmentIds?.length > 0) {
+          filter.assessmentId = {
+            $in: quizAggResult[0].assessmentIds,
+          };
+        }
+      }
+
+      let batchIds;
+
+      console.log("filter", filter);
+
+      //based on assessmentIds we fetch the batchIds
+      if (filter.collegeId || filter.batchId || filter.assessmentId) {
+        const batchAggResult = await assignAssessmentsModel.aggregate([
+          {
+            $match: filter,
+          },
+          {
+            $group: {
+              _id: null,
+              batchIds: { $addToSet: "$batchId" },
+            },
+          },
+        ]);
+        console.log("batchAggResult", batchAggResult);
+        if(batchAggResult?.length === 0) throw createError.NotFound("No students found.");
+        batchIds = batchAggResult[0]?.batchIds;
+      }
+
+      const studentFilter = {};
+
+      if (batchIds?.length > 0) {
+        studentFilter.batchId = { $in: batchIds };
+      }
+      console.log("studentFilter", studentFilter);
+
+      const quizData = await studentsModel.aggregate([
+        { $match: studentFilter },
+        {
+          $lookup: {
+            from: "trackingquizzes",
+            let: { userId: "$userId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$userId", "$$userId"] },
+                      { $eq: ["$quizType", "quiz"] },
+                    ],
+                  },
+                },
+              },
+              {
+                $lookup: {
+                  from: "quizzes",
+                  let: { quizId: "$quizId" },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: {
+                          $eq: ["$_id", "$$quizId"],
+                        },
+                      },
+                    },
+                    {
+                      $project: {
+                        title: 1,
+                      },
+                    },
+                  ],
+                  as: "quizData",
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  correctAnswers: 1,
+                  wrongAnswers: 1,
+                  totalMarks: 1,
+                  totalTime: 1,
+                  takenTime: 1,
+                  title: {
+                    $arrayElemAt: ["$quizData.title", 0],
+                  },
+                },
+              },
+            ],
+            as: "quizData",
+          },
+        },
+        {
+          $unwind: {
+            path: "$quizData",
+            includeArrayIndex: "string",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            name: 1,
+            rollNo: 1,
+            section: 1,
+            quizData: 1,
+            quizStatus: { $cond: [{ $eq: ["$string", null] }, false, true] },
+          },
+        },
+        {
+          $facet: {
+            paginatedData: [
+              { $skip: (page - 1) * perPage },
+              { $limit: perPage },
+            ],
+            totalCount: [{ $count: "count" }],
+          },
+        },
+      ]);
+
+      // Extract paginated data and total count
+      const paginatedData = quizData[0]?.paginatedData || [];
+      const totalCount = quizData[0]?.totalCount[0]?.count || 0;
+
+      return { quizData: paginatedData, quizCount: totalCount };
     } catch (error) {
       throw error;
     }

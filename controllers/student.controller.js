@@ -169,4 +169,44 @@ module.exports = {
       next(error);
     }
   },
+
+  getStudentQuizData: async (req, res, next) => {
+    try {
+      const filter = {};
+      const reqBody = req.body;
+
+      reqBody?.collegeId?.length > 0
+        ? (filter.collegeId = reqBody?.collegeId)
+        : null;
+
+      reqBody?.batchId?.length > 0 ? (filter.batchId = reqBody?.batchId) : null;
+
+      reqBody?.assessmentId?.length > 0
+        ? (filter.assessmentId = reqBody?.assessmentId)
+        : null;
+
+      reqBody?.quizId?.length > 0 ? (filter.quizId = reqBody?.quizId) : null;
+
+      console.log("filter", filter);
+      const { quizCount, quizData } =
+        await studentServices.getQuizDataOfAllStudents(
+          filter,
+          reqBody?.pageNo || 1,
+          reqBody?.perPage || 10
+        );
+      return res.send({
+        success: true,
+        message: "student fetched successfully",
+        data: {
+          quizData,
+          perPage: reqBody?.perPage || 10,
+          pageNo: reqBody?.pageNo || 1,
+          totalQuizCount: quizCount,
+          pages: Math.ceil(quizCount / (reqBody?.perPage || 10)),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };

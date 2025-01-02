@@ -1,6 +1,11 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
-const { trackingQuizServices, publicLinkServices } = require("../services");
+const {
+  trackingQuizServices,
+  publicLinkServices,
+  studentServices,
+} = require("../services");
+const userService = require("../services/users/user.service");
 const { ObjectId } = mongoose.Types;
 
 module.exports = {
@@ -14,7 +19,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "User enrolled in quiz successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -31,7 +36,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "User enrolled in quiz successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -46,7 +51,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Tracking quiz created successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -63,7 +68,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz fetched successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -79,7 +84,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz fetched successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -103,7 +108,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz updated successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -119,7 +124,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz deleted successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -139,7 +144,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz result added successfully.",
-        data: updatedTrackingQuiz
+        data: updatedTrackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -159,7 +164,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Answer check completed.",
-        data: exists
+        data: exists,
       });
     } catch (error) {
       next(error);
@@ -188,7 +193,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz data fetched successfully.",
-        data: trackingQuizzes
+        data: trackingQuizzes,
       });
     } catch (error) {
       next(error);
@@ -203,7 +208,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz results fetched successfully.",
-        data: trackingQuiz
+        data: trackingQuiz,
       });
     } catch (error) {
       next(error);
@@ -227,8 +232,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage)
-        }
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);
@@ -253,11 +258,33 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage)
-        }
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);
     }
-  }
+  },
+  getAllResults: async (req, res, next) => {
+    try {
+      const { pageNo, perPage } = req.body;
+      const { result, count } = await studentServices.getAllResults(
+        perPage,
+        pageNo
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Quiz results fetched successfully.",
+        data: result,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
