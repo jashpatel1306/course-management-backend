@@ -93,6 +93,9 @@ module.exports = {
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
+    departmentId: validate.string,
+    passoutYear: validate.number,
+    semester: validate.number,
   }),
   allResultSchema: Joi.object().keys({
     quizId: validate.string,
@@ -260,6 +263,7 @@ module.exports = {
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
+    activeFilter: validate.string.allow("active", "inactive"),
   }),
   batchWiseDataSchema: Joi.object().keys({
     batchId: validate.id,

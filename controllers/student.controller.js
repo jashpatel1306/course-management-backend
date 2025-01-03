@@ -128,13 +128,25 @@ module.exports = {
           ? req.body?.college_id
           : req.body?.collegeId
         : req.body?.college_id;
+
+      const departmentId = req.body?.departmentId;
+      const semester = req.body?.semester;
+      const passoutYear = req.body?.passoutYear;
+
+      let filter = {};
+
+      batchId ? (filter.batchId = batchId) : null;
+      departmentId ? (filter.department = departmentId) : null;
+      semester ? (filter.semester = semester) : null;
+      passoutYear ? (filter.passoutYear = passoutYear) : null;
+
       const searchText = new RegExp(search, `i`);
+
       const { students, count } = await studentServices.getBatchWiseStudents(
-        batchId === "all" ? "" : batchId,
+        filter,
         searchText,
         perPage,
-        pageNo,
-        college_id
+        pageNo
       );
       res.send({
         success: true,

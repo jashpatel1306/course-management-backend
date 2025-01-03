@@ -122,11 +122,18 @@ module.exports = {
       throw createError(error);
     }
   },
-  getCoursesByCollegeId: async (collegeId, search, pageNo, perPage) => {
+  getCoursesByCollegeId: async (
+    collegeId,
+    activeFilter,
+    search,
+    pageNo,
+    perPage
+  ) => {
     try {
       let filter = {
         $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }],
       };
+
       if (search) {
         filter = {
           $and: [
@@ -144,6 +151,12 @@ module.exports = {
             },
           ],
         };
+      }
+
+      if (activeFilter === "active") {
+        filter.active = true;
+      } else if (activeFilter === "inactive") {
+        filter.active = false;
       }
 
       const courses = await CourseModel.find(filter)
@@ -448,7 +461,6 @@ module.exports = {
               lectures: validLectures,
             };
 
-
             // Push section data to sidebar and content arrays
 
             contentData.push(...allContent);
@@ -495,8 +507,6 @@ module.exports = {
         lastTrackingContentData?.lectureId &&
         lastTrackingContentData?.contentId
       ) {
-        
-
         const contentIndex = finalContentData.findIndex(
           (info) =>
             info.id.toString() === lastTrackingContentData.contentId.toString()

@@ -116,11 +116,13 @@ module.exports = {
     try {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
-      const filter = {};
+      const activeFilter = req.body?.activeFilter;
+       
       const userRole = res.locals.userRole;
       // userRole === "student" ? filter.isPublish = true : filter.
       const { courses, count } = await courseServices.getCoursesByCollegeId(
         college_id,
+        activeFilter,
         search,
         pageNo,
         perPage
@@ -220,7 +222,8 @@ module.exports = {
       const user_id = req.body?.user_id;
       const batchId = req.body?.batch_id;
       const courseId = req.params.courseId;
-      const courseData = await courseServices.getCourseSidebarDataById(user_id,
+      const courseData = await courseServices.getCourseSidebarDataById(
+        user_id,
         batchId,
         courseId
       );

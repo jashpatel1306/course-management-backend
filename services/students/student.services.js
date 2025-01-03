@@ -130,17 +130,12 @@ module.exports = {
       throw createError(error);
     }
   },
-  getBatchWiseStudents: async (
-    batchId,
-    search,
-    perPage,
-    pageNo,
-    collegeUserId
-  ) => {
+  getBatchWiseStudents: async (filterData, search, perPage, pageNo) => {
     try {
+      console.log("filterData", filterData);
       const filter = {
         $and: [
-          batchId ? { batchId } : collegeUserId ? { collegeUserId } : {},
+          filterData,
           {
             $or: [
               { name: { $regex: search } },
@@ -244,7 +239,8 @@ module.exports = {
           },
         ]);
         console.log("batchAggResult", batchAggResult);
-        if(batchAggResult?.length === 0) throw createError.NotFound("No students found.");
+        if (batchAggResult?.length === 0)
+          throw createError.NotFound("No students found.");
         batchIds = batchAggResult[0]?.batchIds;
       }
 
