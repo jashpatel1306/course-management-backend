@@ -2,6 +2,7 @@ const CollegeModel = require("./colleges.model");
 const createError = require("http-errors");
 const userServices = require("../users/user.service");
 const batchesModel = require("../batches/batches.model");
+const { collegePermissions } = require("../../constants/roles.constant");
 module.exports = {
   createCollege: async (data) => {
     try {
@@ -10,8 +11,8 @@ module.exports = {
         email: data.email,
         password: data.password,
         user_name: data.contactPersonName,
-        permissions: [],
-        role: "admin",
+        permissions: collegePermissions,
+        role: "admin"
       };
       let userResult;
       if (data.userId) {
@@ -36,7 +37,7 @@ module.exports = {
     try {
       const college = await CollegeModel.findOne({
         collegeName: name,
-        collegeId: code,
+        collegeId: code
       });
       if (!college) {
         throw createError(404, "College not found");
@@ -78,10 +79,10 @@ module.exports = {
               { shortName: { $regex: searchText } },
               { collegeNo: { $regex: searchText } },
               { contactPersonName: { $regex: searchText } },
-              { contactPersonNo: { $regex: searchText } },
-            ],
-          },
-        ],
+              { contactPersonNo: { $regex: searchText } }
+            ]
+          }
+        ]
       };
 
       const college = await CollegeModel.find(filter)
@@ -128,18 +129,18 @@ module.exports = {
           $project: {
             label: "$collegeName",
             collegeNo: "$collegeNo",
-            value: "$_id",
-          },
+            value: "$_id"
+          }
         },
         {
           $sort: {
-            label: 1,
-          },
-        },
+            label: 1
+          }
+        }
       ]);
       return colleges;
     } catch (error) {
       throw error;
     }
-  },
+  }
 };

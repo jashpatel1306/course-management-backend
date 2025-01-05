@@ -162,16 +162,16 @@ module.exports = {
           },
         },
       ]);
-      if (!adminStatus) {
-        let allBatchesStudentsCount = await studentsModel.countDocuments({
-          collegeUserId: new ObjectId(collegeId),
-        });
+      // if (!adminStatus) {
+        // let allBatchesStudentsCount = await studentsModel.countDocuments({
+        //   collegeUserId: new ObjectId(collegeId),
+        // });
         batches.unshift({
           label: "All Batches",
           value: "all",
-          totalStudents: allBatchesStudentsCount,
+          // totalStudents: allBatchesStudentsCount,
         });
-      }
+      // }
 
       return batches;
     } catch (error) {

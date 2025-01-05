@@ -8,7 +8,7 @@ module.exports = {
       res.send({
         success: true,
         message: "student created successfully",
-        data: student,
+        data: student
       });
     } catch (error) {
       next(error);
@@ -38,7 +38,7 @@ module.exports = {
       res.send({
         success: true,
         message: "students created successfully",
-        data: studentData,
+        data: studentData
       });
     } catch (error) {
       next(error);
@@ -50,7 +50,7 @@ module.exports = {
       res.send({
         success: true,
         message: "student fetched successfully",
-        data: student,
+        data: student
       });
     } catch (error) {
       next(error);
@@ -67,7 +67,7 @@ module.exports = {
       res.send({
         success: true,
         message: "students fetched successfully",
-        data: students,
+        data: students
       });
     } catch (error) {
       next(error);
@@ -83,7 +83,7 @@ module.exports = {
       res.send({
         success: true,
         message: "student updated successfully",
-        data: student,
+        data: student
       });
     } catch (error) {
       next(error);
@@ -96,7 +96,7 @@ module.exports = {
       res.send({
         success: true,
         message: "student deleted successfully",
-        data: student,
+        data: student
       });
     } catch (error) {
       next(error);
@@ -111,7 +111,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `student ${message} successfully`,
-        data: student,
+        data: student
       });
     } catch (error) {
       next(error);
@@ -119,15 +119,16 @@ module.exports = {
   },
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
+      console.log("req.body :", req.body);
       const batchId = req.body?.batchId;
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
       const search = req.body?.search;
-      const college_id = req?.body?.collegeId
-        ? req.body?.collegeId === "all"
-          ? req.body?.college_id
-          : req.body?.collegeId
-        : req.body?.college_id;
+      const college_id = req?.body?.collegeId;
+      // ? req.body?.collegeId === "all"
+      //   ? req.body?.college_id
+      //   : req.body?.collegeId
+      // : req.body?.college_id;
 
       const departmentId = req.body?.departmentId;
       const semester = req.body?.semester;
@@ -135,7 +136,8 @@ module.exports = {
 
       let filter = {};
 
-      batchId ? (filter.batchId = batchId) : null;
+      batchId !== "all" ? (filter.batchId = batchId) : null;
+      college_id !== "all" ? (filter.collegeUserId = college_id) : null;
       departmentId ? (filter.department = departmentId) : null;
       semester ? (filter.semester = semester) : null;
       passoutYear ? (filter.passoutYear = passoutYear) : null;
@@ -156,8 +158,8 @@ module.exports = {
           total: count,
           perPage: perPage,
           pageNo: pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -175,7 +177,7 @@ module.exports = {
       res.send({
         success: true,
         message: "students fetched successfully",
-        data: students,
+        data: students
       });
     } catch (error) {
       next(error);
@@ -208,17 +210,17 @@ module.exports = {
         );
       return res.send({
         success: true,
-        message: "student fetched successfully",
+        message: "student quiz data fetched successfully",
         data: {
           quizData,
           perPage: reqBody?.perPage || 10,
           pageNo: reqBody?.pageNo || 1,
           totalQuizCount: quizCount,
-          pages: Math.ceil(quizCount / (reqBody?.perPage || 10)),
-        },
+          pages: Math.ceil(quizCount / (reqBody?.perPage || 10))
+        }
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };
