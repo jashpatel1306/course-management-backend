@@ -109,8 +109,13 @@ module.exports = {
   getCoursesByBatchId: async (req, res, next) => {
     try {
       const batch_id = req.body?.batch_id;
+      const activeFilter = req.params?.activeStatus;
+
       // userRole === "student" ? filter.isPublish = true : filter.
-      const { courses } = await batchServices.getCoursesByBatchId(batch_id);
+      const { courses } = await batchServices.getCoursesByBatchId(
+        batch_id,
+        activeFilter
+      );
       res.send({
         success: true,
         message: "Courses fetched successfully",

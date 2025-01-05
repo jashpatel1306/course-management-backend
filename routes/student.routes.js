@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { Validate } = require("../validation/validation.methods");
+const {
+  Validate,
+  ValidateQueryParams,
+} = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const { isStudentAuthenticate } = require("../helpers/auth.helper");
 
@@ -22,7 +25,8 @@ router.post(
 );
 
 router.get(
-  "/student-wise-courses",
+  "/student-wise-courses/:activeStatus",
+  // ValidateQueryParams(schemas.paginationAndFilterSchema),
   isStudentAuthenticate,
   batchesController.getCoursesByBatchId
 );
@@ -126,6 +130,5 @@ router.put(
   Validate(schemas.updateQuizTrackingSchema),
   trackingQuizController.updateQuizTracking
 );
-
 
 module.exports = router;

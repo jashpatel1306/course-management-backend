@@ -140,7 +140,7 @@ module.exports = {
       : token;
     jwt.verify(token, JWTSecretKey, async (err, result) => {
       if (err)
-        return res.json({
+        return res.status(401).json({
           status: false,
           message: `Something is wrong in Authentication.Please try again.`,
           isAuth: false,
@@ -161,7 +161,7 @@ module.exports = {
 
           return next();
         } else {
-          return res.json({
+          return res.status(401).json({
             status: false,
             message: `Access to the target resource has been denied`,
             isAuth: false,

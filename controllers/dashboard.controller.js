@@ -18,7 +18,6 @@ module.exports = {
         filter.batchFilter = {
           collegeId,
         };
-        
       }
 
       const data = await dashboardServices.countDocsFromMultipleCollections();
@@ -26,6 +25,19 @@ module.exports = {
       res
         .status(200)
         .json({ success: true, message: "dashboard data fetched.", data });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  getAdminDashBoard: async (req, res, next) => {
+    try {
+      const filter = {};
+      const countData =
+        await dashboardServices.countDocsFromMultipleCollections(filter);
+
+        
+
     } catch (err) {
       next(err);
     }

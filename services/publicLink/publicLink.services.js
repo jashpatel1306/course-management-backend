@@ -11,7 +11,7 @@ async function getMultipleQuizDetailsSimple(quizIds) {
     totalQuestions: quiz.questions.length, // Count of questions
     questionIds: quiz.questions, // Array of question IDs
     totalTime: quiz.time, // Quiz total time
-    totalMarks: quiz.totalMarks // Quiz total time
+    totalMarks: quiz.totalMarks, // Quiz total time
   }));
 }
 async function mergeQuizDetails(quizIds) {
@@ -78,7 +78,7 @@ module.exports = {
         ...publicLink.toObject(),
         soltStatus: publicLink.hits >= publicLink.noofHits ? false : true,
 
-        quizdetails
+        quizdetails,
       };
       delete result.hits;
       delete result.noofHits;
@@ -93,7 +93,7 @@ module.exports = {
         { _id: id },
         data,
         {
-          new: true
+          new: true,
         }
       );
       if (!publicLink)
@@ -115,13 +115,27 @@ module.exports = {
     }
   },
 
-  getAllPublicLink: async (search, pageNo, perPage) => {
+  getAllPublicLink: async (search, pageNo, perPage, status) => {
     try {
       let filter = {};
 
+      if (status === "upcoming") {
+        filter = {
+          startDate: { $gte: new Date() },
+        };
+      } else if (status === "active") {
+        filter = {
+          startDate: { $lte: new Date() },
+          endDate: { $gte: new Date() },
+        };
+      } else if (status === "expired") {
+        filter = {
+          endDate: { $lt: new Date() },
+        };
+      }
       const publicLink = await publicLinkModel
         .find(filter)
-        .sort({ name: 1 })
+        .sort({ name: 1, createdAt: -1 })
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       // .populate("quizId", "_id title");
@@ -144,5 +158,5 @@ module.exports = {
     } catch (error) {
       throw createError(error);
     }
-  }
+  },
 };

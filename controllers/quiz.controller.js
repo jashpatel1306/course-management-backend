@@ -8,7 +8,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Quiz created successfully.",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -22,7 +22,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Quiz created successfully.",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -36,7 +36,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz updated successfully",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -49,7 +49,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz fetched successfully",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -62,7 +62,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Student Quiz fetched successfully",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -77,7 +77,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "public Quiz fetched successfully",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -93,7 +93,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "public Quiz login successfully",
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -106,7 +106,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz deleted successfully",
-        data: []
+        data: [],
       });
     } catch (error) {
       next(error);
@@ -120,7 +120,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Quiz ${message} successfully`,
-        data: quiz
+        data: quiz,
       });
     } catch (error) {
       next(error);
@@ -131,7 +131,7 @@ module.exports = {
       const { pageNo, perPage, status } = req.body;
       const assessmentId = req.params.assessmentId;
       const filter = {
-        assessmentId: { $eq: new mongoose.Types.ObjectId(assessmentId) }
+        assessmentId: { $eq: new mongoose.Types.ObjectId(assessmentId) },
       };
 
       if (status === "active") {
@@ -152,8 +152,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage)
-        }
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);
@@ -161,12 +161,18 @@ module.exports = {
   },
   getPublicQuizzes: async (req, res, next) => {
     try {
-      const { pageNo, perPage, search } = req.body;
+      const { pageNo, perPage, search, status } = req.body;
       const assessmentId = null;
       let filter = {
-        assessmentId: null
+        assessmentId: null,
       };
       const searchText = new RegExp(search, `i`);
+
+      if (status === "published") {
+        filter.isPublish = true;
+      } else if (status === "unpublished") {
+        filter.isPublish = false;
+      }
 
       if (search) {
         filter.title = { $regex: searchText };
@@ -185,8 +191,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage)
-        }
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);
@@ -198,17 +204,17 @@ module.exports = {
       const filter = {
         assessmentId: null,
         isPublish: true,
-        isPublic: true
+        isPublic: true,
       };
 
       const quizzes = await quizzesServices.getQuizzesOptions(filter);
       return res.status(200).send({
         success: true,
         message: "Quizzes options fetched successfully",
-        data: quizzes
+        data: quizzes,
       });
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

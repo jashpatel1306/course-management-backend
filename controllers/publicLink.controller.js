@@ -7,7 +7,7 @@ module.exports = {
       res.send({
         success: true,
         message: "PublicLink  created successfully",
-        data: publicLink
+        data: publicLink,
       });
     } catch (error) {
       next(error);
@@ -22,7 +22,7 @@ module.exports = {
       res.send({
         success: true,
         message: "PublicLink fetched successfully",
-        data: publicLink
+        data: publicLink,
       });
     } catch (error) {
       next(error);
@@ -34,21 +34,24 @@ module.exports = {
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
       const search = req.body?.search;
+      const status = req.body?.status;
+
       const { publicLink, count } = await publicLinkServices.getAllPublicLink(
         search,
         pageNo,
-        perPage
+        perPage,
+        status
       );
       res.send({
         success: true,
-        message: "PublicLink s fetched successfully",
+        message: "PublicLinks fetched successfully",
         data: publicLink,
         pagination: {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage)
-        }
+          pages: Math.ceil(count / perPage),
+        },
       });
     } catch (error) {
       next(error);
@@ -64,7 +67,7 @@ module.exports = {
       res.send({
         success: true,
         message: "PublicLink  updated successfully",
-        data: publicLink
+        data: publicLink,
       });
     } catch (error) {
       next(error);
@@ -79,7 +82,7 @@ module.exports = {
       res.send({
         success: true,
         message: "PublicLink  deleted successfully",
-        data: publicLink
+        data: publicLink,
       });
     } catch (error) {
       next(error);
@@ -94,10 +97,10 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `PublicLink  ${message} successfully`,
-        data: publicLink
+        data: publicLink,
       });
     } catch (error) {
       next(error);
     }
-  }
+  },
 };

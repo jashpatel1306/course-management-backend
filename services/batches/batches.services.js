@@ -30,10 +30,9 @@ module.exports = {
   },
   getBatchById: async (id) => {
     try {
-      const batch = await BatchModel.findOne({ _id: id }).populate(
-        "instructorIds",
-        "_id name"
-      ).populate("courses","_id courseName");
+      const batch = await BatchModel.findOne({ _id: id })
+        .populate("instructorIds", "_id name")
+        .populate("courses", "_id courseName");
       if (!batch) createError.BadRequest("Invalid batch id.");
       return batch;
     } catch (error) {
@@ -178,14 +177,35 @@ module.exports = {
       throw error;
     }
   },
-  getCoursesByBatchId: async (batchId) => {
+  getCoursesByBatchId: async (batchId, activeFilter) => {
     try {
+      let filter = { isPublish: true };
+
+      if (activeFilter === "active") {
+        filter = {
+          startTime: { $lte: new Date() },
+          endTime: { $gte: new Date() },
+        };
+      } else if (activeFilter === "expired") {
+        filter = {
+          endTime: { $lte: new Date() },
+        };
+      } else if (activeFilter === "upcoming") {
+        filter = {
+          startTime: { $gte: new Date() },
+        };
+      }
+
       const batchData = await BatchModel.findOne({ _id: batchId });
       if (!batchData) {
         throw createError(404, "Batches not found");
       }
       const courseIds = batchData.courses;
-      const courses = await CourseModel.find({ _id: { $in: courseIds } });
+
+      const courses = await CourseModel.find({
+        _id: { $in: courseIds },
+        ...filter,
+      });
       if (!courses) {
         throw createError.NotFound("No courses found for the given college.");
       }
@@ -197,7 +217,6 @@ module.exports = {
   },
   getCourseOptionsByBatch: async (batchId) => {
     try {
-     
       const batchData = await BatchModel.findOne({ _id: batchId }).populate(
         "courses",
         "_id courseName"

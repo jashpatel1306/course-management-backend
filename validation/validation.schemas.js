@@ -309,6 +309,8 @@ module.exports = {
     courseId: validate.reqId,
     collegeId: validate.reqId,
     batchId: validate.reqId,
+    startTime: validate.reqDate,
+    endTime: validate.reqDate,
   }),
 
   assignCourseCollegeSchema: Joi.object().keys({
