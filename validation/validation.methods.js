@@ -4,13 +4,16 @@ const Validate = (schema) => {
     try {
       const requestData = req?.body;
       if (isset(requestData)) {
-        const data = { data: requestData };
+        const data =
+          process.env.NODE_ENV === "development"
+            ? { data: JSON.parse(requestData.data) }
+            : { data: requestData };
 
         const result = await schema.validate(data.data);
         if (result.error) {
           return res.status(200).json({
             status: false,
-            message: result?.error?.details,
+            message: result?.error?.details
           });
         } else {
           req.body = data.data;
@@ -19,14 +22,14 @@ const Validate = (schema) => {
       } else {
         return res.status(200).json({
           status: false,
-          message: "Data must be required",
+          message: "Data must be required"
         });
       }
     } catch (error) {
       console.log(`adminValidate error: `, error.message);
       return res.status(200).json({
         status: false,
-        message: "Server validation is fail.",
+        message: "Server validation is fail."
       });
     }
   };
@@ -43,7 +46,7 @@ const ValidateQueryParams = (schema) => {
         if (result.error) {
           return res.status(200).json({
             status: false,
-            message: result?.error?.details,
+            message: result?.error?.details
           });
         } else {
           req.query = data.data;
@@ -52,14 +55,14 @@ const ValidateQueryParams = (schema) => {
       } else {
         return res.status(200).json({
           status: false,
-          message: "Query parameters must be required",
+          message: "Query parameters must be required"
         });
       }
     } catch (error) {
       console.log(`adminValidateQueryParams error: `, error.message);
       return res.status(200).json({
         status: false,
-        message: "Server validation is fail.",
+        message: "Server validation is fail."
       });
     }
   };
@@ -67,5 +70,5 @@ const ValidateQueryParams = (schema) => {
 
 module.exports = {
   Validate,
-  ValidateQueryParams,
+  ValidateQueryParams
 };
