@@ -124,11 +124,11 @@ module.exports = {
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
       const search = req.body?.search;
-      const college_id = req?.body?.collegeId;
-      // ? req.body?.collegeId === "all"
-      //   ? req.body?.college_id
-      //   : req.body?.collegeId
-      // : req.body?.college_id;
+      const college_id = req?.body?.collegeId
+        ? req.body?.collegeId === "all"
+          ? req.body?.college_id
+          : req.body?.collegeId
+        : req.body?.college_id;
 
       const departmentId = req.body?.departmentId;
       const semester = req.body?.semester;
@@ -137,7 +137,9 @@ module.exports = {
       let filter = {};
 
       batchId !== "all" ? (filter.batchId = batchId) : null;
-      college_id !== "all" ? (filter.collegeUserId = college_id) : null;
+      college_id !== "all"
+        ? college_id && (filter.collegeUserId = college_id)
+        : null;
       departmentId ? (filter.department = departmentId) : null;
       semester ? (filter.semester = semester) : null;
       passoutYear ? (filter.passoutYear = passoutYear) : null;
