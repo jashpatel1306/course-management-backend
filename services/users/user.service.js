@@ -7,7 +7,9 @@ const {
   STUDENT,
   ADMIN,
   STAFF,
-  INSTRUCTOR
+  INSTRUCTOR,
+  adminPermissions,
+  collegePermissions
 } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
@@ -39,25 +41,14 @@ module.exports = {
           password: "Admin@123",
           role: SUPERADMIN,
           user_name: "First Admin",
-          permissions: [
-            "dashboard",
-            "students",
-            "batches",
-            "contentHub",
-            "assessment",
-            "publiccontent",
-            "instructors",
-            "colleges",
-            "staff",
-            "policy",
-            "configuration",
-          ]
+          permissions: adminPermissions
         };
         const collageData = {
           email: "lmscollage@admin.com",
           password: "Admin@123",
           role: ADMIN,
-          user_name: "First Collage Admin"
+          user_name: "First Collage Admin",
+          permissions: collegePermissions
         };
 
         data.password = await commonFunctions.encode(data.password);
@@ -304,7 +295,5 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  },
-
-  
+  }
 };

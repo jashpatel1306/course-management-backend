@@ -123,19 +123,6 @@ module.exports = {
     }
   },
 
-  deleteQuiz: async (id) => {
-    try {
-      const quiz = await QuizzesModel.find(filter)
-        .skip((pageNo - 1) * perPage)
-        .limit(perPage);
-
-      if (!quiz) throw createError(400, "invalid quiz id");
-      return quiz;
-    } catch (error) {
-      throw createError.InternalServerError(error);
-    }
-  },
-
   getQuizzesByAssessment: async (filter, perPage, pageNo) => {
     try {
       const quizzes = await QuizzesModel.find(filter)
@@ -168,6 +155,7 @@ module.exports = {
       if (!quiz) throw createError(400, "invalid quiz id");
 
       quiz.active = !quiz.active;
+      quiz.isPublish = active;
       await quiz.save();
       return quiz;
     } catch (error) {

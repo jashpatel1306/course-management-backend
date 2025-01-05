@@ -135,7 +135,7 @@ module.exports = {
       }
       const publicLink = await publicLinkModel
         .find(filter)
-        .sort({ name: 1, createdAt: -1 })
+        // .sort({ name: 1 })
         .skip((pageNo - 1) * perPage)
         .limit(perPage);
       // .populate("quizId", "_id title");

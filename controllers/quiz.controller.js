@@ -102,7 +102,7 @@ module.exports = {
   deleteQuiz: async (req, res, next) => {
     try {
       const quizId = req.params.id;
-      const quiz = await quizzesServices.deleteQuiz(quizId);
+      const quiz = await quizzesServices.toggleActiveStatus(quizId);
       return res.status(200).send({
         success: true,
         message: "Quiz deleted successfully",
@@ -115,7 +115,7 @@ module.exports = {
   changeActiveStatusQuiz: async (req, res, next) => {
     try {
       const id = req.params.id;
-      const quiz = await quizzesServices.toggleActiveStatus(id);
+      const quiz = await quizzesServices.toggleActiveStatus(id, false);
       const message = quiz.active === true ? "activated" : "inactivated";
       res.status(200).json({
         success: true,

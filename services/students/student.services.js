@@ -291,7 +291,7 @@ module.exports = {
               },
               {
                 $project: {
-                  _id: 0,
+                  _id: 1,
                   correctAnswers: 1,
                   wrongAnswers: 1,
                   totalMarks: 1,

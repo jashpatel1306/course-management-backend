@@ -7,7 +7,10 @@ const transformData = async (quizId, data) => {
     let i = 1;
     while (item[`answer${i}`]) {
       answers.push({
-        content: `<p>${item[`answer${i}`]}</p>`,
+        content:
+          item.type === "mcq"
+            ? `<p>${item[`answer${i}`]}</p>`
+            : `${item[`answer${i}`]}`,
         reason: `${
           item.correctAnswer === item[`answer${i}`]
             ? item.answerExplanation || ""
@@ -53,7 +56,7 @@ module.exports = {
       );
       res.send({
         success: true,
-        message: "students created successfully",
+        message: "questions created successfully",
         data: questionObject
       });
     } catch (error) {
