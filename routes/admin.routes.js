@@ -5,7 +5,7 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isSuperAdminAuthenticate,
-  isAdminCommonAuthenticate
+  isAdminCommonAuthenticate,
 } = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
@@ -13,6 +13,7 @@ const collegeController = require("../controllers/college.controller");
 const instructorCourseController = require("../controllers/instructorCourse.controller");
 const batcheController = require("../controllers/batches.controller");
 const publicLinkController = require("../controllers/publicLink.controller");
+const dashboardController = require("../controllers/dashboard.controller");
 
 router.post(
   "/college",
@@ -70,7 +71,7 @@ router.post(
 
 router.post(
   "/public-link/:id",
-  
+
   isAdminCommonAuthenticate,
   publicLinkController.getPublicLinkById
 );
@@ -93,5 +94,13 @@ router.delete(
   publicLinkController.deletePublicLink
 );
 
+//--------------------------------dashboard--------------------------------//
+
+router.post(
+  "/dashboard",
+  Validate(schemas.dateFilterSchema),
+  isAdminCommonAuthenticate,
+  dashboardController.getAdminDashboardData
+);
 
 module.exports = router;

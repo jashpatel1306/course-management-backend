@@ -4,27 +4,49 @@ const { bulkStudentSchema } = require("../validation/validation.schemas");
 const { STUDENT } = require("../constants/roles.constant");
 
 module.exports = {
-  getDashboardCountsData: async (req, res, next) => {
+  getAdminDashboardData: async (req, res, next) => {
     try {
-      const userId = req?.body?.user_id;
-      const collegeId = req?.body?.college_id;
-      const role = res.locals.userRole;
-      let filter = {};
+      console.log("getAdminDashboardData");
+      const startDateFilter = req.body.startDateFilter;
+      const endDateFilter = req.body.endDateFilter;
 
-      if (role === STUDENT) {
-        filter.courseFilter = {
-          collegeId,
-        };
-        filter.batchFilter = {
-          collegeId,
-        };
+      const filter = {};
+
+      if (startDateFilter) {
+        filter.startDate = startDateFilter;
       }
 
-      const data = await dashboardServices.countDocsFromMultipleCollections();
+      if (endDateFilter) {
+        filter.endDate = endDateFilter;
+      }
 
-      res
-        .status(200)
-        .json({ success: true, message: "dashboard data fetched.", data });
+      const [
+        countData,
+        colleges,
+        courses,
+        studentRegistrationChart,
+        activeStudentsChart,
+      ] = await Promise.all([
+        dashboardServices.countDocsFromMultipleCollections({}),
+        dashboardServices.getTopColleges(),
+        dashboardServices.getTopCourses({}),
+        dashboardServices.getStudentRegistrationData(filter),
+        dashboardServices.getActiveStudents(filter),
+      ]);
+
+      console.log("result data", countData, colleges, courses);
+
+      return res.status(200).json({
+        success: true,
+        message: "dashboard data fetched.",
+        data: {
+          countData,
+          colleges,
+          courses,
+          studentRegistrationChart,
+          activeStudentsChart,
+        },
+      });
     } catch (err) {
       next(err);
     }
@@ -35,9 +57,6 @@ module.exports = {
       const filter = {};
       const countData =
         await dashboardServices.countDocsFromMultipleCollections(filter);
-
-        
-
     } catch (err) {
       next(err);
     }

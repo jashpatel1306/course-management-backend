@@ -1,0 +1,15 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/lms-keys ubuntu@3.111.112.166:3030 "cd ~/course-management-backend && git pull origin main && pm2 restart all"
