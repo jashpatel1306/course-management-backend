@@ -493,6 +493,7 @@ module.exports = {
     try {
       const filter = [];
       const currentYear = new Date().getFullYear();
+      console.log("currentYear: ", currentYear);
       const startDate = filterObj.startDate
         ? new Date(filterObj.startDate)
         : new Date(currentYear, 0, 1); // Default to Jan 1 of the current year
