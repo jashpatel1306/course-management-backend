@@ -206,10 +206,11 @@ module.exports = {
         college_id: collegeId,
         batch_id: batchId,
       };
-
+      
       const createSession = await userSessionsServices.createUserSession({
         userId: user._id,
         role: user.role,
+        collegeId,
       });
       if (!createSession) {
         throw createError.InternalServerError("Failed to create session.");

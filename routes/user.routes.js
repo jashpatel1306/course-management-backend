@@ -4,7 +4,7 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
-  isAuthenticate
+  isAuthenticate,
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
@@ -15,7 +15,7 @@ const staffController = require("../controllers/staff.controller");
 const departmentController = require("../controllers/department.controller");
 const {
   handleExcelData,
-  handleExcelQuestionData
+  handleExcelQuestionData,
 } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
 const quizController = require("../controllers/quiz.controller");
@@ -29,6 +29,7 @@ const lectureController = require("../controllers/lecture.contoller");
 const instructorCourseController = require("../controllers/instructorCourse.controller");
 const assignAssessmentController = require("../controllers/assignAssement.controller");
 const trackingQuizController = require("../controllers/trackingQuiz.controller");
+const dashboardController = require("../controllers/dashboard.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -775,4 +776,12 @@ router.post(
   isAdminCommonAuthenticate,
   trackingQuizController.getResultContentOfQuiz
 );
+
+router.post(
+  "/college-dashboard/",
+  Validate(schemas.dateFilterSchema),
+  isAuthenticate,
+  dashboardController.getCollegeDashBoardContent
+);
+
 module.exports = router;

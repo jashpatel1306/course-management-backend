@@ -2,6 +2,8 @@ const createError = require("http-errors");
 const dashboardServices = require("../services/dashboard.services");
 const { bulkStudentSchema } = require("../validation/validation.schemas");
 const { STUDENT } = require("../constants/roles.constant");
+const { getInstructorsByCollegeId } = require("./instructors.controller");
+const createHttpError = require("http-errors");
 
 module.exports = {
   getAdminDashboardData: async (req, res, next) => {
@@ -27,7 +29,7 @@ module.exports = {
         studentRegistrationChart,
         activeStudentsChart,
       ] = await Promise.all([
-        dashboardServices.countDocsFromMultipleCollections({}),
+        dashboardServices.countDocsFromMultipleCollections(),
         dashboardServices.getTopColleges(),
         dashboardServices.getTopCourses({}),
         dashboardServices.getStudentRegistrationData(filter),
@@ -52,11 +54,50 @@ module.exports = {
     }
   },
 
-  getAdminDashBoard: async (req, res, next) => {
+  getCollegeDashBoardContent: async (req, res, next) => {
     try {
+      const collegeId = req.body.college_id;
+      if (!collegeId) throw createHttpError.BadRequest("Invalid collegeId");
+      console.log("get college AdminDashboardData");
+      const startDateFilter = req.body.startDateFilter;
+      const endDateFilter = req.body.endDateFilter;
+
       const filter = {};
-      const countData =
-        await dashboardServices.countDocsFromMultipleCollections(filter);
+
+      if (startDateFilter) {
+        filter.startDate = startDateFilter;
+      }
+
+      if (endDateFilter) {
+        filter.endDate = endDateFilter;
+      }
+      const [
+        countData,
+        courses,
+        batches,
+        studentRegistrationChart,
+        activeStudentsChart,
+      ] = await Promise.all([
+        dashboardServices.countDocsFromMultipleCollections(collegeId),
+        dashboardServices.getTopCourses({ collegeId: collegeId }),
+        dashboardServices.getTopBatches(collegeId),
+        dashboardServices.getStudentRegistrationData({ ...filter, collegeId }),
+        dashboardServices.getActiveStudents({ ...filter, collegeId }),
+      ]);
+
+      console.log("result data", countData, batches, courses);
+
+      return res.status(200).json({
+        success: true,
+        message: "dashboard data fetched.",
+        data: {
+          countData,
+          batches,
+          courses,
+          studentRegistrationChart,
+          activeStudentsChart,
+        },
+      });
     } catch (err) {
       next(err);
     }

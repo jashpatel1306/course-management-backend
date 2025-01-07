@@ -13,7 +13,12 @@ const sessionSchema = new mongoose.Schema(
       required: true,
       enum: ROLES,
     },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "colleges",
+    },
   },
+
   {
     timestamps: true,
     versionKey: false,

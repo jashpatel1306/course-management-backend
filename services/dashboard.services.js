@@ -8,6 +8,7 @@ const { Types } = require("mongoose");
 const { ObjectId } = Types;
 const moment = require("moment");
 const userSessionsModel = require("../services/userSessions/userSessions.model");
+const { id } = require("../validation/validation");
 
 const generateMonthRange = (start, end) => {
   const months = [];
@@ -25,29 +26,27 @@ const generateMonthRange = (start, end) => {
 };
 
 module.exports = {
-  countDocsFromMultipleCollections: async (filter) => {
+  countDocsFromMultipleCollections: async (collegeId) => {
     try {
-      let instructorsFilter = {};
-      let studentsFilter = {};
-      let batchesFilter = {};
-      let coursesFilter = {};
+      const filter = {};
+      const userFilter = {};
 
-      filter?.instructorsFilter
-        ? (instructorsFilter = filter.instructorsFilter)
-        : null;
-      filter?.studentsFilter ? (studentsFilter = filter.studentsFilter) : null;
-      filter?.batchesFilter ? (batchesFilter = filter.batchesFilter) : null;
-      filter?.coursesFilter ? (coursesFilter = filter.coursesFilter) : null;
+      if (collegeId) {
+        filter["collegeId"] = collegeId;
+        userFilter["collegeUserId"] = collegeId;
+      }
 
+      console.log("filter", filter);
+      console.log("userFilter", userFilter);
       const [instructors, students, courses, colleges, batches] =
         await Promise.all([
-          instructorModel.countDocuments(instructorsFilter),
-          studentModel.countDocuments(studentsFilter),
-          courseModel.countDocuments(coursesFilter),
+          instructorModel.countDocuments(filter),
+          studentModel.countDocuments(userFilter),
+          courseModel.countDocuments(filter),
           collegeModel.countDocuments({}),
-          batchModel.countDocuments(batchesFilter),
+          batchModel.countDocuments(filter),
         ]);
-
+      console.log("instructor");
       return {
         instructors,
         students,
@@ -59,120 +58,6 @@ module.exports = {
       throw error;
     }
   },
-
-  // getStudentRegistrationData: async (filterObj) => {
-  //   try {
-  //     const filter = [];
-  //     if (filterObj.startDate) {
-  //       filter.push({
-  //         $gte: ["$createdAt", startDate],
-  //       });
-  //     }
-
-  //     if (filterObj.endDate) {
-  //       filter.push({
-  //         $lte: ["$createdAt", endDate],
-  //       });
-  //     }
-
-  //     if (filterObj.year) {
-  //       filter.push({ $eq: [{ $year: "$createdAt" }, filterObj.year] });
-  //     }
-
-  //     if (filterObj.collegeId) {
-  //       filter.push({ $eq: ["$collegeUserId", filterObj.collegeId] });
-  //     }
-
-  //     const result = await studentModel.aggregate([
-  //       {
-  //         $match: {
-  //           $expr: {
-  //             $and: filter,
-  //           },
-  //         },
-  //       },
-  //       {
-  //         $group: {
-  //           _id: {
-  //             month: { $month: "$createdAt" },
-  //             year: { $year: "$createdAt" },
-  //           },
-  //           count: { $sum: 1 },
-  //         },
-  //       },
-  //       {
-  //         $group: {
-  //           _id: "$_id.year",
-  //           months: {
-  //             $push: {
-  //               month: "$_id.month",
-  //               count: "$count",
-  //             },
-  //           },
-  //         },
-  //       },
-  //       {
-  //         $addFields: {
-  //           allMonths: [
-  //             { month: 1, name: "January" },
-  //             { month: 2, name: "February" },
-  //             { month: 3, name: "March" },
-  //             { month: 4, name: "April" },
-  //             { month: 5, name: "May" },
-  //             { month: 6, name: "June" },
-  //             { month: 7, name: "July" },
-  //             { month: 8, name: "August" },
-  //             { month: 9, name: "September" },
-  //             { month: 10, name: "October" },
-  //             { month: 11, name: "November" },
-  //             { month: 12, name: "December" },
-  //           ],
-  //         },
-  //       },
-  //       {
-  //         $project: {
-  //           year: "$_id",
-  //           monthsArray: {
-  //             $map: {
-  //               input: "$allMonths",
-  //               as: "monthInfo",
-  //               in: "$$monthInfo.name",
-  //             },
-  //           },
-  //           valuesArray: {
-  //             $map: {
-  //               input: "$allMonths",
-  //               as: "monthInfo",
-  //               in: {
-  //                 $let: {
-  //                   vars: {
-  //                     existingMonth: {
-  //                       $arrayElemAt: [
-  //                         {
-  //                           $filter: {
-  //                             input: "$months",
-  //                             as: "m",
-  //                             cond: { $eq: ["$$m.month", "$$monthInfo.month"] },
-  //                           },
-  //                         },
-  //                         0,
-  //                       ],
-  //                     },
-  //                   },
-  //                   in: { $ifNull: ["$$existingMonth.count", 0] },
-  //                 },
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //       { $sort: { year: 1 } },
-  //     ]);
-  //     return result;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // },
 
   getStudentRegistrationData: async (filterObj) => {
     try {
@@ -199,7 +84,9 @@ module.exports = {
       }
 
       if (filterObj.collegeId) {
-        filter.push({ $eq: ["$collegeUserId", filterObj.collegeId] });
+        filter.push({
+          $eq: ["$collegeUserId", new ObjectId(filterObj.collegeId)],
+        });
       }
 
       // Generate dynamic month range
@@ -444,7 +331,15 @@ module.exports = {
 
   getTopBatches: async (collegeId) => {
     try {
-      const result = await batchModel.aggregate([
+      const pipeline = [];
+      let filter = {};
+
+      if (collegeId) {
+        filter["collegeId"] = { $eq: new ObjectId(collegeId) };
+        pipeline.push({ $match: filter });
+      }
+
+      pipeline.push(
         {
           $lookup: {
             from: "students",
@@ -480,8 +375,10 @@ module.exports = {
         },
         {
           $limit: 5,
-        },
-      ]);
+        }
+      );
+
+      const result = await batchModel.aggregate(pipeline);
 
       return result;
     } catch (error) {
@@ -502,6 +399,11 @@ module.exports = {
         : new Date(currentYear, 11, 31); // Default to Dec 31 of the current year
 
       // Generate dynamic month range
+      filterObj.collegeId
+        ? filter.push({
+            $eq: ["$collegeId", new ObjectId(filterObj.collegeId)],
+          })
+        : null;
 
       const dynamicMonths = generateMonthRange(startDate, endDate);
       console.log("dynamicMonths: ", dynamicMonths);
