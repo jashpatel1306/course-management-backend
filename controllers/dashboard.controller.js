@@ -8,18 +8,20 @@ const createHttpError = require("http-errors");
 module.exports = {
   getAdminDashboardData: async (req, res, next) => {
     try {
-      console.log("getAdminDashboardData");
+      console.log("req.body: ",req.body)
       const startDateFilter = req.body.startDateFilter;
       const endDateFilter = req.body.endDateFilter;
-
+      console.log("getAdminDashboardData",startDateFilter);
+      console.log("getAdminDashboardData",endDateFilter);
+      
       const filter = {};
 
       if (startDateFilter) {
-        filter.startDate = startDateFilter;
+        filter.startDate = new Date(startDateFilter);
       }
 
       if (endDateFilter) {
-        filter.endDate = endDateFilter;
+        filter.endDate = new Date(endDateFilter);
       }
 
       const [

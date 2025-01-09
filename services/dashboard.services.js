@@ -222,7 +222,7 @@ module.exports = {
         {
           $project: {
             collegeName: 1,
-            _id: 0,
+            _id: 1,
             studentCount: { $size: "$students" },
             instructorsCount: { $size: "$instructors" },
           },
@@ -284,6 +284,7 @@ module.exports = {
         {
           $project: {
             courses: 1,
+
             students: { $size: "$students" },
           },
         },
@@ -315,7 +316,7 @@ module.exports = {
             course: {
               $arrayElemAt: ["$result.courseName", 0],
             },
-            _id: 0,
+            _id: 1,
           },
         },
         {
@@ -365,7 +366,7 @@ module.exports = {
           $project: {
             batchName: 1,
             students: { $size: "$students" },
-            _id: 0,
+            _id: 1,
           },
         },
         {

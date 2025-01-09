@@ -99,8 +99,9 @@ router.delete(
 router.post(
   "/dashboard",
   Validate(schemas.dateFilterSchema),
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   dashboardController.getAdminDashboardData
 );
+
 
 module.exports = router;

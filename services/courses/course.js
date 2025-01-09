@@ -5,60 +5,60 @@ const CourseSchema = new mongoose.Schema(
   {
     courseName: {
       type: String,
-      required: [true, "Course name is required."],
+      required: [true, "Course name is required."]
     },
     collegeId: {
       type: mongoose.Types.ObjectId,
       // required: [true, "College ID is required."],
       ref: "colleges",
-      default: null,
+      default: null
     },
     courseDescription: {
       type: String,
-      required: [true, "Course description is required."],
+      required: [true, "Course description is required."]
     },
     coverImage: {
-      type: String,
+      type: String
     },
     active: {
       type: Boolean,
-      default: true,
+      default: true
     },
     totalSections: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalLectures: {
       type: Number,
-      default: 0,
+      default: 0
     },
     sections: [
       {
         name: {
-          type: String,
+          type: String
         },
         id: {
           type: mongoose.Types.ObjectId,
-          ref: "sections",
-        },
-      },
+          ref: "sections"
+        }
+      }
     ],
     isPublish: {
       type: Boolean,
-      default: false,
+      default: false
     },
     publishDate: {
-      type: Date,
+      type: Date
     },
     collegeIds: [{ type: mongoose.Types.ObjectId, ref: "colleges" }],
     startTime: {
       type: Date,
-      required: [true, "Course start time is required."],
+      required: [true, "Course start time is required."]
     },
     endTime: {
       type: Date,
-      required: [true, "Course end time is required."],
-    },
+      required: [true, "Course end time is required."]
+    }
   },
   { timestamps: true, versionKey: false }
 );
