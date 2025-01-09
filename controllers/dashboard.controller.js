@@ -8,12 +8,12 @@ const createHttpError = require("http-errors");
 module.exports = {
   getAdminDashboardData: async (req, res, next) => {
     try {
-      console.log("req.body: ",req.body)
+      console.log("req.body: ", req.body);
       const startDateFilter = req.body.startDateFilter;
       const endDateFilter = req.body.endDateFilter;
-      console.log("getAdminDashboardData",startDateFilter);
-      console.log("getAdminDashboardData",endDateFilter);
-      
+      console.log("getAdminDashboardData", startDateFilter);
+      console.log("getAdminDashboardData", endDateFilter);
+
       const filter = {};
 
       if (startDateFilter) {
@@ -104,4 +104,23 @@ module.exports = {
       next(err);
     }
   },
+
+  getDashboardDataOfInstructor: async (req, res, next) => {
+    try {
+      const instructorId = req.body.user_id;
+      if (!instructorId)
+        throw createHttpError.BadRequest("Invalid instructorId");
+      const data = await dashboardServices.getInstructorDashboardData(
+        instructorId
+      );
+      return res.status(200).json({
+        success: true,
+        message: "dashboard data fetched.",
+        data,
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  
 };

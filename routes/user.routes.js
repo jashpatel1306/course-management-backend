@@ -774,7 +774,8 @@ router.post(
   "/quiz-results/:trackingId",
   Validate(schemas.quizResultsFilterSchema),
   isAdminCommonAuthenticate,
-  trackingQuizController.getResultContentOfQuiz
+  // trackingQuizController.getResultContentOfQuiz
+  quizController.getQuizTrackingResults
 );
 
 router.post(
@@ -782,6 +783,12 @@ router.post(
   Validate(schemas.dateFilterSchema),
   isAuthenticate,
   dashboardController.getCollegeDashBoardContent
+);
+
+router.get(
+  "/instructor-dashboard/",
+  isAuthenticate,
+  dashboardController.getDashboardDataOfInstructor
 );
 
 module.exports = router;

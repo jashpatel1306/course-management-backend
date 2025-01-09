@@ -9,6 +9,8 @@ const { ObjectId } = Types;
 const moment = require("moment");
 const userSessionsModel = require("../services/userSessions/userSessions.model");
 const { id } = require("../validation/validation");
+const userModel = require("./users/user.model");
+const batchesModel = require("../services/batches/batches.model");
 
 const generateMonthRange = (start, end) => {
   const months = [];
@@ -491,4 +493,63 @@ module.exports = {
       throw error;
     }
   },
+
+  getInstructorDashboardData: async (instructorId) => {
+    try {
+      const instructor = await instructorModel.findOne(
+        { userId: instructorId },
+        { password: 0 }
+      );
+      console.log("instructor", instructor._id);
+      const result = await batchesModel.aggregate([
+        {
+          $match: {
+            instructorIds: { $eq: instructor._id },
+          },
+        },
+        {
+          $lookup: {
+            from: "students",
+            localField: "_id",
+            foreignField: "batchId",
+            pipeline: [
+              {
+                $project: {
+                  _id: 1,
+                },
+              },
+            ],
+            as: "students",
+          },
+        },
+        {
+          $project: {
+            batchName: 1,
+            students: { $size: "$students" },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            batches: {
+              $push: "$batchName",
+            },
+            students: {
+              $push: "$students",
+            },
+            batchData: {
+              $push: "$$ROOT",
+            },
+          },
+        },
+      ]);
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  
+
 };

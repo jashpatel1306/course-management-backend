@@ -1,6 +1,10 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
-const { quizzesServices, publicLinkServices } = require("../services");
+const {
+  quizzesServices,
+  publicLinkServices,
+  trackingQuizServices,
+} = require("../services");
 module.exports = {
   createQuiz: async (req, res, next) => {
     try {
@@ -212,6 +216,22 @@ module.exports = {
         success: true,
         message: "Quizzes options fetched successfully",
         data: quizzes,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getQuizTrackingResults: async (req, res, next) => {
+    try {
+      const { trackingId } = req.params;
+      const quizId = await trackingQuizServices.getQuizId(trackingId);
+      console.log("Quiz tracking", quizId);
+      const result = await quizzesServices.getQuizResult(quizId, trackingId);
+      return res.status(200).send({
+        success: true,
+        message: "Quiz tracking results fetched successfully",
+        data: result,
       });
     } catch (error) {
       next(error);
