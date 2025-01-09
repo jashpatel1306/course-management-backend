@@ -131,6 +131,7 @@ module.exports = {
         : req.body?.college_id;
 
       const departmentId = req.body?.departmentId;
+      const active = req.body?.active;
       const semester = req.body?.semester;
       const passoutYear = req.body?.passoutYear;
 
@@ -142,6 +143,11 @@ module.exports = {
         : null;
       departmentId ? (filter.department = departmentId) : null;
       semester ? (filter.semester = semester) : null;
+      active
+        ? active === "active"
+          ? (filter.active = true)
+          : (filter.active = false)
+        : null;
       passoutYear ? (filter.passoutYear = passoutYear) : null;
 
       const searchText = new RegExp(search, `i`);

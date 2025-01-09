@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   Validate,
-  ValidateQueryParams,
+  ValidateQueryParams
 } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const { isStudentAuthenticate } = require("../helpers/auth.helper");
@@ -25,7 +25,7 @@ router.post(
 );
 
 router.get(
-  "/student-wise-courses/:activeStatus",
+  "/student-wise-courses",
   // ValidateQueryParams(schemas.paginationAndFilterSchema),
   isStudentAuthenticate,
   batchesController.getCoursesByBatchId
@@ -115,7 +115,7 @@ router.post(
 // Create and enroll in a course
 
 router.post(
-  "/quiz/enroll/:quizId",
+  "/quiz/enroll/:assessmentId/:quizId",
   isStudentAuthenticate,
   trackingQuizController.createEnrollQuiz
 );

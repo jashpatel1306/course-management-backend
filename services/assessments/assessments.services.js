@@ -38,16 +38,29 @@ module.exports = {
             localField: "contents.id",
             foreignField: "_id",
             as: "quizData",
-            pipeline: [{ $match: { active: true } }],
-          },
+            pipeline: [
+              { $match: { active: true } },
+              {
+                $project: {
+                  _id: 1,
+                  totalMarks: 1,
+                  title: 1,
+                  time: 1,
+                  assessmentId: 1,
+                  active: 1,
+                  questionsLength: { $size: "$questions" }
+                }
+              }
+            ]
+          }
         },
         {
           $lookup: {
             from: "exercises", // Collection name for exercises
             localField: "contents.id",
             foreignField: "_id",
-            as: "exerciseData",
-          },
+            as: "exerciseData"
+          }
         },
         {
           $addFields: {
@@ -66,12 +79,12 @@ module.exports = {
                             $filter: {
                               input: "$quizData",
                               as: "quiz",
-                              cond: { $eq: ["$$quiz._id", "$$content.id"] },
-                            },
+                              cond: { $eq: ["$$quiz._id", "$$content.id"] }
+                            }
                           },
-                          0,
-                        ],
-                      },
+                          0
+                        ]
+                      }
                     },
                     {
                       type: "$$content.type",
@@ -81,18 +94,18 @@ module.exports = {
                             $filter: {
                               input: "$exerciseData",
                               as: "exercise",
-                              cond: { $eq: ["$$exercise._id", "$$content.id"] },
-                            },
+                              cond: { $eq: ["$$exercise._id", "$$content.id"] }
+                            }
                           },
-                          0,
-                        ],
-                      },
-                    },
-                  ],
-                },
-              },
-            },
-          },
+                          0
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
         },
 
         {
@@ -102,24 +115,33 @@ module.exports = {
             totalQuestions: 1,
             expiresAt: 1,
             quizTrackingData: 1,
+
             content: {
               $filter: {
                 input: "$contents",
                 as: "content",
-                cond: { $eq: ["$$content.data.active", true] },
-              },
-            },
-          },
-        }, // Remove lookup arrays from the result
+                cond: { $eq: ["$$content.data.active", true] }
+              }
+            }
+          }
+        } // Remove lookup arrays from the result
       ]);
 
       if (!assessment || assessment.length === 0)
         throw createError(404, "Assessment not found");
       let finalData = assessment[0];
-      finalData.trackingData = await trackingQuizzeseModel.find({
-        userId: userId,
-        // quizId: item.data._id,
-      });
+      finalData.trackingQuizData = await trackingQuizzeseModel.find(
+        {
+          userId: userId,
+          assessmentId: id
+        },
+        {
+          _id: 1,
+          userId: 1,
+          quizId: 1,
+          quizType: 1
+        }
+      );
       return finalData; // Since aggregate returns an array
     } catch (error) {
       throw createError.InternalServerError(error);
@@ -132,7 +154,7 @@ module.exports = {
         { _id: id },
         data,
         {
-          new: true,
+          new: true
         }
       );
       if (!assessment) throw createError(400, "invalid assessment id");
@@ -160,21 +182,20 @@ module.exports = {
     collegeId
   ) => {
     try {
-    
       const filter = {
         $and: [
           batchId !== "all"
             ? {
-                batches: { $in: [batchId] },
+                batches: { $in: [batchId] }
               }
             : {},
           collegeId ? { collegeId } : {},
           {
-            $or: [{ title: { $regex: search } }],
-          },
-        ],
+            $or: [{ title: { $regex: search } }]
+          }
+        ]
       };
-     
+
       const assessments = await AssessmentsModel.find(filter)
         .populate("batches", "_id batchName")
         .skip((pageNo - 1) * perPage)
@@ -235,7 +256,7 @@ module.exports = {
   getAssessmentOptionsByCollegeId: async (collegeId) => {
     try {
       const assessment = await AssessmentsModel.find({
-        collegeId: collegeId,
+        collegeId: collegeId
       });
       const data = assessment.map((item) => {
         return { label: item.title, value: item._id };
@@ -254,5 +275,5 @@ module.exports = {
     } catch (error) {
       console.error("Error adding batch:", error.message);
     }
-  },
+  }
 };

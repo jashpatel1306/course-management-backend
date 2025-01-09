@@ -13,8 +13,8 @@ const getFilter = (filterObj, key) => {
   if (filterObj[key]) {
     return {
       [key]: {
-        $in: filterObj[key].map((value) => new mongoose.Types.ObjectId(value)),
-      },
+        $in: filterObj[key].map((value) => new mongoose.Types.ObjectId(value))
+      }
     };
   }
   return {};
@@ -72,7 +72,7 @@ module.exports = {
   updateStudent: async (id, data) => {
     try {
       const student = await studentModel.findOneAndUpdate({ _id: id }, data, {
-        new: true,
+        new: true
       });
       if (!student) createError(500, "Error while updating student");
       return student;
@@ -99,8 +99,8 @@ module.exports = {
           $or: [
             { name: { $regex: search } },
             { email: { $regex: search } },
-            { rollNo: { $regex: search } },
-          ],
+            { rollNo: { $regex: search } }
+          ]
         };
       }
 
@@ -141,9 +141,11 @@ module.exports = {
               { name: { $regex: search } },
               { email: { $regex: search } },
               { rollNo: { $regex: search } },
-            ],
-          },
-        ],
+              { phone: { $regex: search } },
+              { section: { $regex: search } }
+            ]
+          }
+        ]
       };
       const students = await studentModel
         .find(filter)
@@ -165,7 +167,7 @@ module.exports = {
       if (search) {
         filter[$or] = [
           { name: { $regex: search } },
-          { email: { $regex: search } },
+          { email: { $regex: search } }
         ];
       }
       const student = await studentModel
@@ -189,7 +191,7 @@ module.exports = {
       let filter = {
         ...getFilter(filterObj, "collegeId"),
         ...getFilter(filterObj, "batchId"),
-        ...getFilter(filterObj, "assessmentId"),
+        ...getFilter(filterObj, "assessmentId")
       };
 
       //get assessment ids based on all three filters
@@ -200,23 +202,23 @@ module.exports = {
               _id: {
                 $in: filterObj?.quizId.map(
                   (id) => new mongoose.Types.ObjectId(id)
-                ),
-              },
-            },
+                )
+              }
+            }
           },
           {
             $group: {
               _id: null,
-              assessmentIds: { $push: "$assessmentId" },
-            },
-          },
+              assessmentIds: { $push: "$assessmentId" }
+            }
+          }
         ]);
         console.log("quizAggResult", quizAggResult);
         console.log("assessmentIds", quizAggResult[0]?.assessmentIds?.length);
 
         if (quizAggResult[0]?.assessmentIds?.length > 0) {
           filter.assessmentId = {
-            $in: quizAggResult[0].assessmentIds,
+            $in: quizAggResult[0].assessmentIds
           };
         }
       }
@@ -229,14 +231,14 @@ module.exports = {
       if (filter.collegeId || filter.batchId || filter.assessmentId) {
         const batchAggResult = await assignAssessmentsModel.aggregate([
           {
-            $match: filter,
+            $match: filter
           },
           {
             $group: {
               _id: null,
-              batchIds: { $addToSet: "$batchId" },
-            },
-          },
+              batchIds: { $addToSet: "$batchId" }
+            }
+          }
         ]);
         console.log("batchAggResult", batchAggResult);
         // if (batchAggResult?.length === 0)
@@ -263,10 +265,10 @@ module.exports = {
                   $expr: {
                     $and: [
                       { $eq: ["$userId", "$$userId"] },
-                      { $eq: ["$quizType", "quiz"] },
-                    ],
-                  },
-                },
+                      { $eq: ["$quizType", "quiz"] }
+                    ]
+                  }
+                }
               },
               {
                 $lookup: {
@@ -276,18 +278,18 @@ module.exports = {
                     {
                       $match: {
                         $expr: {
-                          $eq: ["$_id", "$$quizId"],
-                        },
-                      },
+                          $eq: ["$_id", "$$quizId"]
+                        }
+                      }
                     },
                     {
                       $project: {
-                        title: 1,
-                      },
-                    },
+                        title: 1
+                      }
+                    }
                   ],
-                  as: "quizData",
-                },
+                  as: "quizData"
+                }
               },
               {
                 $project: {
@@ -298,20 +300,20 @@ module.exports = {
                   totalTime: 1,
                   takenTime: 1,
                   title: {
-                    $arrayElemAt: ["$quizData.title", 0],
-                  },
-                },
-              },
+                    $arrayElemAt: ["$quizData.title", 0]
+                  }
+                }
+              }
             ],
-            as: "quizData",
-          },
+            as: "quizData"
+          }
         },
         {
           $unwind: {
             path: "$quizData",
             includeArrayIndex: "string",
-            preserveNullAndEmptyArrays: true,
-          },
+            preserveNullAndEmptyArrays: true
+          }
         },
         {
           $project: {
@@ -319,18 +321,18 @@ module.exports = {
             rollNo: 1,
             section: 1,
             quizData: 1,
-            quizStatus: { $cond: [{ $eq: ["$string", null] }, false, true] },
-          },
+            quizStatus: { $cond: [{ $eq: ["$string", null] }, false, true] }
+          }
         },
         {
           $facet: {
             paginatedData: [
               { $skip: (page - 1) * perPage },
-              { $limit: perPage },
+              { $limit: perPage }
             ],
-            totalCount: [{ $count: "count" }],
-          },
-        },
+            totalCount: [{ $count: "count" }]
+          }
+        }
       ]);
 
       // Extract paginated data and total count
@@ -341,5 +343,5 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  },
+  }
 };

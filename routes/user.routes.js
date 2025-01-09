@@ -748,7 +748,7 @@ router.post(
 router.post(
   "/get-all-result",
   Validate(schemas.allResultSchema),
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   trackingQuizController.getAllResult
 );
 

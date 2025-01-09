@@ -26,7 +26,7 @@ const getPreAssessmentDataByType = async (
       contentType: "assessment",
       id: result[0].assessmentId._id,
       title: result[0].assessmentId.title,
-      status: await contentstatus,
+      status: await contentstatus
     };
   } else {
     return null;
@@ -69,7 +69,7 @@ const getSectionAssessmentDataByType = async (
       title: result[0].assessmentId.title,
       sectionIndex: sectionIndex,
       lectureIndex: lectureIndex,
-      status: await contentstatus, // Change the logic here if needed for assessment submission
+      status: await contentstatus // Change the logic here if needed for assessment submission
     };
   } else {
     return null;
@@ -101,7 +101,7 @@ module.exports = {
   updateCourse: async (id, data) => {
     try {
       const course = await CourseModel.findByIdAndUpdate(id, data, {
-        new: true,
+        new: true
       });
       if (!course) {
         throw createError.NotFound("Course not found.");
@@ -130,8 +130,16 @@ module.exports = {
     perPage
   ) => {
     try {
+      console.log(
+        "getCoursesByCollegeId filter: ",
+        collegeId,
+        activeFilter,
+        search,
+        pageNo,
+        perPage
+      );
       let filter = {
-        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }],
+        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }]
       };
 
       if (search) {
@@ -140,23 +148,23 @@ module.exports = {
             {
               $or: [
                 { collegeId: collegeId },
-                { collegeIds: { $in: [collegeId] } },
-              ],
+                { collegeIds: { $in: [collegeId] } }
+              ]
             },
             {
               $or: [
                 { courseName: { $regex: search, $options: "i" } },
-                { courseDescription: { $regex: search, $options: "i" } },
-              ],
-            },
-          ],
+                { courseDescription: { $regex: search, $options: "i" } }
+              ]
+            }
+          ]
         };
       }
 
       if (activeFilter === "active") {
-        filter.active = true;
+        filter.isPublish = true;
       } else if (activeFilter === "inactive") {
-        filter.active = false;
+        filter.isPublish = false;
       }
 
       const courses = await CourseModel.find(filter)
@@ -222,11 +230,11 @@ module.exports = {
           {
             $or: [
               { collegeId: collegeId },
-              { collegeIds: { $in: [collegeId] } },
-            ],
+              { collegeIds: { $in: [collegeId] } }
+            ]
           },
-          { isPublish: true },
-        ],
+          { isPublish: true }
+        ]
       });
       const data = courses.map((item) => {
         return { label: item.courseName, value: item._id };
@@ -256,7 +264,7 @@ module.exports = {
       // Find the batch
       const batch = await batchesModel.findOne({
         _id: batchId,
-        collegeId: collegeId,
+        collegeId: collegeId
       });
 
       if (!batch) {
@@ -276,7 +284,7 @@ module.exports = {
 
       return {
         message:
-          "Course ID added to batch and college ID updated in course successfully.",
+          "Course ID added to batch and college ID updated in course successfully."
       };
     } catch (error) {
       throw new Error(error.message);
@@ -300,7 +308,7 @@ module.exports = {
       }
 
       return {
-        message: "Course ID added to college updated in course successfully.",
+        message: "Course ID added to college updated in course successfully."
       };
     } catch (error) {
       throw new Error(error.message);
@@ -322,7 +330,7 @@ module.exports = {
       // Fetch published course by ID
       const course = await CourseModel.findOne({
         _id: courseId,
-        isPublish: true,
+        isPublish: true
       }).populate("sections.id", "_id name lectures");
 
       if (!course) {
@@ -415,7 +423,7 @@ module.exports = {
                         sectionId: section._id,
                         sectionIndex: index,
                         lectureIndex: lectureIndex,
-                        status: await contentstatus,
+                        status: await contentstatus
                       };
                     })
                   );
@@ -431,7 +439,7 @@ module.exports = {
                     title: lectureData.name,
                     sectionIndex: index,
                     lectureIndex: lectureIndex,
-                    content: finalContent,
+                    content: finalContent
                   };
                 } catch (error) {
                   console.error(
@@ -458,7 +466,7 @@ module.exports = {
               index: index,
               id: section._id,
               title: section.name,
-              lectures: validLectures,
+              lectures: validLectures
             };
 
             // Push section data to sidebar and content arrays
@@ -501,7 +509,7 @@ module.exports = {
         lectureId: finalContentData[0]?.lectureId
           ? finalContentData[0]?.lectureId
           : finalContentData[0].id,
-        contentId: finalContentData[0].id,
+        contentId: finalContentData[0].id
       };
       if (
         lastTrackingContentData?.lectureId &&
@@ -524,7 +532,7 @@ module.exports = {
         totalLectures: course?.totalLectures,
         sidebarData: sidebarData,
         contentData: finalContentData,
-        activeContent: activeContent,
+        activeContent: activeContent
       };
     } catch (error) {
       console.error("Error fetching published course data:", error);
@@ -535,7 +543,7 @@ module.exports = {
     try {
       // Fetch published course by ID
       const course = await CourseModel.findOne({
-        _id: courseId,
+        _id: courseId
       }).populate("sections.id", "_id name lectures");
 
       if (!course) {
@@ -576,7 +584,7 @@ module.exports = {
                       sectionId: section._id,
                       sectionIndex: index,
                       lectureIndex: lectureIndex,
-                      status: false,
+                      status: false
                     })
                   );
 
@@ -589,7 +597,7 @@ module.exports = {
                     title: lectureData.name,
                     sectionIndex: index,
                     lectureIndex: lectureIndex,
-                    content: finalContent,
+                    content: finalContent
                   };
                 } catch (error) {
                   console.error(
@@ -616,7 +624,7 @@ module.exports = {
               index: index,
               id: section._id,
               title: section.name,
-              lectures: validLectures,
+              lectures: validLectures
             };
 
             // Push section data to sidebar and content arrays
@@ -642,11 +650,11 @@ module.exports = {
             return a.sectionIndex - b.sectionIndex;
           }
           return a.lectureIndex - b.lectureIndex;
-        }),
+        })
       };
     } catch (error) {
       console.error("Error fetching published course data:", error);
       throw error; // Ensure errors are propagated
     }
-  },
+  }
 };

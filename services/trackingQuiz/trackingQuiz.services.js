@@ -20,7 +20,7 @@ const upsertQuestion = (data, newRecord) => {
   return data;
 };
 module.exports = {
-  createEnrollQuiz: async (body, quizId) => {
+  createEnrollQuiz: async (body, quizId, assessmentId) => {
     try {
       const userId = body?.user_id ? body.user_id : await generateMongoId();
 
@@ -37,7 +37,7 @@ module.exports = {
       }
       // If it doesn't exist, create a new tracking quiz
       const data = body?.user_id
-        ? { userId, quizId }
+        ? { userId, quizId, assessmentId }
         : { userId, quizId, ...body, quizType: "public" };
       const result = await trackingQuizModel.create(data);
 
@@ -422,6 +422,11 @@ module.exports = {
           $eq: new ObjectId(filter.batchId)
         };
       }
+      if (filter?.userId) {
+        secondeCond.userId = {
+          $eq: new ObjectId(filter.userId)
+        };
+      }
       if (filter?.assessmentId) {
         secondeCond.assessmentId = {
           $eq: new ObjectId(filter.assessmentId)
@@ -506,6 +511,7 @@ module.exports = {
             totalMarks: "$totalMarks",
             totalTime: "$totalTime",
             takenTime: "$takenTime",
+            assessmentId: "$assessmentId",
             userName: { $arrayElemAt: ["$userData.name", 0] },
             userEmail: { $arrayElemAt: ["$userData.email", 0] },
             userRollNo: { $arrayElemAt: ["$userData.rollNo", 0] },

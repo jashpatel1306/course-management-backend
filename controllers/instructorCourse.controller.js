@@ -16,7 +16,7 @@ module.exports = {
           return res.json({
             status: false,
             message: movetoAWS.message,
-            data: [],
+            data: []
           });
         if (movetoAWS.data) requestBody.coverImage = movetoAWS.data;
       }
@@ -26,7 +26,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Instructor Course created successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -45,7 +45,7 @@ module.exports = {
           return res.json({
             status: false,
             message: movetoAWS.message,
-            data: [],
+            data: []
           });
         if (movetoAWS.data) requestBody.coverImage = movetoAWS.data;
       }
@@ -56,7 +56,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Instructor Course updated successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -68,10 +68,12 @@ module.exports = {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
       const filter = {};
+      const activeFilter = req.body?.activeFilter;
       const { courses, count } =
         await instructorCourseService.getInstructorCoursesByCollegeId(
           college_id,
           search,
+          activeFilter,
           pageNo,
           perPage
         );
@@ -83,8 +85,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -98,7 +100,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Instructor Course fetched successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -113,7 +115,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Instructor course updated successfully.",
-        data: updatedCourse,
+        data: updatedCourse
       });
     } catch (error) {
       next(createError(error));
@@ -121,14 +123,15 @@ module.exports = {
   },
   updateInstructorCourseContent: async (req, res, next) => {
     try {
-      const lecture = await instructorCourseService.updateInstructorCourseContent(
-        req.params.id,
-        req.body
-      );
+      const lecture =
+        await instructorCourseService.updateInstructorCourseContent(
+          req.params.id,
+          req.body
+        );
       res.send({
         success: true,
         message: "Course Content updated successfully",
-        data: lecture,
+        data: lecture
       });
     } catch (error) {
       next(error);
@@ -146,7 +149,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Content Deleted Successfully",
-        data: lecture,
+        data: lecture
       });
     } catch (error) {
       next(error);
@@ -160,7 +163,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: "Instructor course deleted successfully.",
-        data: [],
+        data: []
       });
     } catch (error) {
       next(createError(error));
@@ -171,18 +174,18 @@ module.exports = {
       const ids = req.body;
       const courses = await instructorCourseService.assignCourseToCollege(
         ids.courseId,
-        ids.collegeId,
+        ids.collegeId
       );
       if (courses) {
         return res.status(200).json({
           success: true,
           message: "Course assigned successfully",
-          data: courses,
+          data: courses
         });
       } else {
         return res.status(400).json({
           success: false,
-          message: "Failed to assign course",
+          message: "Failed to assign course"
         });
       }
     } catch (error) {
@@ -192,14 +195,16 @@ module.exports = {
   getInstructorCoursesOptions: async (req, res, next) => {
     try {
       const collegeId = req.params.collegeId;
-      const courses = await instructorCourseService.getInstructorCourseService(collegeId);
+      const courses = await instructorCourseService.getInstructorCourseService(
+        collegeId
+      );
       res.send({
         success: true,
         message: "Courses fetched successfully",
-        data: courses,
+        data: courses
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const {
   trackingQuizServices,
   publicLinkServices,
-  studentServices,
+  studentServices
 } = require("../services");
 const userService = require("../services/users/user.service");
 const { ObjectId } = mongoose.Types;
@@ -12,14 +12,16 @@ module.exports = {
   createEnrollQuiz: async (req, res, next) => {
     try {
       const quizId = req.params.quizId;
+      const assessmentId = req.params.assessmentId;
       const trackingQuiz = await trackingQuizServices.createEnrollQuiz(
         req.body,
-        quizId
+        quizId,
+        assessmentId
       );
       return res.status(201).send({
         success: true,
         message: "User enrolled in quiz successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -36,7 +38,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "User enrolled in quiz successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -51,7 +53,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Tracking quiz created successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -68,7 +70,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz fetched successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -84,7 +86,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz fetched successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -108,7 +110,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz updated successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -124,7 +126,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Tracking quiz deleted successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -144,7 +146,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz result added successfully.",
-        data: updatedTrackingQuiz,
+        data: updatedTrackingQuiz
       });
     } catch (error) {
       next(error);
@@ -164,7 +166,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Answer check completed.",
-        data: exists,
+        data: exists
       });
     } catch (error) {
       next(error);
@@ -193,7 +195,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz data fetched successfully.",
-        data: trackingQuizzes,
+        data: trackingQuizzes
       });
     } catch (error) {
       next(error);
@@ -208,7 +210,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz results fetched successfully.",
-        data: trackingQuiz,
+        data: trackingQuiz
       });
     } catch (error) {
       next(error);
@@ -232,8 +234,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -242,11 +244,18 @@ module.exports = {
   getAllResult: async (req, res, next) => {
     try {
       console.log("req.body : ", req.body);
-      const { collegeId, batchId, assessmentId, quizId, pageNo, perPage } =
-        req.body;
+      const {
+        collegeId,
+        batchId,
+        assessmentId,
+        quizId,
+        userId,
+        pageNo,
+        perPage
+      } = req.body;
       console.log("pageNo, perPage: ", pageNo, perPage);
       const { result, count } = await trackingQuizServices.getAllResult(
-        { collegeId, batchId, assessmentId, quizId },
+        { collegeId, batchId, assessmentId, quizId, userId },
         perPage,
         pageNo
       );
@@ -258,8 +267,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -280,11 +289,11 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };

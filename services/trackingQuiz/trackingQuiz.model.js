@@ -15,6 +15,10 @@ const trackingQuizzesSchema = new mongoose.Schema(
       ref: "quizzes",
       required: [true, "quiz id is required."]
     },
+    assessmentId: {
+      type: mongoose.Types.ObjectId,
+      ref: "assessments",
+    },
     correctAnswers: {
       type: Number,
       default: 0

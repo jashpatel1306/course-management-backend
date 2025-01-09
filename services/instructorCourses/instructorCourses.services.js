@@ -18,7 +18,7 @@ module.exports = {
   updateInstructorCourse: async (id, data) => {
     try {
       const course = await InstructorCourseModel.findByIdAndUpdate(id, data, {
-        new: true,
+        new: true
       });
       if (!course) {
         throw createError.NotFound("Instructor Course not found.");
@@ -31,12 +31,13 @@ module.exports = {
   getInstructorCoursesByCollegeId: async (
     collegeId,
     search,
+    activeFilter,
     pageNo,
     perPage
   ) => {
     try {
       let filter = {
-        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }],
+        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }]
       };
       if (search) {
         filter = {
@@ -44,17 +45,22 @@ module.exports = {
             {
               $or: [
                 { collegeId: collegeId },
-                { collegeIds: { $in: [collegeId] } },
-              ],
+                { collegeIds: { $in: [collegeId] } }
+              ]
             },
             {
               $or: [
                 { courseName: { $regex: search, $options: "i" } },
-                { courseDescription: { $regex: search, $options: "i" } },
-              ],
-            },
-          ],
+                { courseDescription: { $regex: search, $options: "i" } }
+              ]
+            }
+          ]
         };
+      }
+      if (activeFilter === "active") {
+        filter.isPublish = true;
+      } else if (activeFilter === "inactive") {
+        filter.isPublish = false;
       }
 
       const courses = await InstructorCourseModel.find(filter)
@@ -88,7 +94,7 @@ module.exports = {
   updateInstructorCourse: async (id, data) => {
     try {
       const course = await InstructorCourseModel.findByIdAndUpdate(id, data, {
-        new: true,
+        new: true
       });
       if (!course) {
         throw createError.NotFound("Instructor course not found.");
@@ -113,8 +119,8 @@ module.exports = {
           { _id: courseId },
           {
             $push: {
-              content: [newContent],
-            },
+              content: [newContent]
+            }
           }
         );
       }
@@ -130,8 +136,8 @@ module.exports = {
         { _id: courseId }, // Find the lecture by its _id
         {
           $pull: {
-            content: { _id: contentId }, // Remove the item matching the contentId
-          },
+            content: { _id: contentId } // Remove the item matching the contentId
+          }
         }
       );
       return result;
@@ -186,7 +192,7 @@ module.exports = {
   getPublishInstructorCourses: async () => {
     try {
       const publishCourses = await InstructorCourseModel.find({
-        isPublish: true,
+        isPublish: true
       });
       if (!publishCourses || publishCourses.length === 0) {
         throw createError.NotFound("No publish instructor courses found.");
@@ -215,7 +221,7 @@ module.exports = {
       }
 
       return {
-        message: "Course ID added to college updated in course successfully.",
+        message: "Course ID added to college updated in course successfully."
       };
     } catch (err) {
       throw createError(err);
@@ -225,11 +231,11 @@ module.exports = {
     try {
       const courses = await InstructorCourseModel.find(
         {
-          collegeIds: collegeId,
+          collegeIds: collegeId
         },
         {
           collegeIds: 0,
-          updatedAt: 0,
+          updatedAt: 0
         }
       );
       if (!courses || courses.length === 0) {
@@ -247,11 +253,11 @@ module.exports = {
           {
             $or: [
               { collegeId: collegeId },
-              { collegeIds: { $in: [collegeId] } },
-            ],
+              { collegeIds: { $in: [collegeId] } }
+            ]
           },
-          { isPublish: true },
-        ],
+          { isPublish: true }
+        ]
       });
       const data = courses.map((item) => {
         return { label: item.courseName, value: item._id };
@@ -260,5 +266,5 @@ module.exports = {
     } catch (error) {
       throw createError(500, error.message);
     }
-  },
+  }
 };
