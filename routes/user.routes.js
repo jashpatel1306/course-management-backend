@@ -772,7 +772,7 @@ router.post(
 
 router.post(
   "/quiz-results/:trackingId",
-  Validate(schemas.quizResultsFilterSchema),
+  // Validate(schemas.quizResultsFilterSchema),
   isAdminCommonAuthenticate,
   // trackingQuizController.getResultContentOfQuiz
   quizController.getQuizTrackingResults

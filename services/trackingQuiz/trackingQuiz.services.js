@@ -407,7 +407,6 @@ module.exports = {
       console.log("ggg");
       const firstCond = { quizType: "quiz" };
       const secondeCond = {};
-      const instructorId = req;
 
       if (filter?.quizId) {
         firstCond.quizId = {

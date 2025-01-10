@@ -485,6 +485,7 @@ module.exports = {
             },
           },
         },
+
         { $sort: { year: 1 } },
       ]);
 
@@ -549,7 +550,4 @@ module.exports = {
       throw error;
     }
   },
-
-  
-
 };
