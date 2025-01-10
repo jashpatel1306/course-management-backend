@@ -231,7 +231,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Quiz tracking results fetched successfully",
-        data: result,
+        data: result ? result[0] : {},
       });
     } catch (error) {
       next(error);
