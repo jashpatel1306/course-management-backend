@@ -217,6 +217,7 @@ module.exports = {
                   question: 1,
                   answers: 1, // Include the answers for lookup
                   marks: 1,
+                  questionType: 1,
                 },
               },
             ],

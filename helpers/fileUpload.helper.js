@@ -120,10 +120,15 @@ module.exports = {
   uploadFileMaterialToAWS: (fileData, path) => {
     return new Promise(async (resolve, reject) => {
       try {
+        console.log("fileData : ", fileData);
         // Supported MIME types and file extensions
         const acceptFiles = [
           // PDF
           "application/pdf",
+          "image/png",
+          "image/jpeg",
+          "image/jpg",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // DOCX
 
           // Microsoft Office formats
           "application/vnd.ms-powerpoint", // PPT (old)
@@ -144,6 +149,7 @@ module.exports = {
           "docx", // Word (DOCX)
           "xls", // Excel (XLS)
           "xlsx", // Excel (XLSX)
+          "png", // PNG
         ];
 
         const fileExt = fileData?.name
@@ -533,7 +539,6 @@ module.exports = {
     }
   },
   uploadPart: async (uploadId, key, partNumber, part) => {
-  
     const buffer = Buffer.from(part.data, `binary`);
 
     const params = {
