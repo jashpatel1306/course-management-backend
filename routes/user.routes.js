@@ -791,4 +791,10 @@ router.get(
   dashboardController.getDashboardDataOfInstructor
 );
 
+router.get(
+  "/student-dashboard/",
+  isAuthenticate,
+  dashboardController.getDashboardDataOfStudent
+);
+
 module.exports = router;

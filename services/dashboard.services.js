@@ -11,6 +11,8 @@ const userSessionsModel = require("../services/userSessions/userSessions.model")
 const { id } = require("../validation/validation");
 const userModel = require("./users/user.model");
 const batchesModel = require("../services/batches/batches.model");
+const assignAssessmentsModel = require("./assignAssessment/assignAssessment.model");
+const createHttpError = require("http-errors");
 
 const generateMonthRange = (start, end) => {
   const months = [];
@@ -548,6 +550,95 @@ module.exports = {
       return result;
     } catch (error) {
       throw error;
+    }
+  },
+  getStudentDashboardData: async (studentId) => {
+    try {
+      const student = await studentModel.findOne({ userId: studentId });
+      if (!student) {
+        throw createHttpError(403, "Invalid student");
+      }
+      console.log("student", student);
+      const batchId = student.batchId;
+
+      const courses = await batchModel.aggregate([
+        {
+          $match: {
+            _id: new ObjectId(batchId),
+          },
+        },
+        {
+          $lookup: {
+            from: "courses",
+            localField: "courses",
+            foreignField: "_id",
+            as: "courses",
+            pipeline: [
+              {
+                $project: {
+                  _id: 1,
+                  courseName: 1,
+                  courseDescription: 1,
+                  coverImage: 1,
+                  totalSections: 1,
+                  totalLectures: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $project: { courses: 1 },
+        },
+      ]);
+
+      const date = new Date();
+
+      const assessments = await assignAssessmentsModel.aggregate([
+        {
+          $match: {
+            batchId: new ObjectId(batchId),
+            $expr: {
+              $and: [
+                {
+                  $gte: [
+                    "$endDate",
+                    new Date(date.getFullYear(), date.getMonth(), 1),
+                  ],
+                },
+                {
+                  $lte: [
+                    "$endDate",
+                    new Date(date.getFullYear(), date.getMonth() + 1, 0),
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        {
+          $lookup: {
+            from: "assessments",
+            localField: "assessmentId",
+            foreignField: "_id",
+            as: "assessments",
+          },
+        },
+        {
+          $project: {
+            title: { $arrayElemAt: ["$assessments.title", 0] },
+            assessmentId: { $arrayElemAt: ["$assessments._id", 0] },
+            dueDate: "$endDate",
+          },
+        },
+      ]);
+      console.log("assessments", assessments);
+      return {
+        courses: courses ? courses[0].courses : [],
+        assessments: assessments,
+      };
+    } catch (err) {
+      throw err;
     }
   },
 };
