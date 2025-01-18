@@ -5,19 +5,24 @@ const transformData = async (quizId, data) => {
   return await data.map((item) => {
     const answers = [];
     let i = 1;
-    while (item[`answer${i}`]) {
-      answers.push({
-        content:
-          item.type === "mcq"
-            ? `<p>${item[`answer${i}`]}</p>`
-            : `${item[`answer${i}`]}`,
-        reason: `${
-          item.correctAnswer === item[`answer${i}`]
-            ? item.answerExplanation || ""
-            : ""
-        }`,
-        correct: item.correctAnswer === item[`answer${i}`]
-      });
+    // console.log("item[`answer${i}`] :", item[`answer${i}`]);
+    while (i < 5) {
+      const answerContent = item[`answer${i}`];
+      if (answerContent !== "") {
+        answers.push({
+          content:
+            item.type === "mcq"
+              ? `<p>${item[`answer${i}`]}</p>`
+              : `${item[`answer${i}`]}`,
+          reason: `${
+            item.correctAnswer === item[`answer${i}`]
+              ? item.answerExplanation || ""
+              : ""
+          }`,
+          correct: item.correctAnswer === item[`answer${i}`]
+        });
+      }
+
       i++;
     }
 
