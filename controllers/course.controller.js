@@ -6,12 +6,15 @@ module.exports = {
   createCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
+      console.log("image", image);
       const request_body = req.body;
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
           `courses/coverImage/`
         );
+        console.log("movetoAWS", movetoAWS);
+
         if (!movetoAWS.status)
           return res.json({
             status: false,
@@ -19,6 +22,7 @@ module.exports = {
             data: [],
           });
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
+        console.log("movetoAWS", movetoAWS);
       }
       const course = await courseServices.createCourse(req.body);
       res.send({
@@ -117,7 +121,7 @@ module.exports = {
       const { search, pageNo = 1, perPage = 10 } = req.body;
       const college_id = req?.body?.collegeId ? req.body?.collegeId : null;
       const activeFilter = req.body?.activeFilter;
-       
+
       const userRole = res.locals.userRole;
       // userRole === "student" ? filter.isPublish = true : filter.
       const { courses, count } = await courseServices.getCoursesByCollegeId(

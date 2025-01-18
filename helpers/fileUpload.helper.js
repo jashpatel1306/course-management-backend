@@ -93,7 +93,7 @@ module.exports = {
           // .resize(resizedWidth, resizedHeight)
           .toFormat("webp")
           .toBuffer();
-
+        console.log("webpBuffer", webpBuffer);
         // Setting up S3 upload parameters
         const params = {
           Bucket: process.env.AWS_S3_BUCKET,
@@ -103,12 +103,13 @@ module.exports = {
           ContentType: "image/webp",
         };
         s3.upload(params, function (err, data) {
-          if (err)
-            console.log("err: ",err)
+          if (err) {
+            console.log("err: ", err);
             return resolve({
               status: false,
               message: `Error uploading image on s3.`,
             });
+          }
           return resolve({ status: true, data: data?.Location });
         });
       } catch (error) {
