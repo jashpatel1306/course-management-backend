@@ -52,12 +52,10 @@ const CourseSchema = new mongoose.Schema(
     },
     collegeIds: [{ type: mongoose.Types.ObjectId, ref: "colleges" }],
     startTime: {
-      type: Date,
-      required: [true, "Course start time is required."]
+      type: Date
     },
     endTime: {
-      type: Date,
-      required: [true, "Course end time is required."]
+      type: Date
     }
   },
   { timestamps: true, versionKey: false }

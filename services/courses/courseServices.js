@@ -374,7 +374,7 @@ module.exports = {
       }
 
       // Process sections if they exist
-      if (course?.sections.length) {
+      if (course?.sections?.length) {
         const finalSectionData = await Promise.all(
           course.sections.map(async (info, index) => {
             const section = info.id; // Create a shallow copy to avoid mutation
@@ -383,11 +383,11 @@ module.exports = {
 
             // Fetch and process lectures for this section
             const lectureContent = await Promise.all(
-              section.lectures.map(async (lecture, lectureIndex) => {
+              section.lectures?.map(async (lecture, lectureIndex) => {
                 try {
                   const lectureData =
                     await lecturesServices.getPublishLectureDataById(
-                      lecture.id
+                      lecture?.id
                     );
 
                   if (!lectureData) {
@@ -435,7 +435,7 @@ module.exports = {
 
                   return {
                     type: "lecture",
-                    id: lectureData._id,
+                    id: lectureData?._id,
                     title: lectureData.name,
                     sectionIndex: index,
                     lectureIndex: lectureIndex,

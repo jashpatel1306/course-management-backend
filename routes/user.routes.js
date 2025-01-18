@@ -4,7 +4,7 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
-  isAuthenticate,
+  isAuthenticate
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
@@ -15,7 +15,7 @@ const staffController = require("../controllers/staff.controller");
 const departmentController = require("../controllers/department.controller");
 const {
   handleExcelData,
-  handleExcelQuestionData,
+  handleExcelQuestionData
 } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
 const quizController = require("../controllers/quiz.controller");
@@ -90,7 +90,7 @@ router.get(
 );
 router.get(
   "/batches-option",
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   batchesController.getBatchesOption
 );
 
@@ -338,7 +338,7 @@ router.delete(
 );
 router.get(
   "/assessment-option-by-college/:collegeId",
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   assessmentController.getAssessmentOptionsByCollegeId
 );
 
@@ -773,7 +773,7 @@ router.post(
 router.post(
   "/quiz-results/:trackingId",
   // Validate(schemas.quizResultsFilterSchema),
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   // trackingQuizController.getResultContentOfQuiz
   quizController.getQuizTrackingResults
 );

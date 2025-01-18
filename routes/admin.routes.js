@@ -48,7 +48,7 @@ router.get(
 
 router.get(
   "/batches-option/:collegeId",
-  isAdminCommonAuthenticate,
+  // isAdminCommonAuthenticate,
   batcheController.getBatchesOption
 );
 

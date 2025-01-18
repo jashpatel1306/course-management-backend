@@ -29,13 +29,13 @@ module.exports = {
         colleges,
         courses,
         studentRegistrationChart,
-        activeStudentsChart,
+        activeStudentsChart
       ] = await Promise.all([
         dashboardServices.countDocsFromMultipleCollections(),
         dashboardServices.getTopColleges(),
         dashboardServices.getTopCourses({}),
         dashboardServices.getStudentRegistrationData(filter),
-        dashboardServices.getActiveStudents(filter),
+        dashboardServices.getActiveStudents(filter)
       ]);
 
       console.log("result data", countData, colleges, courses);
@@ -48,8 +48,8 @@ module.exports = {
           colleges,
           courses,
           studentRegistrationChart,
-          activeStudentsChart,
-        },
+          activeStudentsChart
+        }
       });
     } catch (err) {
       next(err);
@@ -78,13 +78,13 @@ module.exports = {
         courses,
         batches,
         studentRegistrationChart,
-        activeStudentsChart,
+        activeStudentsChart
       ] = await Promise.all([
         dashboardServices.countDocsFromMultipleCollections(collegeId),
         dashboardServices.getTopCourses({ collegeId: collegeId }),
         dashboardServices.getTopBatches(collegeId),
         dashboardServices.getStudentRegistrationData({ ...filter, collegeId }),
-        dashboardServices.getActiveStudents({ ...filter, collegeId }),
+        dashboardServices.getActiveStudents({ ...filter, collegeId })
       ]);
 
       console.log("result data", countData, batches, courses);
@@ -97,8 +97,8 @@ module.exports = {
           batches,
           courses,
           studentRegistrationChart,
-          activeStudentsChart,
-        },
+          activeStudentsChart
+        }
       });
     } catch (err) {
       next(err);
@@ -116,7 +116,7 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "dashboard data fetched.",
-        data,
+        data: data.length ? data[0] : null
       });
     } catch (err) {
       next(err);
@@ -131,11 +131,10 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: "dashboard data fetched.",
-        data,
+        data
       });
     } catch (err) {
       next(err);
     }
-  },
-  
+  }
 };

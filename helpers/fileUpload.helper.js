@@ -5,7 +5,6 @@ const randomstring = require(`randomstring`);
 const fs = require(`fs`);
 const limit = 60;
 const baseUrl = `content/images/`;
-const { v4: uuidv4 } = require("uuid");
 
 const awsConfig = {
   accessKeyId: process.env.AWS_S3_ACCESSKEYID,
@@ -105,6 +104,7 @@ module.exports = {
         };
         s3.upload(params, function (err, data) {
           if (err)
+            console.log("err: ",err)
             return resolve({
               status: false,
               message: `Error uploading image on s3.`,

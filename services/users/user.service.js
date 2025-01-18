@@ -9,7 +9,7 @@ const {
   STAFF,
   INSTRUCTOR,
   adminPermissions,
-  collegePermissions,
+  collegePermissions
 } = require("../../constants/roles.constant");
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const commonFunctions = require("../../helpers/commonFunctions");
@@ -42,14 +42,14 @@ module.exports = {
           password: "Admin@123",
           role: SUPERADMIN,
           user_name: "First Admin",
-          permissions: adminPermissions,
+          permissions: adminPermissions
         };
         const collageData = {
           email: "lmscollage@admin.com",
           password: "Admin@123",
           role: ADMIN,
           user_name: "First Collage Admin",
-          permissions: collegePermissions,
+          permissions: collegePermissions
         };
 
         data.password = await commonFunctions.encode(data.password);
@@ -67,7 +67,7 @@ module.exports = {
           { upsert: true }
         );
         const collageUserResult = await userModel.findOne({
-          email: collageData.email,
+          email: collageData.email
         });
         const userResult = await userModel.findOne({ email: data.email });
 
@@ -79,7 +79,7 @@ module.exports = {
             contactPersonName: "First Admin",
             contactPersonNo: "+919999999999",
             shortName: "superAdmin College",
-            isAdmin: true,
+            isAdmin: true
           };
           await collegesModel.updateOne(
             { userId: collageUserResult._id },
@@ -141,8 +141,9 @@ module.exports = {
       }
       if (user.role === INSTRUCTOR) {
         const instructorData = await InstructorModel.findOne({
-          userId: user._id,
+          userId: user._id
         });
+        console.log("instructorData: ", instructorData);
         if (instructorData && !instructorData.active) {
           throw createError.Unauthorized(
             "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
@@ -151,7 +152,7 @@ module.exports = {
       }
       if (user.role === ADMIN) {
         const collegeData = await collegesModel.findOne({
-          userId: user._id,
+          userId: user._id
         });
         if (collegeData && !collegeData.active) {
           throw createError.Unauthorized(
@@ -161,7 +162,7 @@ module.exports = {
       }
       if (user.role === STUDENT) {
         const studentData = await studentsModel.findOne({
-          userId: user._id,
+          userId: user._id
         });
         if (studentData && !studentData.active) {
           throw createError.Unauthorized(
@@ -171,7 +172,7 @@ module.exports = {
       }
       if (user.role === STAFF) {
         const staffData = await staffModel.findOne({
-          userId: user._id,
+          userId: user._id
         });
         if (staffData && !staffData.active) {
           throw createError.Unauthorized(
@@ -197,6 +198,18 @@ module.exports = {
         const staffData = await staffModel.findOne({ userId: user._id });
         collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
       }
+      if (!collegeId && user.role === STAFF) {
+        const staffData = await staffModel.findOne({ userId: user._id });
+        collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
+      }
+      if (!collegeId && user.role === INSTRUCTOR) {
+        const instructorData = await InstructorModel.findOne({
+          userId: user._id
+        });
+        collegeId = instructorData?.collegeId
+          ? instructorData?.collegeId
+          : null;
+      }
       console.log("user : ", user);
       const userData = {
         user_id: user._id,
@@ -204,20 +217,20 @@ module.exports = {
         email: user.email,
         permissions: user.permissions,
         college_id: collegeId,
-        batch_id: batchId,
+        batch_id: batchId
       };
 
       const createSession = await userSessionsServices.createUserSession({
         userId: user._id,
         role: user.role,
-        collegeId,
+        collegeId
       });
       if (!createSession) {
         throw createError.InternalServerError("Failed to create session.");
       }
 
       const accessToken = jwt.sign(userData, JWTSecretKey, {
-        expiresIn: 86400,
+        expiresIn: 86400
       });
 
       return { accessToken, user, collegeId, batchId };
@@ -307,5 +320,5 @@ module.exports = {
     } catch (error) {
       throw error;
     }
-  },
+  }
 };
