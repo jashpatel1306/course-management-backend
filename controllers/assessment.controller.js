@@ -8,7 +8,7 @@ module.exports = {
       return res.status(201).send({
         success: true,
         message: "Assessment created successfully.",
-        data: assessment,
+        data: assessment
       });
     } catch (error) {
       next(error);
@@ -26,7 +26,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Assessment updated successfully",
-        data: assessment,
+        data: assessment
       });
     } catch (error) {
       next(error);
@@ -44,7 +44,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Assessment fetched successfully",
-        data: assessment,
+        data: assessment
       });
     } catch (error) {
       next(error);
@@ -60,7 +60,7 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Assessment deleted successfully",
-        data: [],
+        data: []
       });
     } catch (error) {
       next(error);
@@ -75,7 +75,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Assessment ${message} successfully`,
-        data: assessment,
+        data: assessment
       });
     } catch (error) {
       next(error);
@@ -111,8 +111,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -125,12 +125,14 @@ module.exports = {
       const searchText = new RegExp(req.body?.search, `i`);
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
+      const status = req.body?.status;
       const { assessments, count } =
-        await assignAssessmentService.getAllAssignAssessment(
+        await assignAssessmentService.getStudentsAllAssignAssessment(
           batchId === "all" ? "" : batchId,
           perPage,
           pageNo,
-          college_id
+          college_id,
+          status
         );
       return res.status(200).send({
         success: true,
@@ -140,8 +142,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -155,10 +157,10 @@ module.exports = {
       return res.status(200).send({
         success: true,
         message: "Assessment option fetched successfully",
-        data: assessment,
+        data: assessment
       });
     } catch (error) {
       next(error);
     }
-  },
+  }
 };

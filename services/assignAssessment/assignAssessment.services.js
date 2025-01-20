@@ -9,7 +9,6 @@ module.exports = {
     try {
       data.type = "batch";
       if (data.assessmentId && data.batchId) {
-      
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId
@@ -30,7 +29,6 @@ module.exports = {
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
       if (data.assessmentId && data.batchId) {
-      
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId
@@ -50,7 +48,6 @@ module.exports = {
       data.sectionId = data.sectionId ? data.sectionId : null;
       data.lectureId = data.lectureId ? data.lectureId : null;
       if (data.assessmentId && data.batchId) {
-       
         await assessmentsModel.addBatchToAssessment(
           data.assessmentId,
           data.batchId
@@ -60,7 +57,7 @@ module.exports = {
         { _id: id },
         data,
         {
-          new: true,
+          new: true
         }
       );
       if (!assessment) throw createError(400, "invalid assign assessment id");
@@ -72,7 +69,7 @@ module.exports = {
   deleteAssignAssessment: async (id) => {
     try {
       const assessment = await AssignAssessmentsModel.findOneAndDelete({
-        _id: id,
+        _id: id
       });
       if (!assessment) throw createError(400, "invalid assign assessment id");
       return assessment;
@@ -84,7 +81,7 @@ module.exports = {
     try {
       const assessment = await AssignAssessmentsModel.findOne({
         batchId,
-        type: "batch",
+        type: "batch"
       }).populate("assessmentId");
       if (!assessment) throw createError(400, "invalid batch id");
       return assessment;
@@ -96,7 +93,7 @@ module.exports = {
     try {
       const assessment = await AssignAssessmentsModel.findOne({
         courseId,
-        type: "course",
+        type: "course"
       }).populate("assessmentId");
       if (!assessment) throw createError(400, "invalid course id");
       return assessment;
@@ -112,7 +109,7 @@ module.exports = {
         batchId,
         type: "course",
         startDate: { $lte: currentDate },
-        endDate: { $gte: currentDate },
+        endDate: { $gte: currentDate }
       }).populate("assessmentId");
       if (!assessment) throw createError(400, "invalid course id");
       return assessment;
@@ -129,7 +126,7 @@ module.exports = {
   ) => {
     try {
       const filter = {
-        $and: [collegeId ? { collegeId } : {}, batchId ? { batchId } : {}],
+        $and: [collegeId ? { collegeId } : {}, batchId ? { batchId } : {}]
       };
       const assessments = await AssignAssessmentsModel.find(filter)
         .populate("batchId", "_id batchName")
@@ -145,4 +142,51 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  getStudentsAllAssignAssessment: async (
+    batchId,
+    perPage,
+    pageNo,
+    collegeId,
+    searchText,
+    status
+  ) => {
+    try {
+      const statusFilter = null;
+
+      if (status === "upcoming") {
+        statusFilter = {
+          startDate: { $gte: new Date() }
+        };
+      } else if (status === "active") {
+        statusFilter = {
+          startDate: { $lte: new Date() },
+          endDate: { $gte: new Date() }
+        };
+      } else if (status === "expired") {
+        statusFilter = {
+          endDate: { $lt: new Date() }
+        };
+      }
+      let filter = {
+        $and: [
+          collegeId ? { collegeId } : {},
+          batchId ? { batchId } : {},
+          ...(statusFilter ? [statusFilter] : [])
+        ]
+      };
+      console.log("filter : ",filter)
+      const assessments = await AssignAssessmentsModel.find(filter)
+        .populate("batchId", "_id batchName")
+        .populate("courseId", "_id courseName")
+        .populate("assessmentId", "_id title totalQuestions totalMarks")
+        .skip((pageNo - 1) * perPage)
+        .limit(perPage);
+      const count = await AssignAssessmentsModel.countDocuments(filter);
+      if (!assessments)
+        throw createError(500, "Error while Fetching assign assessments.");
+      return { assessments, count };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  }
 };
