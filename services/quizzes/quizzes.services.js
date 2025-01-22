@@ -25,7 +25,7 @@ module.exports = {
       const quiz = await QuizzesModel.findById(id)
         .populate({
           path: "questions",
-          match: { active: true }, // Optional: Filter to include only active questions
+          match: { active: true } // Optional: Filter to include only active questions
         })
         .exec();
 
@@ -38,7 +38,7 @@ module.exports = {
 
       // Return the quiz with ordered questions
       return {
-        ...quiz.toObject(),
+        ...quiz.toObject()
         // questions: orderedQuestions,
       };
     } catch (error) {
@@ -65,7 +65,7 @@ module.exports = {
 
       // Return the quiz with ordered questions
       return {
-        ...quiz.toObject(),
+        ...quiz.toObject()
         // questions: orderedQuestions, // Uncomment if reordering is necessary
       };
     } catch (error) {
@@ -99,7 +99,7 @@ module.exports = {
       const quiz = await QuizzesModel.findById(id)
         .populate({
           path: "questions",
-          match: { active: true }, // Optional: Filter to include only active questions
+          match: { active: true } // Optional: Filter to include only active questions
         })
         .exec();
 
@@ -115,7 +115,7 @@ module.exports = {
   updateQuiz: async (id, data) => {
     try {
       const quiz = await QuizzesModel.findOneAndUpdate({ _id: id }, data, {
-        new: true,
+        new: true
       });
       if (!quiz) throw createError(400, "invalid quiz id");
       return quiz;
@@ -169,11 +169,12 @@ module.exports = {
       const quiz = await QuizzesModel.aggregate([
         {
           $match: {
-            _id: new ObjectId(id),
-          },
+            // _id: new ObjectId(id),
+            _id: { $in: id }
+          }
         },
         {
-          $unwind: "$questions",
+          $unwind: "$questions"
         },
         {
           $lookup: {
@@ -183,23 +184,23 @@ module.exports = {
               {
                 $match: {
                   $expr: {
-                    $eq: ["$_id", new ObjectId(trackingId)],
-                  },
-                },
+                    $eq: ["$_id", new ObjectId(trackingId)]
+                  }
+                }
               },
               {
-                $unwind: "$result",
+                $unwind: "$result"
               },
               {
                 $match: {
                   $expr: {
-                    $eq: ["$result.questionId", "$$questionId"],
-                  },
-                },
-              },
+                    $eq: ["$result.questionId", "$$questionId"]
+                  }
+                }
+              }
             ],
-            as: "result",
-          },
+            as: "result"
+          }
         },
         {
           $lookup: {
@@ -208,8 +209,8 @@ module.exports = {
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: ["$_id", "$$questionId"] },
-                },
+                  $expr: { $eq: ["$_id", "$$questionId"] }
+                }
               },
               {
                 $project: {
@@ -217,12 +218,12 @@ module.exports = {
                   question: 1,
                   answers: 1, // Include the answers for lookup
                   marks: 1,
-                  questionType: 1,
-                },
-              },
+                  questionType: 1
+                }
+              }
             ],
-            as: "questionData",
-          },
+            as: "questionData"
+          }
         },
         {
           $project: {
@@ -233,13 +234,14 @@ module.exports = {
             wrongAnswers: { $arrayElemAt: ["$result.wrongAnswers", 0] },
             reslutMarks: { $arrayElemAt: ["$result.totalMarks", 0] },
             totalTime: { $arrayElemAt: ["$result.totalTime", 0] },
+            specificField: { $arrayElemAt: ["$result.specificField", 0] },
             takenTime: { $arrayElemAt: ["$result.takenTime", 0] },
-            isSubmit: { $arrayElemAt: ["$result.isSubmit", 0] },
+            quizType: { $arrayElemAt: ["$result.quizType", 0] },
             questionData: {
-              $arrayElemAt: ["$questionData", 0],
+              $arrayElemAt: ["$questionData", 0]
             },
-            result: { $arrayElemAt: ["$result", 0] },
-          },
+            result: { $arrayElemAt: ["$result", 0] }
+          }
         },
 
         {
@@ -250,13 +252,13 @@ module.exports = {
                   $filter: {
                     input: { $ifNull: ["$questionData.answers", []] }, // Ensure it's an array
                     as: "answer",
-                    cond: { $eq: ["$$answer._id", "$result.result.answerId"] },
-                  },
+                    cond: { $eq: ["$$answer._id", "$result.result.answerId"] }
+                  }
                 },
-                0,
-              ],
-            },
-          },
+                0
+              ]
+            }
+          }
         },
         {
           $group: {
@@ -266,16 +268,29 @@ module.exports = {
             wrongAnswers: { $first: "$wrongAnswers" },
             totalTime: { $first: "$totalTime" },
             takenTime: { $first: "$takenTime" },
-            isSubmit: { $first: "isSubmit" },
-
+            quizType: { $first: "$quizType" },
             results: { $push: "$questionData" },
-          },
+            specificField: { $first: "$specificField" },
+          }
         },
+        {
+          $project: {
+            totalMarks: 1,
+            quizId: 1,
+            correctAnswers: 1,
+            wrongAnswers: 1,
+            totalTime: 1,
+            takenTime: 1,
+            specificField: 1,
+            quizType: 1,
+            results: 1,
+          }
+        }
       ]);
       if (!quiz) throw createError(500, "Error fetching quiz results");
       return quiz;
     } catch (error) {
       throw error;
     }
-  },
+  }
 };
