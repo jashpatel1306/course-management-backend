@@ -4,42 +4,42 @@ const QuizSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "quiz title is required."],
+      required: [true, "quiz title is required."]
     },
     description: {
-      type: Array,
+      type: Array
     },
     questions: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "questions",
-      },
+        ref: "questions"
+      }
     ],
     active: {
       type: Boolean,
-      default: true,
+      default: true
     },
     totalMarks: {
       type: Number,
-      default: 0,
+      default: 0
     },
     assessmentId: {
       type: mongoose.Types.ObjectId,
       ref: "assessments",
-      default: null,
+      default: null
     },
     isPublic: {
       type: Boolean,
-      default: false,
+      default: false
     },
     time: {
       type: Number,
-      default: 0,
+      default: 0
     },
     isPublish: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   { timestamps: true, versionKey: false }
 );
@@ -56,9 +56,9 @@ QuizSchema.post("save", async function (quiz) {
         $push: {
           contents: {
             type: "quiz",
-            id: quiz._id,
-          },
-        },
+            id: quiz._id
+          }
+        }
       },
       { new: true }
     );

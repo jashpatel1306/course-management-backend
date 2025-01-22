@@ -228,6 +228,7 @@ module.exports = {
       const quizId = await trackingQuizServices.getQuizId(trackingId);
       console.log("Quiz tracking", quizId);
       const result = await quizzesServices.getQuizResult(quizId, trackingId);
+      // console.log("Quiz result", result);
       return res.status(200).send({
         success: true,
         message: "Quiz tracking results fetched successfully",
@@ -237,4 +238,20 @@ module.exports = {
       next(error);
     }
   },
+  // getQuizTrackingResults: async (req, res, next) => {
+  //   try {
+  //     const { trackingId } = req.params;
+  //     const quizId = await trackingQuizServices.getQuizResultId(trackingId);
+  //     console.log("Quiz tracking", quizId);
+  //     const result = await quizzesServices.getQuizResult("678e4a148495891cfe1f3d5c", trackingId);
+  //     // console.log("Quiz result", result);
+  //     return res.status(200).send({
+  //       success: true,
+  //       message: "Quiz tracking results fetched successfully",
+  //       data: result ? result[0] : {},
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // },
 };
