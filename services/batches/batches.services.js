@@ -5,6 +5,7 @@ const CollegeModel = require("../colleges/colleges.model");
 const studentsModel = require("../students/student.model");
 const batchesModel = require("./batches.model");
 const CourseModel = require("../courses/course");
+const trackingCourseModel = require("../trackingCourse/trackingCourse.model");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -20,7 +21,7 @@ module.exports = {
   updateBatch: async (id, data) => {
     try {
       const batch = await BatchModel.findOneAndUpdate({ _id: id }, data, {
-        new: true,
+        new: true
       });
       if (!batch) createError(500, "Error while updating batch");
       return batch;
@@ -58,7 +59,7 @@ module.exports = {
 
       if (search) {
         filter = {
-          $or: [{ batchName: { $regex: search } }],
+          $or: [{ batchName: { $regex: search } }]
         };
       }
 
@@ -96,7 +97,7 @@ module.exports = {
       const batchesWithStudentCount = await Promise.all(
         batches.map(async (batch) => {
           const studentCount = await studentsModel.countDocuments({
-            batchId: batch._id,
+            batchId: batch._id
           });
           return { ...batch.toObject(), studentCount };
         })
@@ -134,15 +135,15 @@ module.exports = {
     try {
       let batches = await BatchModel.aggregate([
         {
-          $match: { collegeId: new ObjectId(collegeId) },
+          $match: { collegeId: new ObjectId(collegeId) }
         },
         {
           $lookup: {
             from: "students", // Referencing the students collection
             localField: "_id", // Field from the batches collection
             foreignField: "batchId", // Field from the students collection
-            as: "studentsData", // Alias for the joined data
-          },
+            as: "studentsData" // Alias for the joined data
+          }
         },
         {
           $project: {
@@ -155,21 +156,21 @@ module.exports = {
                 "$batchName", // The label
                 " (", // Separator (you can customize this)
                 { $toString: { $size: "$studentsData" } }, // Convert totalStudents to string
-                ")",
-              ],
-            },
-          },
-        },
+                ")"
+              ]
+            }
+          }
+        }
       ]);
       // if (!adminStatus) {
-        // let allBatchesStudentsCount = await studentsModel.countDocuments({
-        //   collegeUserId: new ObjectId(collegeId),
-        // });
-        batches.unshift({
-          label: "All Batches",
-          value: "all",
-          // totalStudents: allBatchesStudentsCount,
-        });
+      // let allBatchesStudentsCount = await studentsModel.countDocuments({
+      //   collegeUserId: new ObjectId(collegeId),
+      // });
+      batches.unshift({
+        label: "All Batches",
+        value: "all"
+        // totalStudents: allBatchesStudentsCount,
+      });
       // }
 
       return batches;
@@ -184,15 +185,15 @@ module.exports = {
       if (activeFilter === "active") {
         filter = {
           startTime: { $lte: new Date() },
-          endTime: { $gte: new Date() },
+          endTime: { $gte: new Date() }
         };
       } else if (activeFilter === "expired") {
         filter = {
-          endTime: { $lte: new Date() },
+          endTime: { $lte: new Date() }
         };
       } else if (activeFilter === "upcoming") {
         filter = {
-          startTime: { $gte: new Date() },
+          startTime: { $gte: new Date() }
         };
       }
 
@@ -204,13 +205,62 @@ module.exports = {
 
       const courses = await CourseModel.find({
         _id: { $in: courseIds },
-        ...filter,
+        ...filter
       });
       if (!courses) {
         throw createError.NotFound("No courses found for the given college.");
       }
 
       return { courses };
+    } catch (error) {
+      throw createError(error);
+    }
+  },
+  getDashboardCourses: async (batchId, userId) => {
+    try {
+      const batchData = await BatchModel.findOne({ _id: batchId });
+      if (!batchData) {
+        throw createError(404, "Batches not found");
+      }
+      const courseIds = batchData.courses;
+
+      const courses = await CourseModel.find({
+        _id: { $in: courseIds },
+        isPublish: true
+      });
+      const trackingCourses = await trackingCourseModel.find(
+        {
+          courseId: { $in: courseIds },
+          userId: userId
+        },
+        {
+          courseId: 1,
+          totalcontent: 1,
+          trackingContent: 1
+        }
+      );
+
+      let completedCourseCount = 0;
+      let onGoingCourseCount = 0;
+      trackingCourses.map((course) => {
+        if (course?.totalcontent <= course?.trackingContent?.length) {
+          completedCourseCount++;
+        } else {
+          onGoingCourseCount++;
+        }
+      });
+      const finalResult = {
+        total: courses.length,
+        completed: completedCourseCount,
+        ongoing: onGoingCourseCount
+      };
+      console.log("finalResult: ", finalResult);
+
+      if (!courses) {
+        throw createError.NotFound("No courses found for the given college.");
+      }
+
+      return { trackingCourses: finalResult };
     } catch (error) {
       throw createError(error);
     }
@@ -228,5 +278,5 @@ module.exports = {
     } catch (error) {
       throw createError(500, error.message);
     }
-  },
+  }
 };

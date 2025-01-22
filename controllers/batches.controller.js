@@ -8,7 +8,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batch created successfully",
-        data: batch,
+        data: batch
       });
     } catch (error) {
       next(error);
@@ -20,7 +20,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batch fetched successfully",
-        data: batch,
+        data: batch
       });
     } catch (error) {
       next(error);
@@ -34,7 +34,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batches fetched successfully",
-        data: batches,
+        data: batches
       });
     } catch (error) {
       next(error);
@@ -48,7 +48,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batches fetched successfully",
-        data: batches,
+        data: batches
       });
     } catch (error) {
       next(error);
@@ -61,7 +61,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batch updated successfully",
-        data: batch,
+        data: batch
       });
     } catch (error) {
       next(error);
@@ -73,7 +73,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batch deleted successfully",
-        data: batch,
+        data: batch
       });
     } catch (error) {
       next(error);
@@ -88,7 +88,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `batch ${message} successfully`,
-        data: batch,
+        data: batch
       });
     } catch (error) {
       next(error);
@@ -100,7 +100,7 @@ module.exports = {
       res.status(200).send({
         success: true,
         message: "batches fetched successfully",
-        data: batches,
+        data: batches
       });
     } catch (err) {
       next(err);
@@ -119,7 +119,25 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses fetched successfully",
-        data: courses,
+        data: courses
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  getDashboardCourses: async (req, res, next) => {
+    try {
+      const batch_id = req.body?.batch_id;
+      const user_id = req.body?.user_id;
+
+      const { trackingCourses } = await batchServices.getDashboardCourses(
+        batch_id,
+        user_id
+      );
+      res.send({
+        success: true,
+        message: "Courses fetched successfully",
+        data: trackingCourses
       });
     } catch (err) {
       next(err);
@@ -133,10 +151,10 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses option fetched successfully",
-        data: result,
+        data: result
       });
     } catch (err) {
       next(err);
     }
-  },
+  }
 };

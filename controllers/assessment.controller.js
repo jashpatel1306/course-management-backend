@@ -132,6 +132,7 @@ module.exports = {
           perPage,
           pageNo,
           college_id,
+          searchText,
           status
         );
       return res.status(200).send({

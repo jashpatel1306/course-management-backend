@@ -26,9 +26,13 @@ router.post(
 
 router.get(
   "/student-wise-courses",
-  // ValidateQueryParams(schemas.paginationAndFilterSchema),
   isStudentAuthenticate,
   batchesController.getCoursesByBatchId
+);
+router.get(
+  "/student-wise-courses/dashboard",
+  isStudentAuthenticate,
+  batchesController.getDashboardCourses
 );
 router.get(
   "/course-view-data/:courseId",

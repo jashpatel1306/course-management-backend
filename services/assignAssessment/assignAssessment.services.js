@@ -151,7 +151,7 @@ module.exports = {
     status
   ) => {
     try {
-      const statusFilter = null;
+      let statusFilter = null;
 
       if (status === "upcoming") {
         statusFilter = {
