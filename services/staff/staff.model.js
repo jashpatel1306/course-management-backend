@@ -54,8 +54,8 @@ staffSchema.pre("save", async function (next) {
       next(createError.Conflict("Email already exists."));
     }
   }
-  // const password = commonHelpers.generateRandomPassword();
-  const password = "Admin@123";
+  const password = commonHelpers.generateRandomPassword();
+  // const password = "Admin@123";
 
   const userData = {
     email: this.email,

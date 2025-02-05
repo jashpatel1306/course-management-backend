@@ -55,8 +55,8 @@ InstructorSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("email")) {
     try {
       // Create or update user associated with this instructor
-      // const password = commonHelpers.generateRandomPassword();
-      const password = "Admin@123"; // Default password (should be hashed in a real scenario)
+      const password = commonHelpers.generateRandomPassword();
+      // const password = "Admin@123"; // Default password (should be hashed in a real scenario)
 
       const userData = {
         email: this.email,

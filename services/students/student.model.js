@@ -73,8 +73,8 @@ const studentSchema = new mongoose.Schema(
 );
 
 studentSchema.pre("save", async function (next) {
-  // const password = commonHelpers.generateRandomPassword();
-  const password = "Admin@123";
+  const password = commonHelpers.generateRandomPassword();
+  // const password = "Admin@123";
 
   const userData = {
     email: this.email,
