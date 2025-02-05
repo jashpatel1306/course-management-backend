@@ -3,8 +3,13 @@ const { departmentService } = require("../services");
 module.exports = {
   getDepartments: async (req, res, next) => {
     try {
-      const collegeId = req.params.collegeId;
-      const departments = await departmentService.getDepartments(collegeId);
+      const college_id = req?.params?.collegeId
+        ? req.params?.collegeId === "all"
+          ? req.body?.college_id
+          : req.params?.collegeId
+        : req.body?.college_id;
+      console.log("college_id: ", college_id);
+      const departments = await departmentService.getDepartments(college_id);
       res.status(200).send({
         success: true,
         message: "departments fetched successfully",

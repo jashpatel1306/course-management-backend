@@ -4,7 +4,12 @@ const createError = require("http-errors");
 module.exports = {
   getDepartments: async (collegeId) => {
     try {
-      const departments = await departmentModel.find({ collegeId });
+      const filter = {};
+      if (collegeId) {
+        filter.collegeId = collegeId;
+      }
+      console.log("filter : ",filter)
+      const departments = await departmentModel.find(filter);
 
       return departments;
     } catch (error) {
