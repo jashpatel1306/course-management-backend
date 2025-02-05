@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
+const { generateRandomPassword } = require("../../helpers/common.helper");
 
 // Define Instructor Schema
 const InstructorSchema = new mongoose.Schema(
@@ -55,7 +56,7 @@ InstructorSchema.pre("save", async function (next) {
   if (this.isNew || this.isModified("email")) {
     try {
       // Create or update user associated with this instructor
-      const password = commonHelpers.generateRandomPassword();
+      const password = generateRandomPassword();
       // const password = "Admin@123"; // Default password (should be hashed in a real scenario)
 
       const userData = {

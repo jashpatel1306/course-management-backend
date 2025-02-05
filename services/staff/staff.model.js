@@ -4,6 +4,7 @@ const { STAFF, SUPERADMIN } = require("../../constants/roles.constant");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
+const { generateRandomPassword } = require("../../helpers/common.helper");
 
 const staffSchema = new mongoose.Schema(
   {
@@ -54,7 +55,7 @@ staffSchema.pre("save", async function (next) {
       next(createError.Conflict("Email already exists."));
     }
   }
-  const password = commonHelpers.generateRandomPassword();
+  const password = generateRandomPassword();
   // const password = "Admin@123";
 
   const userData = {

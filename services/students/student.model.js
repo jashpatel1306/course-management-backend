@@ -4,6 +4,7 @@ const { STUDENT } = require("../../constants/roles.constant");
 const { sendMailWithServices } = require("../../helpers/mail.helper");
 const createError = require("http-errors");
 const commonFunctions = require("../../helpers/commonFunctions");
+const { generateRandomPassword } = require("../../helpers/common.helper");
 
 const studentSchema = new mongoose.Schema(
   {
@@ -73,7 +74,7 @@ const studentSchema = new mongoose.Schema(
 );
 
 studentSchema.pre("save", async function (next) {
-  const password = commonHelpers.generateRandomPassword();
+  const password = generateRandomPassword();
   // const password = "Admin@123";
 
   const userData = {
