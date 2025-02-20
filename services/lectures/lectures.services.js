@@ -43,8 +43,8 @@ module.exports = {
           { _id: lectureId },
           {
             $push: {
-              lectureContent: [newContent],
-            },
+              lectureContent: [newContent]
+            }
           }
         );
       }
@@ -59,12 +59,12 @@ module.exports = {
   updateLecture: async (id, data) => {
     try {
       const lecture = await LecturesModel.findByIdAndUpdate(id, data, {
-        new: true,
+        new: true
       });
       await SectionModel.findOneAndUpdate(
         { _id: data.sectionId, "lectures.id": id }, // Query filter
         {
-          $set: { "lectures.$.name": data.name }, // Update operation
+          $set: { "lectures.$.name": data.name } // Update operation
         },
         { new: true, runValidators: true } // Options: return updated doc and validate
       );
@@ -79,7 +79,7 @@ module.exports = {
   updateLectureDragDrop: async (id, data) => {
     try {
       const lecture = await LecturesModel.findByIdAndUpdate(id, data, {
-        new: true,
+        new: true
       });
 
       if (!lecture) {
@@ -98,7 +98,7 @@ module.exports = {
         await SectionModel.findOneAndUpdate(
           { _id: lecture.sectionId, "lectures.id": id }, // Query filter
           {
-            $pull: { lectures: { id: id } }, // Update operation
+            $pull: { lectures: { id: id } } // Update operation
           },
           { new: true, runValidators: true } // Options: return updated doc and validate
         );
@@ -123,8 +123,8 @@ module.exports = {
         { _id: lectureId }, // Find the lecture by its _id
         {
           $pull: {
-            lectureContent: { _id: contentId }, // Remove the item matching the contentId
-          },
+            lectureContent: { _id: contentId } // Remove the item matching the contentId
+          }
         }
       );
       return result;
@@ -175,7 +175,7 @@ module.exports = {
     try {
       const publishLectures = await LecturesModel.find({
         isPublish: true,
-        sectionId,
+        sectionId
       });
       if (!publishLectures || publishLectures.length === 0) {
         throw createError.NotFound("No publish lectures found.");
@@ -189,7 +189,7 @@ module.exports = {
     try {
       const lectures = await LecturesModel.find({
         sectionId: sectionId,
-        isPublish: true,
+        isPublish: true
       });
       const data = lectures.map((item) => {
         return { label: item.name, value: item._id };
@@ -203,14 +203,15 @@ module.exports = {
     try {
       const lecture = await LecturesModel.findOne({
         _id: id,
-        isPublish: true,
+        isPublish: true
       });
-      if (!lecture) {
-        throw createError.NotFound("Lecture not found.");
-      }
+      console.log("lecture: ", lecture);
+      // if (!lecture) {
+      //   throw createError.NotFound("Lecture not found.");
+      // }
       return lecture;
     } catch (error) {
       throw createError(error);
     }
-  },
+  }
 };

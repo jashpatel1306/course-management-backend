@@ -385,10 +385,12 @@ module.exports = {
             const lectureContent = await Promise.all(
               section.lectures?.map(async (lecture, lectureIndex) => {
                 try {
+                  console.log("lecture : ", lecture);
                   const lectureData =
                     await lecturesServices.getPublishLectureDataById(
                       lecture?.id
                     );
+                  console.log("lectureData: ", lectureData);
 
                   if (!lectureData) {
                     console.warn(`No data found for lecture ID: ${lecture.id}`);
@@ -505,25 +507,34 @@ module.exports = {
         }
         return a.lectureIndex - b.lectureIndex;
       });
-      let activeContent = {
-        lectureId: finalContentData[0]?.lectureId
-          ? finalContentData[0]?.lectureId
-          : finalContentData[0].id,
-        contentId: finalContentData[0].id
-      };
-      if (
-        lastTrackingContentData?.lectureId &&
-        lastTrackingContentData?.contentId
-      ) {
-        const contentIndex = finalContentData.findIndex(
-          (info) =>
-            info.id.toString() === lastTrackingContentData.contentId.toString()
-        );
-        activeContent.lectureId = finalContentData[contentIndex + 1]?.lectureId
-          ? finalContentData[contentIndex + 1]?.lectureId
-          : finalContentData[contentIndex + 1]?.id;
-        activeContent.contentId = finalContentData[contentIndex + 1]?.id;
+      let activeContent = {};
+      if (finalContentData.length > 0) {
+        console.log("finalContentData[0] :", finalContentData[0]);
+        {
+          activeContent = {
+            lectureId: finalContentData[0]?.lectureId
+              ? finalContentData[0]?.lectureId
+              : finalContentData[0].id,
+            contentId: finalContentData[0].id
+          };
+          if (
+            lastTrackingContentData?.lectureId &&
+            lastTrackingContentData?.contentId
+          ) {
+            const contentIndex = finalContentData.findIndex(
+              (info) =>
+                info.id.toString() ===
+                lastTrackingContentData.contentId.toString()
+            );
+            activeContent.lectureId = finalContentData[contentIndex + 1]
+              ?.lectureId
+              ? finalContentData[contentIndex + 1]?.lectureId
+              : finalContentData[contentIndex + 1]?.id;
+            activeContent.contentId = finalContentData[contentIndex + 1]?.id;
+          }
+        }
       }
+
       return {
         courseName: course?.courseName,
         courseDescription: course?.courseDescription,

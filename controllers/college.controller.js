@@ -31,6 +31,7 @@ module.exports = {
         perPage,
         status
       );
+      
       res.status(200).json({
         success: true,
         message: "Colleges fetched successfully",
