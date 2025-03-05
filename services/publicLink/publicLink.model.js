@@ -87,6 +87,12 @@ publicLinkSchema.post("findOneAndUpdate", async function (data) {
       totalMarks += quiz.totalMarks || 0;
       totalQuestions += quiz.questions.length || 0;
     });
+    console.log("Total time : ", {
+      totalTime: totalTime,
+      totalMarks: totalMarks,
+      totalQuestions: totalQuestions,
+      quizzes: quizzes.length
+    });
     await mongoose.model("publicLink").updateOne(
       { _id: data._id },
       {

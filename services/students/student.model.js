@@ -10,65 +10,65 @@ const studentSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "name is required"],
+      required: [true, "name is required"]
     },
     email: {
       type: String,
-      required: [true, "email is required"],
+      required: [true, "email is required"]
     },
     rollNo: {
       type: String,
-      required: [true, "rollNo is required"],
+      required: [true, "rollNo is required"]
     },
     phone: {
       type: String,
-      required: [true, "phone is required"],
+      required: [true, "phone is required"]
     },
     collegeUserId: {
       type: mongoose.Types.ObjectId,
       ref: "colleges",
-      required: [true, "college id is required."],
+      required: [true, "college id is required."]
     },
     batchId: {
       type: mongoose.Types.ObjectId,
       ref: "batches",
-      required: [true, "batchId is required."],
+      required: [true, "batchId is required."]
     },
     userId: {
       type: mongoose.Types.ObjectId,
-      ref: "users",
+      ref: "users"
     },
     department: {
       type: mongoose.Types.ObjectId,
       ref: "departments",
-      required: [true, "department is required."],
+      required: [true, "department is required."]
     },
     section: {
       type: String,
-      required: [true, "section is required."],
+      required: [true, "section is required."]
     },
     passoutYear: {
       type: Number,
-      required: [true, "pass-out year is required."],
+      required: [true, "pass-out year is required."]
     },
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
+      enum: ["male", "female", "other"]
     },
     semester: {
       type: Number,
-      enum: [1, 2, 3, 4, 5, 6, 7, 8],
+      enum: [1, 2, 3, 4, 5, 6, 7, 8]
     },
     active: {
       type: Boolean,
-      default: true,
+      default: true
     },
     colName: {
-      type: String,
+      type: String
     },
     colCode: {
-      type: String,
-    },
+      type: String
+    }
   },
   { timestamps: true, versionKey: false }
 );
@@ -82,7 +82,7 @@ studentSchema.pre("save", async function (next) {
     password,
     user_name: this.name,
     permissions: [],
-    role: STUDENT,
+    role: STUDENT
   };
   if (userData.password) {
     userData.password = await commonFunctions.encode(userData.password);
@@ -102,6 +102,58 @@ studentSchema.pre("save", async function (next) {
   const body = `Your Password for Learning management system is ${password}`;
 
   sendMailWithServices(to, subject, body);
+  next();
+});
+studentSchema.pre("findOneAndUpdate", async function (next) {
+  const docToUpdate = await this.model.findOne(this.getQuery());
+  console.log("docToUpdate: ", docToUpdate.email);
+  if (docToUpdate) {
+    // Perform your updates here
+    const updatedFields = this.getUpdate();
+    console.log("findOneAndUpdate updatedFields: ", updatedFields);
+    // Example: Modify the update object
+    if (updatedFields.email !== docToUpdate.email) {
+      const password = generateRandomPassword();
+      console.log("password...........", password);
+      await mongoose.model("users").updateOne(
+        { _id: docToUpdate.userId },
+        {
+          email: updatedFields.email,
+          password: await commonFunctions.encode(password)
+        }
+      );
+      const to = updatedFields.email;
+      const subject = "Password for Learning management system";
+      const body = `Your Password for Learning management system is ${password}`;
+
+      sendMailWithServices(to, subject, body);
+      console.log("findOneAndUpdate updated user password");
+    }
+    if (updatedFields.$set) {
+      updatedFields.$set.lastModified = new Date();
+    } else {
+      updatedFields.$set = { lastModified: new Date() };
+    }
+  }
+  // const password = generateRandomPassword();
+
+  // console.log("findOneAndUpdate this: ", docToUpdate.userId);
+
+  // const userData = await mongoose
+  //   .model("users")
+  //   .findOne({ _id: docToUpdate.userId });
+  // console.log("findOneAndUpdate userData: ", docToUpdate.email, userData.email);
+  // if (docToUpdate.email !== userData.email) {
+  //   console.log("password: ", password);
+  //   await mongoose.model("users").updateOne(
+  //     { _id: docToUpdate.userId },
+  //     {
+  //       email: docToUpdate.email,
+  //       password: await commonFunctions.encode(password)
+  //     }
+  //   );
+  //   console.log("findOneAndUpdate updated user password");
+  // }
   next();
 });
 

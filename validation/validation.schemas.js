@@ -94,7 +94,7 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber,
     departmentId: validate.string,
-    passoutYear: validate.number,
+    passoutYear: validate.string,
     semester: validate.number,
     active: validate.string
   }),

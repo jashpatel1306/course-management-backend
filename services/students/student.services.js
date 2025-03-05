@@ -71,9 +71,7 @@ module.exports = {
 
   updateStudent: async (id, data) => {
     try {
-      const student = await studentModel.findOneAndUpdate({ _id: id }, data, {
-        new: true
-      });
+      const student = await studentModel.findOneAndUpdate({ _id: id }, data);
       if (!student) createError(500, "Error while updating student");
       return student;
     } catch (error) {

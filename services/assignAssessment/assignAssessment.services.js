@@ -14,7 +14,24 @@ module.exports = {
           data.batchId
         );
       }
-      const assessment = await AssignAssessmentsModel.create(data);
+      const assessmentData = await AssignAssessmentsModel.findOne({
+        collegeId: data.collegeId,
+        batchId: data.batchId,
+        courseId: data.courseId,
+        assessmentId: data.assessmentId
+      });
+      console.log("assessmentData :", assessmentData);
+      let assessment = null;
+      if (assessmentData._id) {
+        console.log("Update Data");
+        assessment = await AssignAssessmentsModel.updateOne(
+          { _id: assessmentData._id },
+          { data }
+        );
+      } else {
+        console.log("Create Data");
+        assessment = await AssignAssessmentsModel.create(data);
+      }
 
       if (!assessment)
         throw createError(500, "Error while creating assessment");
@@ -174,7 +191,7 @@ module.exports = {
           ...(statusFilter ? [statusFilter] : [])
         ]
       };
-      console.log("filter : ",filter)
+      console.log("filter : ", filter);
       const assessments = await AssignAssessmentsModel.find(filter)
         .populate("batchId", "_id batchName")
         .populate("courseId", "_id courseName")

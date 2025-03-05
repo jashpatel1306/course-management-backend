@@ -1,5 +1,4 @@
 const { studentServices, departmentService } = require("../services");
-const { Validate } = require("../validation/validation.methods");
 
 module.exports = {
   createStudent: async (req, res, next) => {

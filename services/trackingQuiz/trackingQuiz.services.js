@@ -445,6 +445,7 @@ module.exports = {
             takenTime: "$takenTime",
             assessmentId: "$assessmentId",
             specificField: "$specificField",
+            quizData: "$quizData",
             quizTitle: { $arrayElemAt: ["$quizData.publicLinkName", 0] },
             quizTotalMarks: { $arrayElemAt: ["$quizData.totalMarks", 0] },
             quizTime: { $arrayElemAt: ["$quizData.totalTime", 0] },
@@ -455,22 +456,23 @@ module.exports = {
           }
         }
       ];
-      const result1 = await trackingQuizModel.aggregate([
+      const result = await trackingQuizModel.aggregate([
         ...pipeline,
         { $skip: (pageNo - 1) * perPage },
         { $limit: perPage }
       ]);
-      const result = await trackingQuizModel
-        .find({ quizId: new ObjectId(quizId) })
-        .skip((pageNo - 1) * perPage)
-        .limit(perPage);
+      // const result = await trackingQuizModel
+      //   .find({ quizId: new ObjectId(quizId) })
+      //   .skip((pageNo - 1) * perPage)
+      //   .limit(perPage);
+
       if (!result) throw createError(500, "Error while Fetching result.");
 
       const count = await trackingQuizModel.countDocuments({
         quizId: new ObjectId(quizId)
       });
 
-      return { result: result1, count };
+      return { result: result, count };
     } catch (error) {
       throw createError.InternalServerError(error);
     }

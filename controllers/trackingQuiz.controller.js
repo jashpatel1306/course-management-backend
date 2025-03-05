@@ -226,6 +226,7 @@ module.exports = {
         perPage,
         pageNo
       );
+      console.log("count : ",count)
       return res.status(200).send({
         success: true,
         message: "Quiz results fetched successfully.",
