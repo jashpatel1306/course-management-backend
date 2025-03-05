@@ -72,7 +72,7 @@ app.use((err, req, res, next) => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM signal received: closing HTTP server");
-  server.close(() => {
+  app.close(() => {
     console.log("HTTP server closed");
     process.exit(0);
   });
@@ -80,7 +80,7 @@ process.on("SIGTERM", () => {
 
 process.on("SIGINT", () => {
   console.log("SIGINT signal received: closing HTTP server");
-  server.close(() => {
+  app.close(() => {
     console.log("HTTP server closed");
     process.exit(0);
   });
