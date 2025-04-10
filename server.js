@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3030;
 const app = express();
 
 //postgres connection
-
+console.log("Testing purpous logs")
 app.use(
   cors({
     origin: "*", // You can specify allowed origins here
