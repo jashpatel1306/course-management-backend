@@ -70,21 +70,21 @@ app.use((err, req, res, next) => {
 });
 
 // Graceful shutdown
-// process.on("SIGTERM", () => {
-//   console.log("SIGTERM signal received: closing HTTP server");
-//   app.close(() => {
-//     console.log("HTTP server closed");
-//     process.exit(0);
-//   });
-// });
+process.on("SIGTERM", () => {
+  console.log("SIGTERM signal received: closing HTTP server");
+  app.close(() => {
+    console.log("HTTP server closed");
+    process.exit(0);
+  });
+});
 
-// process.on("SIGINT", () => {
-//   console.log("SIGINT signal received: closing HTTP server");
-//   app.close(() => {
-//     console.log("HTTP server closed");
-//     process.exit(0);
-//   });
-// });
+process.on("SIGINT", () => {
+  console.log("SIGINT signal received: closing HTTP server");
+  app.close(() => {
+    console.log("HTTP server closed");
+    process.exit(0);
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`server is running on port ` + PORT);
