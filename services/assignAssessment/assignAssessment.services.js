@@ -22,7 +22,7 @@ module.exports = {
       });
       console.log("assessmentData :", assessmentData);
       let assessment = null;
-      if (assessmentData._id) {
+      if (assessmentData?._id) {
         console.log("Update Data");
         assessment = await AssignAssessmentsModel.updateOne(
           { _id: assessmentData._id },

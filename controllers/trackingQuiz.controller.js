@@ -275,6 +275,27 @@ module.exports = {
       next(error);
     }
   },
+  changesResultVisibility: async (req, res, next) => {
+    try {
+      console.log("req.body : ", req.body);
+      const { trackingId } = req.params;
+
+      const {
+        showResult
+      } = req.body;
+      await trackingQuizServices.changesResultVisibility(
+        trackingId, showResult
+      );
+      return res.status(200).send({
+        success: true,
+        message: "Quiz result visibility changed successfully.",
+        data: [],
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getAllResults: async (req, res, next) => {
     try {
       const { pageNo, perPage } = req.body;

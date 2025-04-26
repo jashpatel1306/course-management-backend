@@ -67,7 +67,12 @@ const trackingQuizzesSchema = new mongoose.Schema(
     isSubmit: {
       type: Boolean,
       default: false
+    },
+    showResult: {
+      type: Boolean,
+      default: false
     }
+
   },
 
   { timestamps: true, versionKey: false }

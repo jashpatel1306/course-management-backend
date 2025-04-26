@@ -524,7 +524,8 @@ module.exports = {
             totalTime: "$totalTime",
             takenTime: "$takenTime",
             quizType: "$quizType",
-            specificField: "$specificField"
+            specificField: "$specificField",
+            showResult: "$showResult"
           }
         },
         {
@@ -599,7 +600,8 @@ module.exports = {
             assessmentId: { $arrayElemAt: ["$quizData.assessmentId", 0] },
             quizQuestionsLength: {
               $arrayElemAt: ["$quizData.questionsLength", 0]
-            }
+            },
+            showResult: "$showResult"
           }
         },
         {
@@ -620,6 +622,18 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  changesResultVisibility: async (trackingId, showResult) => {
+    try {
+      const result = await trackingQuizModel.findOneAndUpdate({_id:trackingId},{showResult: showResult});
+
+      if (!result) throw createError(500, "Error while Fetching result.");
+
+      return { result };
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
+
   getQuizId: async (id) => {
     try {
       const result = await trackingQuizModel.findOne({

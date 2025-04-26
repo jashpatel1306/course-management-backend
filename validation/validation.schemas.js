@@ -107,6 +107,11 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber
   }),
+  changesResultVisibilitySchema: Joi.object().keys({
+    trackingId: validate.string,
+    showResult: validate.boolean,
+  }),
+
   allQuizResultSchema: Joi.object().keys({
     quizId: validate.array.items(validate.id),
     collegeId: validate.array.items(validate.id),
