@@ -624,7 +624,12 @@ module.exports = {
   },
   changesResultVisibility: async (trackingIds, showResult) => {
     try {
-      const result = await trackingQuizModel.updateMany({_id:{$in:trackingIds}},{showResult: showResult});
+      let result;
+      if(trackingIds.length > 0){
+        result = await trackingQuizModel.updateMany({_id:{$in:trackingIds}},{showResult: showResult});
+      }else{
+        result = await trackingQuizModel.updateMany({},{showResult: showResult});
+      }
 
       if (!result) throw createError(500, "Error while Fetching result.");
 
