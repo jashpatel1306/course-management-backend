@@ -111,7 +111,7 @@ const handlePostTotalMarkOperation = async function (question) {
         { totalMarks: quizData[0]?.totalMarks ? quizData[0]?.totalMarks : 0 }
       );
     if (!quiz) {
-      throw new Error("Quiz not found");
+      throw new Error("Quiz not found!");
     }
   } catch (error) {
     console.log(`Error updating quiz with new question: ${error.message}`);
