@@ -622,9 +622,9 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
-  changesResultVisibility: async (trackingId, showResult) => {
+  changesResultVisibility: async (trackingIds, showResult) => {
     try {
-      const result = await trackingQuizModel.findOneAndUpdate({_id:trackingId},{showResult: showResult});
+      const result = await trackingQuizModel.updateMany({_id:{$in:trackingIds}},{showResult: showResult});
 
       if (!result) throw createError(500, "Error while Fetching result.");
 

@@ -108,7 +108,7 @@ module.exports = {
     perPage: validate.reqNumber
   }),
   changesResultVisibilitySchema: Joi.object().keys({
-    trackingId: validate.string,
+    trackingIds: validate.reqArray,
     showResult: validate.boolean,
   }),
 

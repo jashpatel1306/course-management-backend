@@ -752,7 +752,7 @@ router.post(
   trackingQuizController.getAllResult
 );
 router.put(
-  "/change-result-visibility/:trackingId",
+  "/change-result-visibility",
   Validate(schemas.changesResultVisibilitySchema),
   isAdminCommonAuthenticate,
   trackingQuizController.changesResultVisibility

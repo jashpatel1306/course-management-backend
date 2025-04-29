@@ -34,6 +34,7 @@ module.exports = {
         req.body,
         quizId
       );
+
       publicLinkServices.increaseHitCount(quizId);
       return res.status(201).send({
         success: true,
@@ -277,14 +278,14 @@ module.exports = {
   },
   changesResultVisibility: async (req, res, next) => {
     try {
-      console.log("req.body : ", req.body);
-      const { trackingId } = req.params;
+      // const { trackingId } = req.params;
 
       const {
-        showResult
+        showResult,
+        trackingIds
       } = req.body;
       await trackingQuizServices.changesResultVisibility(
-        trackingId, showResult
+        trackingIds, showResult
       );
       return res.status(200).send({
         success: true,

@@ -3,7 +3,7 @@ const publicLinkModel = require("./publicLink.model");
 const createError = require("http-errors");
 async function getMultipleQuizDetailsSimple(quizIds) {
   const quizzes = await QuizModel.find({ _id: { $in: quizIds } }).select(
-    "questions time totalMarks"
+    "title questions time totalMarks"
   );
 
   return quizzes.map((quiz) => ({
@@ -12,23 +12,25 @@ async function getMultipleQuizDetailsSimple(quizIds) {
     questionIds: quiz.questions, // Array of question IDs
     totalTime: quiz.time, // Quiz total time
     totalMarks: quiz.totalMarks, // Quiz total time
+    title: quiz.title,
   }));
 }
 async function mergeQuizDetails(quizIds) {
   const quizzes = await getMultipleQuizDetailsSimple(quizIds); // Assume this fetches the details
-
   // Merge all values into one object
+  let quizArr = [];
   const mergedDetails = quizzes.reduce(
     (acc, quiz) => {
       acc.totalQuestions += quiz.totalQuestions;
       acc.questionIds = acc.questionIds.concat(quiz.questionIds); // Merge question IDs
       acc.totalTime += quiz.totalTime;
       acc.totalMarks += quiz.totalMarks;
+      quizArr.push({title:quiz.title, totalMarks:quiz.totalMarks, totalQuestion:quiz.totalQuestions });
       return acc;
     },
     { totalQuestions: 0, questionIds: [], totalTime: 0, totalMarks: 0 } // Initial values
   );
-
+  mergedDetails.details= quizArr
   return mergedDetails;
 }
 module.exports = {
@@ -55,10 +57,14 @@ module.exports = {
   },
   increaseHitCount: async (id) => {
     try {
-      const publicLink = await publicLinkModel.findOne({ _id: id });
+      const publicLink = await publicLinkModel.findOneAndUpdate(
+        { _id: id },
+        { $inc: { hits: 1 } },
+        { new: true }
+      );
       if (!publicLink) throw createError(400, "Invalid publicLink ID");
 
-      await publicLink.increaseHits();
+      // await publicLink.increaseHits();
       console.log("Hit count increased successfully");
     } catch (error) {
       throw createError(error);
