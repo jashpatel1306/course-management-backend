@@ -1,6 +1,7 @@
 const QuizzesModel = require("./quizzes.model");
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const trackingQuizzeseModel = require("../trackingQuiz/trackingQuiz.model");
 const { ObjectId } = mongoose.Types;
 
 module.exports = {
@@ -166,10 +167,9 @@ module.exports = {
 
   getQuizResult: async (id, trackingId) => {
     try {
-      const quiz = await QuizzesModel.aggregate([
+      let quiz = await QuizzesModel.aggregate([
         {
           $match: {
-            // _id: new ObjectId(id),
             _id: { $in: id }
           }
         },
@@ -216,7 +216,7 @@ module.exports = {
                 $project: {
                   _id: 1,
                   question: 1,
-                  answers: 1, // Include the answers for lookup
+                  answers: 1,
                   marks: 1,
                   questionType: 1
                 }
@@ -227,9 +227,9 @@ module.exports = {
         },
         {
           $project: {
+            quizId: "$_id",
             questionId: "$questions",
             totalMarks: 1,
-            quizId: { $arrayElemAt: ["$result.quizId", 0] },
             correctAnswers: { $arrayElemAt: ["$result.correctAnswers", 0] },
             wrongAnswers: { $arrayElemAt: ["$result.wrongAnswers", 0] },
             reslutMarks: { $arrayElemAt: ["$result.totalMarks", 0] },
@@ -243,14 +243,13 @@ module.exports = {
             result: { $arrayElemAt: ["$result", 0] }
           }
         },
-
         {
           $addFields: {
             "questionData.answerValue": {
               $arrayElemAt: [
                 {
                   $filter: {
-                    input: { $ifNull: ["$questionData.answers", []] }, // Ensure it's an array
+                    input: { $ifNull: ["$questionData.answers", []] },
                     as: "answer",
                     cond: { $eq: ["$$answer._id", "$result.result.answerId"] }
                   }
@@ -262,7 +261,7 @@ module.exports = {
         },
         {
           $group: {
-            _id: 0,
+            _id: "$quizId",
             totalMarks: { $first: "$totalMarks" },
             correctAnswers: { $first: "$correctAnswers" },
             wrongAnswers: { $first: "$wrongAnswers" },
@@ -270,25 +269,105 @@ module.exports = {
             takenTime: { $first: "$takenTime" },
             quizType: { $first: "$quizType" },
             results: { $push: "$questionData" },
-            specificField: { $first: "$specificField" },
+            specificField: { $first: "$specificField" }
           }
         },
         {
           $project: {
+            _id: 0,
+            quizId: "$_id",
             totalMarks: 1,
-            quizId: 1,
             correctAnswers: 1,
             wrongAnswers: 1,
             totalTime: 1,
             takenTime: 1,
             specificField: 1,
             quizType: 1,
-            results: 1,
+            results: 1
           }
         }
       ]);
+      let subject=await trackingQuizzeseModel.aggregate(
+        [
+          {
+            $match: {
+              _id: new ObjectId(trackingId)
+            }
+          },
+          {
+            $unwind: "$result"
+          },
+          {
+            $lookup: {
+              from: "questions",
+              localField: "result.questionId",
+              foreignField: "_id",
+              as: "questionDetail"
+            }
+          },
+          {
+            $unwind: "$questionDetail"
+          },
+          {
+            $lookup: {
+              from: "quizzes",
+              localField: "questionDetail.quizId",
+              foreignField: "_id",
+              as: "quizDetail"
+            }
+          },
+          {
+            $unwind: "$quizDetail"
+          },
+          {
+            $addFields: {
+              isCorrect: {
+                $in: [
+                  "$result.answerId",
+                  {
+                    $map: {
+                      input: "$questionDetail.answers",
+                      as: "a",
+                      in: {
+                        $cond: [{ $eq: ["$$a.correct", true] }, "$$a._id", null]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            $group: {
+              _id: "$quizDetail._id",
+              title: { $first: "$quizDetail.title" },
+              ObtainedMarks: {
+                $sum: {
+                  $cond: ["$isCorrect", "$questionDetail.marks", 0]
+                }
+              },
+              correctAnswers: {
+                $sum: {
+                  $cond: ["$isCorrect", 1, 0]
+                }
+              },
+              wrongAnswers: {
+                $sum: {
+                  $cond: ["$isCorrect", 0, 1]
+                }
+              },
+              totalTime: { $first: "$totalTime" }, // from root doc (if one value for all subjects)
+              takenTime: { $first: "$takenTime" },  // same here,
+              specificField:{ $first: "$specificField" }
+            }
+          }
+        ]
+
+      )
+
       if (!quiz) throw createError(500, "Error fetching quiz results");
-      return quiz;
+
+      return [quiz,subject];
     } catch (error) {
       throw error;
     }

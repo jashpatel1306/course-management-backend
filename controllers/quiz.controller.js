@@ -248,13 +248,13 @@ module.exports = {
       let result = null;
       let publicLinkData = null;
       let quizData = null;
+      let subject=null;
       if (trackingQuizData.quizType === "public") {
         console.log("Public quiz");
         publicLinkData = await publicLinkServices.getPublicLinkById(
           trackingQuizData.quizId
         );
-        console.log("publicLinkData : ", publicLinkData);
-        result = await quizzesServices.getQuizResult(
+        [result,subject] = await quizzesServices.getQuizResult(
           publicLinkData.quizId,
           trackingId
         );
@@ -262,16 +262,17 @@ module.exports = {
         quizData = await quizzesServices.getStudentQuizById(
           trackingQuizData.quizId
         );
-        result = await quizzesServices.getQuizResult(
+        [result,subject] = await quizzesServices.getQuizResult(
           [trackingQuizData.quizId],
           trackingId
         );
       }
-      const finalData = result ? result[0] : {};
+      let finalData = result ? result[0] : {};
       if (trackingQuizData.quizType === "public") {
-        finalData.quizData = publicLinkData;
+        finalData = {result, subject, quizData: publicLinkData};
       } else {
-        finalData.quizData = quizData;
+        finalData = {result, subject,quizData: quizData};
+        // finalData.quizData = quizData;
       }
 
       // console.log("Quiz result", result);
