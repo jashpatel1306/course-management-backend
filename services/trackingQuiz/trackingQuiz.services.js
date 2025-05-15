@@ -386,25 +386,11 @@ module.exports = {
 
   getAllResultByQuiz: async (quizId, perPage, pageNo) => {
     try {
+      //fenil Changes
       const pipeline = [
         {
           $match: {
             quizId: new ObjectId(quizId)
-          }
-        },
-        {
-          $project: {
-            trackingId: "$_id",
-            userId: "$userId",
-            quizId: "$quizId",
-            correctAnswers: "$correctAnswers",
-            wrongAnswers: "$wrongAnswers",
-            totalMarks: "$totalMarks",
-            totalTime: "$totalTime",
-            takenTime: "$takenTime",
-            quizType: "$quizType",
-            specificField: "$specificField",
-            createdAt: "$createdAt"
           }
         },
         {
@@ -418,13 +404,61 @@ module.exports = {
                 }
               },
               {
+                $lookup: {
+                  from: "quizzes",
+                  let: { quizIds: "$quizId" },
+                  pipeline: [
+                    {
+                      $match: {
+                        $expr: { $in: ["$_id", "$$quizIds"] }
+                      }
+                    },
+                    {
+                      $lookup: {
+                        from: "questions",
+                        let: { questionIds: "$questions" },
+                        pipeline: [
+                          {
+                            $match: {
+                              $expr: { $in: ["$_id", "$$questionIds"] }
+                            }
+                          }
+                        ],
+                        as: "questions"
+                      }
+                    },
+                    {
+                      $project: {
+                        _id: 1,
+                        title: 1,
+                        totalMarks: 1,
+                        time: 1,
+                        totalQuestions: { $size: { $ifNull: ["$questions", []] } },
+                        questions: {
+                          $map: {
+                            input: { $ifNull: ["$questions", []] },
+                            as: "question",
+                            in: {
+                              _id: "$$question._id",
+                              question: "$$question.question",
+                              answers: { $ifNull: ["$$question.answers", []] },
+                              marks: "$$question.marks"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  as: "quizzes"
+                }
+              },
+              {
                 $project: {
                   _id: 1,
+                  publicLinkName: 1,
                   totalTime: 1,
                   totalMarks: 1,
                   totalQuestions: 1,
-                  publicLinkName: 1,
-                  totalMarks: 1,
                   quizzes: 1
                 }
               }
@@ -433,29 +467,137 @@ module.exports = {
           }
         },
         {
+          $unwind: "$quizData"
+        },
+        {
           $project: {
-            trackingId: "$trackingId",
-            userId: "$userId",
-            quizId: "$quizId",
-            createdAt: "$createdAt",
-            correctAnswers: "$correctAnswers",
-            wrongAnswers: "$wrongAnswers",
-            totalMarks: "$totalMarks",
-            totalTime: "$totalTime",
-            takenTime: "$takenTime",
-            assessmentId: "$assessmentId",
-            specificField: "$specificField",
-            quizData: "$quizData",
-            quizTitle: { $arrayElemAt: ["$quizData.publicLinkName", 0] },
-            quizTotalMarks: { $arrayElemAt: ["$quizData.totalMarks", 0] },
-            quizTime: { $arrayElemAt: ["$quizData.totalTime", 0] },
-            assessmentId: { $arrayElemAt: ["$quizData.assessmentId", 0] },
-            totalQuestions: {
-              $arrayElemAt: ["$quizData.totalQuestions", 0]
+            trackingId: "$_id",
+            userId: 1,
+            quizId: 1,
+            createdAt: 1,
+            correctAnswers: 1,
+            wrongAnswers: 1,
+            totalMarks: 1,
+            totalTime: 1,
+            takenTime: 1,
+            specificField: 1,
+            quizData: {
+              _id: "$quizData._id",
+              publicLinkName: "$quizData.publicLinkName",
+              totalTime: "$quizData.totalTime",
+              totalMarks: "$quizData.totalMarks",
+              totalQuestions: "$quizData.totalQuestions",
+              quizzes: {
+
+                $map: {
+                  input: "$quizData.quizzes",
+                  as: "quiz",
+                  in: {
+                    _id: "$$quiz._id",
+                    title: "$$quiz.title",
+                    totalMarks: "$$quiz.totalMarks",
+                    time: "$$quiz.time",
+                    totalQuestions: "$$quiz.totalQuestions",
+                    correctAnswers: {
+                      $size: {
+                        $filter: {
+                          input: { $ifNull: ["$result", []] },
+                          as: "res",
+                          cond: {
+                            $and: [
+                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
+                              {
+                                $let: {
+                                  vars: {
+                                    question: {
+                                      $arrayElemAt: [
+                                        {
+                                          $filter: {
+                                            input: { $ifNull: ["$$quiz.questions", []] },
+                                            as: "q",
+                                            cond: { $eq: ["$$q._id", "$$res.questionId"] }
+                                          }
+                                        },
+                                        0
+                                      ]
+                                    }
+                                  },
+                                  in: {
+                                    $anyElementTrue: {
+                                      $map: {
+                                        input: { $ifNull: ["$$question.answers", []] },
+                                        as: "ans",
+                                        in: {
+                                          $and: [
+                                            { $eq: ["$$ans._id", "$$res.answerId"] },
+                                            { $eq: ["$$ans.correct", true] }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    wrongAnswers: {
+                      $size: {
+                        $filter: {
+                          input: { $ifNull: ["$result", []] },
+                          as: "res",
+                          cond: {
+                            $and: [
+                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
+                              {
+                                $let: {
+                                  vars: {
+                                    question: {
+                                      $arrayElemAt: [
+                                        {
+                                          $filter: {
+                                            input: { $ifNull: ["$$quiz.questions", []] },
+                                            as: "q",
+                                            cond: { $eq: ["$$q._id", "$$res.questionId"] }
+                                          }
+                                        },
+                                        0
+                                      ]
+                                    }
+                                  },
+                                  in: {
+                                    $not: {
+                                      $anyElementTrue: {
+                                        $map: {
+                                          input: { $ifNull: ["$$question.answers", []] },
+                                          as: "ans",
+                                          in: {
+                                            $and: [
+                                              { $eq: ["$$ans._id", "$$res.answerId"] },
+                                              { $eq: ["$$ans.correct", true] }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }
       ];
+
       const result = await trackingQuizModel.aggregate([
         ...pipeline,
         { $skip: (pageNo - 1) * perPage },
