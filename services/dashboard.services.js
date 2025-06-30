@@ -42,11 +42,12 @@ module.exports = {
 
       console.log("filter", filter);
       console.log("userFilter", userFilter);
+      const courseFilter= { $or: [{ collegeId: collegeId }, { collegeIds: { $elemMatch: { $eq: collegeId }} }] }  //fenil changes
       const [instructors, students, courses, colleges, batches] =
         await Promise.all([
           instructorModel.countDocuments(filter),
           studentModel.countDocuments(userFilter),
-          courseModel.countDocuments(filter),
+          courseModel.countDocuments(courseFilter),
           collegeModel.countDocuments({}),
           batchModel.countDocuments(filter),
         ]);

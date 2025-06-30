@@ -125,6 +125,19 @@ module.exports = {
       next(error);
     }
   },
+  deleteQuestionsByQuiz: async (req, res, next) => {
+    try {
+      const quizId = req.params.quizId;
+      const question = await questionServices.deleteQuestionByQuiz(quizId);
+      return res.status(200).send({
+        success: true,
+        message: "Question deleted successfully",
+        data: []
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
   changeActiveStatus: async (req, res, next) => {
     try {

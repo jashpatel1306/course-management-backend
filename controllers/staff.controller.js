@@ -1,4 +1,5 @@
 const { staffServices } = require("../services");
+const { userServices } = require("../services");
 const { Validate } = require("../validation/validation.methods");
 
 module.exports = {
@@ -76,6 +77,7 @@ module.exports = {
   updateStaff: async (req, res, next) => {
     try {
       const staff = await staffServices.updateStaff(req.params.id, req.body);
+      await userServices.updatePermission(staff.userId, req.body.permissions);      //Changes By Fenil for permission update issue
       res.send({
         success: true,
         message: "Staff member updated successfully",

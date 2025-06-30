@@ -320,5 +320,14 @@ module.exports = {
     } catch (error) {
       throw error;
     }
+  },
+  //Changes By Fenil for permission update issue
+  updatePermission: async (user_id, permissions) => {
+    try {
+      await userModel.updateOne({ _id: user_id }, { permissions });
+      return true;
+    } catch (error) {
+      throw error;
+    }
   }
 };

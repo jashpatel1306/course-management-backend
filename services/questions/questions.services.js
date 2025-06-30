@@ -123,6 +123,15 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
+  deleteQuestionByQuiz: async (id) => {
+    try {
+      const result = await QuestionsModel.deleteMany({ quizId: id });
+      if (!result) throw createError(400, "invalid quiz id");
+      return result;
+    } catch (error) {
+      throw createError.InternalServerError(error);
+    }
+  },
 
   activeToggle: async (id) => {
     try {

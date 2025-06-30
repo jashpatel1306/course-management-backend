@@ -89,7 +89,7 @@ router.get(
   batchesController.getAllBatches
 );
 router.get(
-  "/batches-option",
+  "/batches-option/:collegeId?",
   // isAdminCommonAuthenticate,
   batchesController.getBatchesOption
 );
@@ -241,6 +241,11 @@ router.delete(
   "/question/:id",
   isAdminCommonAuthenticate,
   questionController.deleteQuestion
+);
+router.delete(
+  "/delete-questions/:quizId",
+  isAdminCommonAuthenticate,
+  questionController.deleteQuestionsByQuiz
 );
 
 //------------------------------ quiz ---------------------------------//

@@ -49,7 +49,8 @@ module.exports = {
                   assessmentId: 1,
                   description: 1,
                   active: 1,
-                  questionsLength: { $size: "$questions" }
+                  questionsLength: { $size: "$questions" },
+                  isPublish:1
                 }
               }
             ]
