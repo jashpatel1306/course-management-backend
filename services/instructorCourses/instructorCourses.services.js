@@ -36,9 +36,13 @@ module.exports = {
     perPage
   ) => {
     try {
-      let filter = {
-        $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }]
-      };
+      let filter = {};
+      if(collegeId){
+        filter = {
+          $or: [{ collegeId: collegeId }, { collegeIds: { $in: [collegeId] } }]
+        }
+      }
+      console.log(filter);
       if (search) {
         filter = {
           $and: [

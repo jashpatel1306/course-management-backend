@@ -41,6 +41,24 @@ module.exports = {
       next(error);
     }
   },
+    getUserProfile: async (req, res, next) => {
+    try {
+      const userId = req.body?.user_id;
+      const { user, collegeId } = await userServices.getUserProfile(userId);
+
+      return res.status(200).json({
+        status: true,
+        message: "User profile data fetched successfully",
+        data: {
+          data: user,
+          collegeId: collegeId,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   resetForgotPassword: async (req, res, next) => {
     try {
       const request_body = req?.body;

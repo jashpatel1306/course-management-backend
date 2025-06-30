@@ -218,6 +218,10 @@ module.exports = {
     batchIds: validate.array.items(validate.id),
     collegeIds: validate.array.items(validate.id)
   }),
+    deleteQuesetionsSchema: Joi.object().keys({
+    questionIds: validate.array.items(validate.id)
+  }),
+
   createBatchAssignAssessmentSchema: Joi.object().keys({
     collegeId: validate.reqId,
     batchId: validate.reqId,

@@ -42,6 +42,12 @@ router.post(
   isAuthenticate,
   userController.resetForgotPassword
 );
+router.get(
+  "/get-user-profile",
+  isAuthenticate,
+  userController.getUserProfile
+);
+
 router.put(
   `/update-user-profile`,
   Validate(schemas.editUserSchemas),
@@ -242,10 +248,11 @@ router.delete(
   isAdminCommonAuthenticate,
   questionController.deleteQuestion
 );
-router.delete(
-  "/delete-questions/:quizId",
+router.post(
+  "/delete-questions",
+  Validate(schemas.deleteQuesetionsSchema),
   isAdminCommonAuthenticate,
-  questionController.deleteQuestionsByQuiz
+  questionController.deleteQuestions
 );
 
 //------------------------------ quiz ---------------------------------//

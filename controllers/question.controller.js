@@ -125,10 +125,10 @@ module.exports = {
       next(error);
     }
   },
-  deleteQuestionsByQuiz: async (req, res, next) => {
+  deleteQuestions: async (req, res, next) => {
     try {
-      const quizId = req.params.quizId;
-      const question = await questionServices.deleteQuestionByQuiz(quizId);
+      const questionIds = req.body.questionIds;
+      const question = await questionServices.deleteQuestions(questionIds);
       return res.status(200).send({
         success: true,
         message: "Question deleted successfully",

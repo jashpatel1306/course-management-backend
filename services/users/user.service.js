@@ -238,6 +238,90 @@ module.exports = {
       throw error;
     }
   },
+  getUserProfile: async (userId) => {
+    try {
+      let user = await userModel.findOne({_id: userId});
+      if (!user) {
+        throw createError(404, "User not found");
+      }
+      if (!user.active) {
+        throw createError.Unauthorized(
+          "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+        );
+      }
+      if (user.role === INSTRUCTOR) {
+        const instructorData = await InstructorModel.findOne({
+          userId: user._id
+        });
+        console.log("instructorData: ", instructorData);
+        if (instructorData && !instructorData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === ADMIN) {
+        const collegeData = await collegesModel.findOne({
+          userId: user._id
+        });
+        if (collegeData && !collegeData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === STUDENT) {
+        const studentData = await studentsModel.findOne({
+          userId: user._id
+        });
+        if (studentData && !studentData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+      if (user.role === STAFF) {
+        const staffData = await staffModel.findOne({
+          userId: user._id
+        });
+        if (staffData && !staffData.active) {
+          throw createError.Unauthorized(
+            "Your account has been blocked by the main admin. Please contact the main admin for further assistance."
+          );
+        }
+      }
+
+      const collegeData = await collegesModel.findOne({ userId: user._id });
+      let collegeId = collegeData?._id ? collegeData?._id : null;
+      let batchId = null;
+      if (!collegeId && user.role === STUDENT) {
+        const studentData = await studentsModel.findOne({ userId: user._id });
+        batchId = studentData?.batchId ? studentData?.batchId : null;
+        const batchData = await batchesModel.findOne({ _id: batchId });
+        collegeId = batchData?.collegeId ? batchData?.collegeId : null;
+      }
+      if (!collegeId && user.role === STAFF) {
+        const staffData = await staffModel.findOne({ userId: user._id });
+        collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
+      }
+      if (!collegeId && user.role === STAFF) {
+        const staffData = await staffModel.findOne({ userId: user._id });
+        collegeId = staffData?.collegeUserId ? staffData?.collegeUserId : null;
+      }
+      if (!collegeId && user.role === INSTRUCTOR) {
+        const instructorData = await InstructorModel.findOne({
+          userId: user._id
+        });
+        collegeId = instructorData?.collegeId
+          ? instructorData?.collegeId
+          : null;
+      }
+      return { user, collegeId, batchId };
+    } catch (error) {
+      throw error;
+    }
+  },
+
   findUserById: async (userId) => {
     try {
       const user = await userModel.findOne({ _id: userId });

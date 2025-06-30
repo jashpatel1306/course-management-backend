@@ -123,10 +123,10 @@ module.exports = {
       throw createError.InternalServerError(error);
     }
   },
-  deleteQuestionByQuiz: async (id) => {
+  deleteQuestions: async (questionIds) => {
     try {
-      const result = await QuestionsModel.deleteMany({ quizId: id });
-      if (!result) throw createError(400, "invalid quiz id");
+      const result = await QuestionsModel.deleteMany({ _id: { $in: questionIds } });
+      if (!result) throw createError(400, "invalid question ids");
       return result;
     } catch (error) {
       throw createError.InternalServerError(error);
