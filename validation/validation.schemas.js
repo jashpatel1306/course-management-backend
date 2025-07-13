@@ -109,7 +109,7 @@ module.exports = {
   }),
   changesResultVisibilitySchema: Joi.object().keys({
     trackingIds: validate.reqArray,
-    showResult: validate.boolean,
+    showResult: validate.boolean
   }),
 
   allQuizResultSchema: Joi.object().keys({
@@ -126,6 +126,7 @@ module.exports = {
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber
   }),
+
   departmentSchema: Joi.object().keys({
     department: validate.reqString,
     collegeId: validate.id,
@@ -218,7 +219,7 @@ module.exports = {
     batchIds: validate.array.items(validate.id),
     collegeIds: validate.array.items(validate.id)
   }),
-    deleteQuesetionsSchema: Joi.object().keys({
+  deleteQuesetionsSchema: Joi.object().keys({
     questionIds: validate.array.items(validate.id)
   }),
 
@@ -284,6 +285,15 @@ module.exports = {
   }),
   courseWiseDataSchema: Joi.object().keys({
     courseId: validate.id,
+    search: validate.string,
+    pageNo: validate.reqNumber,
+    perPage: validate.reqNumber
+  }),
+  courseCompletionReportSchema: Joi.object().keys({
+    collegeId: validate.string,
+    batchId: validate.string,
+    departmentId: validate.string,
+    courseId: validate.string,
     search: validate.string,
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber

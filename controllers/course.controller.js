@@ -1,6 +1,7 @@
 const { courseServices } = require("../services");
 const createError = require("http-errors");
 const commonUploadFunction = require("../helpers/fileUpload.helper");
+const { default: mongoose } = require("mongoose");
 
 module.exports = {
   createCourse: async (req, res, next) => {
@@ -19,7 +20,7 @@ module.exports = {
           return res.json({
             status: false,
             message: movetoAWS.message,
-            data: [],
+            data: []
           });
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
         console.log("movetoAWS", movetoAWS);
@@ -28,7 +29,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Course created successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -40,7 +41,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Course fetched successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -53,7 +54,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -68,7 +69,7 @@ module.exports = {
       res.status(200).json({
         success: true,
         message: `Course ${message} successfully`,
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -87,7 +88,7 @@ module.exports = {
           return res.json({
             status: false,
             message: movetoAWS.message,
-            data: [],
+            data: []
           });
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
       }
@@ -98,7 +99,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Course updated successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -110,7 +111,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Course deleted successfully",
-        data: course,
+        data: course
       });
     } catch (error) {
       next(error);
@@ -139,8 +140,8 @@ module.exports = {
           total: count,
           perPage,
           pageNo,
-          pages: Math.ceil(count / perPage),
-        },
+          pages: Math.ceil(count / perPage)
+        }
       });
     } catch (error) {
       next(error);
@@ -153,7 +154,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses fetched successfully",
-        data: courses,
+        data: courses
       });
     } catch (error) {
       next(error);
@@ -171,12 +172,12 @@ module.exports = {
         return res.status(200).json({
           success: true,
           message: "Course assigned successfully",
-          data: courses,
+          data: courses
         });
       } else {
         return res.status(400).json({
           success: false,
-          message: "Failed to assign course",
+          message: "Failed to assign course"
         });
       }
     } catch (error) {
@@ -194,12 +195,12 @@ module.exports = {
         return res.status(200).json({
           success: true,
           message: "Course assigned successfully",
-          data: courses,
+          data: courses
         });
       } else {
         return res.status(400).json({
           success: false,
-          message: "Failed to assign course",
+          message: "Failed to assign course"
         });
       }
     } catch (error) {
@@ -215,7 +216,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses sections options fetched successfully",
-        data: options,
+        data: options
       });
     } catch (error) {
       next(error);
@@ -235,7 +236,7 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses Data fetched successfully",
-        data: courseData,
+        data: courseData
       });
     } catch (error) {
       next(error);
@@ -248,10 +249,56 @@ module.exports = {
       res.send({
         success: true,
         message: "Courses Data fetched successfully",
-        data: courseData,
+        data: courseData
       });
     } catch (error) {
       next(error);
     }
   },
+  getCourseCompletionReport: async (req, res, next) => {
+    try {
+      const {
+        collegeId,
+        batchId,
+        departmentId,
+        courseId,
+        search,
+        pageNo = 1,
+        perPage = 10
+      } = req.body;
+      const college_id = req?.body?.college_id
+        ? req?.body?.college_id
+        : req.body?.collegeId
+        ? req.body?.collegeId
+        : null;
+      const filter = {
+        collegeId: college_id ? new mongoose.Types.ObjectId(college_id) : null,
+        batchId: batchId ? new mongoose.Types.ObjectId(batchId) : null,
+        departmentId: departmentId
+          ? new mongoose.Types.ObjectId(departmentId)
+          : null,
+        courseId: courseId ? new mongoose.Types.ObjectId(courseId) : null,
+        search: search ? search : null,
+        pageNo: Number(pageNo),
+        perPage: Number(perPage)
+      };
+      const { result, count } = await courseServices.getCourseCompletionReport(
+        filter
+      );
+      res.send({
+        success: true,
+        message: "Courses fetched successfully",
+        body: filter,
+        data: result,
+        pagination: {
+          total: count,
+          perPage,
+          pageNo,
+          pages: Math.ceil(count / perPage)
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 };

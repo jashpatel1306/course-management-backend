@@ -543,6 +543,14 @@ router.get(
   isAdminCommonAuthenticate,
   courseController.getCoursepreviewById
 );
+
+//new api
+router.post(
+  "/course-completion-reports",
+  Validate(schemas.courseCompletionReportSchema),
+  isAdminCommonAuthenticate,
+  courseController.getCourseCompletionReport
+);
 //--------------------------- Sections -------------------------//
 
 router.post(

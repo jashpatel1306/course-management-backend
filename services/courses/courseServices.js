@@ -2,9 +2,11 @@ const trackingCourseServices = require("../trackingCourse/trackingCourse.service
 const assignAssessmentServices = require("../assignAssessment/assignAssessment.services");
 const quizzesServices = require("../quizzes/quizzes.services");
 const batchesModel = require("../batches/batches.model");
+const studentsModel = require("../students/student.model");
 const lecturesServices = require("../lectures/lectures.services");
 const CourseModel = require("./course"); // Adjust the path as needed
 const createError = require("http-errors");
+const { mongoose } = require("mongoose");
 const getPreAssessmentDataByType = async (
   userId,
   courseId,
@@ -666,6 +668,254 @@ module.exports = {
     } catch (error) {
       console.error("Error fetching published course data:", error);
       throw error; // Ensure errors are propagated
+    }
+  },
+  getCourseCompletionReport: async ({
+    collegeId,
+    batchId,
+    departmentId,
+    courseId,
+    pageNo = 1,
+    perPage = 10
+  }) => {
+    try {
+      const page = Number(pageNo) || 1;
+      const limit = Number(perPage) || 10;
+      const skip = (page - 1) * limit;
+
+      const matchStage = {
+        ...(collegeId && {
+          collegeUserId: collegeId
+        }),
+        ...(batchId && { batchId: batchId }),
+        ...(departmentId && {
+          department: departmentId
+        }),
+        active: true
+      };
+
+      const matchCourseStage = {
+        ...(courseId && {
+          courseId: courseId
+        })
+      };
+
+      const pipeline1 = [
+        { $match: matchStage },
+        {
+          $project: {
+            userId: 1,
+            name: 1,
+            email: 1,
+            batchId: 1,
+            department: 1,
+            collegeUserId: 1
+          }
+        },
+        {
+          $lookup: {
+            from: "batches",
+            let: { batchId: "$batchId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$_id", "$$batchId"] }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  batchName: 1,
+                  courses: 1
+                }
+              }
+            ],
+            as: "batchData"
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            collegeUserId: 1,
+            batchId: 1,
+            department: 1,
+            userId: 1,
+            batchName: { $arrayElemAt: ["$batchData.batchName", 0] },
+            courseId: { $arrayElemAt: ["$batchData.courses", 0] }
+          }
+        },
+        { $unwind: { path: "$courseId", preserveNullAndEmptyArrays: true } },
+
+        {
+          $match: matchCourseStage
+        }
+      ];
+      const pipeline2 = [
+        { $sort: { name: 1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: "courses",
+            let: { courseId: "$courseId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$_id", "$$courseId"] }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  courseName: 1
+                }
+              }
+            ],
+            as: "courseData"
+          }
+        },
+        {
+          $lookup: {
+            from: "trackingcourses",
+            let: { userId: "$userId", courseId: "$courseId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ["$userId", "$$userId"] },
+                      { $eq: ["$courseId", "$$courseId"] }
+                    ]
+                  }
+                }
+              },
+              {
+                $project: {
+                  courseId: 1,
+                  totalcontent: 1,
+                  trackingContent: { $size: "$trackingContent" }
+                }
+              }
+            ],
+            as: "courseTracking"
+          }
+        },
+        {
+          $lookup: {
+            from: "courses",
+            let: { courseId: "$courseId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$_id", "$$courseId"] }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  courseName: 1
+                }
+              }
+            ],
+            as: "courseData"
+          }
+        },
+        {
+          $lookup: {
+            from: "colleges",
+            let: { collegeId: "$collegeUserId" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$_id", "$$collegeId"] }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  collegeName: 1
+                }
+              }
+            ],
+            as: "collegeData"
+          }
+        },
+        {
+          $lookup: {
+            from: "departments",
+            let: { department: "$department" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [{ $eq: ["$_id", "$$department"] }]
+                  }
+                }
+              },
+              {
+                $project: {
+                  department: 1
+                }
+              }
+            ],
+            as: "departmentData"
+          }
+        },
+        {
+          $addFields: {
+            trackingStatus: {
+              $cond: {
+                if: { $gt: [{ $size: "$courseTracking" }, 0] },
+                then: true,
+                else: false
+              }
+            }
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            email: 1,
+            collegeId: "$collegeUserId",
+            batchId: 1,
+            departmentId: "$department",
+            userId: 1,
+            batchName: 1,
+            courseId: 1,
+            trackingStatus: 1,
+            courseName: { $arrayElemAt: ["$courseData.courseName", 0] },
+            departmentName: {
+              $arrayElemAt: ["$departmentData.department", 0]
+            },
+            collegeName: { $arrayElemAt: ["$collegeData.collegeName", 0] },
+            totalcontent: { $arrayElemAt: ["$courseTracking.totalcontent", 0] },
+            trackingContent: {
+              $arrayElemAt: ["$courseTracking.trackingContent", 0]
+            }
+          }
+        }
+      ];
+      console.log("matchStage", [...pipeline1, ...pipeline2]);
+      const result = await studentsModel.aggregate([
+        ...pipeline1,
+        ...pipeline2
+      ]);
+      const countResult = await studentsModel.aggregate(pipeline1);
+
+      return {
+        result,
+        count: countResult.length
+      };
+    } catch (error) {
+      console.error("Error fetching course completion report:", error);
+      throw error;
     }
   }
 };
