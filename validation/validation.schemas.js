@@ -471,5 +471,22 @@ module.exports = {
   dateFilterSchema: Joi.object().keys({
     startDateFilter: validate.date,
     endDateFilter: validate.date
+  }),
+  certificateSchem: Joi.object().keys({
+    companyLogo1: validate.any,
+    companyLogo2: validate.any,
+    signature1: validate.any,
+    signature2: validate.any,
+    signatory1Name: validate.string,
+    signatory1Title: validate.string,
+    signatory2Name: validate.string,
+    signatory2Title: validate.string
+  }),
+  studentCertificateSchema: Joi.object().keys({
+    userId: validate.id,
+    studentName: validate.string,
+    courseName: validate.string,
+    courseId: validate.id,
+    certificateStatus: validate.string
   })
 };

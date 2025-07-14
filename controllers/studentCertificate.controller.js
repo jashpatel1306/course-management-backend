@@ -1,12 +1,11 @@
-const studentCertificateService = require("../services");
+const { studentCertificateService } = require("../services");
 const createHttpError = require("http-errors");
 
 module.exports = {
   createStudentCertificate: async (req, res, next) => {
     try {
-      const certificate = await studentCertificateService.createStudentCertificate(
-        req.body
-      );
+      const certificate =
+        await studentCertificateService.createStudentCertificate(req.body);
       return res.status(201).json({
         status: true,
         message: "Student certificate created successfully.",
@@ -19,7 +18,8 @@ module.exports = {
 
   getAllStudentCertificates: async (req, res, next) => {
     try {
-      const certificates = await studentCertificateService.getAllStudentCertificates();
+      const certificates =
+        await studentCertificateService.getAllStudentCertificates();
       return res.status(200).json({
         status: true,
         message: "Certificates fetched successfully.",
@@ -33,7 +33,8 @@ module.exports = {
   getStudentCertificateById: async (req, res, next) => {
     try {
       const id = req.params.id;
-      const certificate = await studentCertificateService.getStudentCertificateById(id);
+      const certificate =
+        await studentCertificateService.getStudentCertificateById(id);
       if (!certificate) throw createHttpError(404, "Certificate not found");
 
       return res.status(200).json({
@@ -50,10 +51,11 @@ module.exports = {
     try {
       const id = req.params.id;
       const { status } = req.body;
-      const updated = await studentCertificateService.updateStudentCertificateStatus(
-        id,
-        status
-      );
+      const updated =
+        await studentCertificateService.updateStudentCertificateStatus(
+          id,
+          status
+        );
       return res.status(200).json({
         status: true,
         message: "Certificate status updated successfully.",

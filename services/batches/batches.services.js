@@ -6,6 +6,8 @@ const studentsModel = require("../students/student.model");
 const batchesModel = require("./batches.model");
 const CourseModel = require("../courses/course");
 const trackingCourseModel = require("../trackingCourse/trackingCourse.model");
+const templateCertificateModel = require("../templateCertificate/templateCertificate.model");
+const studentCertificateModel = require("../studentCertificate/studentCertificate.model");
 const ObjectId = mongoose.Types.ObjectId;
 
 module.exports = {
@@ -178,7 +180,7 @@ module.exports = {
       throw error;
     }
   },
-  getCoursesByBatchId: async (batchId, activeFilter) => {
+  getCoursesByBatchId: async (batchId, user_id, activeFilter) => {
     try {
       let filter = { isPublish: true };
 
@@ -207,11 +209,26 @@ module.exports = {
         _id: { $in: courseIds },
         ...filter
       });
+      console.log("courseIds:  ", courseIds);
+      console.log("user_id:  ", user_id);
+      const certificateData = await studentCertificateModel.find(
+        {
+          courseId: { $in: courseIds },
+          userId: new ObjectId(user_id)
+        },
+        {
+          courseId: 1,
+          _id: 1,
+          userId: 1,
+          certificateStatus: 1
+        }
+      );
+      console.log("certificateData:  ", certificateData);
       if (!courses) {
         throw createError.NotFound("No courses found for the given college.");
       }
 
-      return { courses };
+      return { courses, certificateData };
     } catch (error) {
       throw createError(error);
     }

@@ -5,7 +5,7 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isSuperAdminAuthenticate,
-  isAdminCommonAuthenticate,
+  isAdminCommonAuthenticate
 } = require("../helpers/auth.helper");
 
 //----------------------------- college --------------------------------//
@@ -102,6 +102,31 @@ router.post(
   // isAdminCommonAuthenticate,
   dashboardController.getAdminDashboardData
 );
-
+router.post("/file/upload", async (req, res, next) => {
+  try {
+    const image = req.files?.image;
+    const request_body = req.body;
+    if (image) {
+      const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
+        image,
+        `file/images/`
+      );
+      if (!movetoAWS.status)
+        return res.json({
+          status: false,
+          message: movetoAWS.message,
+          data: []
+        });
+      if (movetoAWS.data) request_body.url = movetoAWS.data;
+    }
+    res.send({
+      success: true,
+      message: "Course updated successfully",
+      data: request_body.url
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

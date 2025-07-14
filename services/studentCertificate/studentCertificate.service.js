@@ -3,6 +3,13 @@ const templateCertificateModel = require("../templateCertificate/templateCertifi
 
 module.exports = {
   createStudentCertificate: async (data) => {
+    const existing = await studentCertificateModel.findOne({
+      userId: data.userId,
+      courseId: data.courseId
+    });
+
+    if (existing) throw new Error("User already has a certificate for this course");
+
     const template = await templateCertificateModel.findOne({
       type: "DEFAULT"
     });

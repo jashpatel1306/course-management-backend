@@ -110,16 +110,19 @@ module.exports = {
     try {
       const batch_id = req.body?.batch_id;
       const activeFilter = req.params?.activeStatus;
+      const user_id = req.body?.user_id;
 
       // userRole === "student" ? filter.isPublish = true : filter.
-      const { courses } = await batchServices.getCoursesByBatchId(
-        batch_id,
-        activeFilter
-      );
+      const { courses, certificateData } =
+        await batchServices.getCoursesByBatchId(
+          batch_id,
+          user_id,
+          activeFilter
+        );
       res.send({
         success: true,
         message: "Courses fetched successfully",
-        data: courses
+        data: { courses, certificateData }
       });
     } catch (err) {
       next(err);
