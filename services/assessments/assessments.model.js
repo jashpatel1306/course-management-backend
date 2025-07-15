@@ -4,41 +4,46 @@ const assessmentSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: true
     },
     collegeId: {
       type: mongoose.Types.ObjectId,
-      ref: "colleges",
+      ref: "colleges"
     },
     batches: [
       {
         type: mongoose.Types.ObjectId,
-        ref: "batches",
-      },
+        ref: "batches"
+      }
     ],
+    type: {
+      type: String,
+      enum: ["quiz", "exercise"],
+      required: true
+    },
     contents: [
       {
         type: {
           type: String,
-          enum: ["quiz", "exercise"],
+          enum: ["quiz", "exercise"]
         },
         id: {
-          type: mongoose.Types.ObjectId,
-        },
-      },
+          type: mongoose.Types.ObjectId
+        }
+      }
     ],
     totalMarks: {
       type: Number,
-      default: 0,
+      default: 0
     },
     totalQuestions: {
       type: Number,
-      default: 0,
+      default: 0
     },
     active: {
       type: Boolean,
-      default: true,
-    },
+      default: true
+    }
   },
   { timestamps: true, versionKey: false }
 );
@@ -48,8 +53,16 @@ async function calculateTotalMarksAndQuestions(contents) {
   let totalQuestions = 0;
 
   for (const content of contents) {
+    console.log("content.type :::", content.type);
     if (content.type === "quiz") {
       const quiz = await mongoose.model("quizzes").findById(content.id);
+      if (quiz) {
+        totalMarks += quiz.totalMarks || 0;
+        totalQuestions += quiz.questions?.length || 0;
+      }
+    }
+    if (content.type === "exercise") {
+      const quiz = await mongoose.model("exercises").findById(content.id);
       if (quiz) {
         totalMarks += quiz.totalMarks || 0;
         totalQuestions += quiz.questions?.length || 0;

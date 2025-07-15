@@ -52,7 +52,7 @@ module.exports = {
   },
   isAdminCommonAuthenticate: (req, res, next) => {
     let token = req.headers.authorization;
-    token = token.toLowerCase().includes("bearer")
+    token = token?.toLowerCase().includes("bearer")
       ? token.split(" ")[1]
       : token;
     try {

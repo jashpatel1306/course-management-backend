@@ -7,14 +7,12 @@ module.exports = {
   createCourse: async (req, res, next) => {
     try {
       const image = req.files?.image;
-      console.log("image", image);
       const request_body = req.body;
       if (image) {
         const movetoAWS = await commonUploadFunction.uploadMaterialToAWS(
           image,
           `courses/coverImage/`
         );
-        console.log("movetoAWS", movetoAWS);
 
         if (!movetoAWS.status)
           return res.json({
@@ -23,7 +21,6 @@ module.exports = {
             data: []
           });
         if (movetoAWS.data) request_body.coverImage = movetoAWS.data;
-        console.log("movetoAWS", movetoAWS);
       }
       const course = await courseServices.createCourse(req.body);
       res.send({

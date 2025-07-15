@@ -23,4 +23,7 @@ module.exports = {
   publicLinkServices: require("./publicLink/publicLink.services"),
   templateCertificateService: require("./templateCertificate/templateCertificate.service"),
   studentCertificateService: require("./studentCertificate/studentCertificate.service"),
+  trackingExercisesService: require("./trackingExercises/trackingExercises.services"),
+  exerciseQuestionsService: require("./exercisQuestions/exercisQuestions.services"),
+  exerciseService: require("./exercises/exercises.services")
 };

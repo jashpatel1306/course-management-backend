@@ -221,13 +221,11 @@ module.exports = {
     try {
       const { quizId } = req.params;
       const { pageNo, perPage } = req.body;
-      console.log("quizId: ", quizId);
       const { result, count } = await trackingQuizServices.getAllResultByQuiz(
         quizId,
         perPage,
         pageNo
       );
-      console.log("count : ",count)
       return res.status(200).send({
         success: true,
         message: "Quiz results fetched successfully.",
@@ -245,7 +243,6 @@ module.exports = {
   },
   getAllResult: async (req, res, next) => {
     try {
-      console.log("req.body : ", req.body);
       const {
         collegeId,
         batchId,
@@ -255,7 +252,6 @@ module.exports = {
         pageNo,
         perPage
       } = req.body;
-      console.log("pageNo, perPage: ", pageNo, perPage);
       const { result, count } = await trackingQuizServices.getAllResult(
         { collegeId, batchId, assessmentId, quizId, userId },
         perPage,

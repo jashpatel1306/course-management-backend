@@ -226,9 +226,7 @@ module.exports = {
   //   try {
   //     const { trackingId } = req.params;
   //     const quizId = await trackingQuizServices.getQuizId(trackingId);
-  //     console.log("Quiz tracking", quizId);
   //     const result = await quizzesServices.getQuizResult(quizId, trackingId);
-  //     // console.log("Quiz result", result);
   //     return res.status(200).send({
   //       success: true,
   //       message: "Quiz tracking results fetched successfully",
@@ -244,13 +242,11 @@ module.exports = {
       const trackingQuizData = await trackingQuizServices.getQuizResultId(
         trackingId
       );
-      console.log("Quiz tracking", trackingQuizData);
       let result = null;
       let publicLinkData = null;
       let quizData = null;
       let subject=null;
       if (trackingQuizData.quizType === "public") {
-        console.log("Public quiz");
         publicLinkData = await publicLinkServices.getPublicLinkById(
           trackingQuizData.quizId
         );
@@ -275,7 +271,6 @@ module.exports = {
         // finalData.quizData = quizData;
       }
 
-      // console.log("Quiz result", result);
       return res.status(200).send({
         success: true,
         message: "Quiz tracking results fetched successfully",

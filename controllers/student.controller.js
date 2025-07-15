@@ -118,7 +118,6 @@ module.exports = {
   },
   getAllStudentsBatchWise: async (req, res, next) => {
     try {
-      console.log("req.body :", req.body);
       const batchId = req.body?.batchId;
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
@@ -208,7 +207,6 @@ module.exports = {
 
       reqBody?.quizId?.length > 0 ? (filter.quizId = reqBody?.quizId) : null;
 
-      console.log("filter", filter);
       const { quizCount, quizData } =
         await studentServices.getQuizDataOfAllStudents(
           filter,

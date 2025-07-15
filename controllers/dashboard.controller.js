@@ -8,11 +8,8 @@ const createHttpError = require("http-errors");
 module.exports = {
   getAdminDashboardData: async (req, res, next) => {
     try {
-      console.log("req.body: ", req.body);
       const startDateFilter = req.body.startDateFilter;
       const endDateFilter = req.body.endDateFilter;
-      console.log("getAdminDashboardData", startDateFilter);
-      console.log("getAdminDashboardData", endDateFilter);
 
       const filter = {};
 
@@ -38,7 +35,6 @@ module.exports = {
         dashboardServices.getActiveStudents(filter)
       ]);
 
-      console.log("result data", countData, colleges, courses);
 
       return res.status(200).json({
         success: true,
@@ -60,7 +56,6 @@ module.exports = {
     try {
       const collegeId = req.body.college_id;
       if (!collegeId) throw createHttpError.BadRequest("Invalid collegeId");
-      console.log("get college AdminDashboardData");
       const startDateFilter = req.body.startDateFilter;
       const endDateFilter = req.body.endDateFilter;
 
@@ -86,8 +81,6 @@ module.exports = {
         dashboardServices.getStudentRegistrationData({ ...filter, collegeId }),
         dashboardServices.getActiveStudents({ ...filter, collegeId })
       ]);
-
-      console.log("result data", countData, batches, courses);
 
       return res.status(200).json({
         success: true,

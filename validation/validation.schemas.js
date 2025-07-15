@@ -96,7 +96,8 @@ module.exports = {
     departmentId: validate.string,
     passoutYear: validate.string,
     semester: validate.number,
-    active: validate.string
+    active: validate.string,
+    type: validate.string
   }),
   allResultSchema: Joi.object().keys({
     userId: validate.string,
@@ -165,6 +166,11 @@ module.exports = {
     quizId: validate.reqId,
     questionType: validate.string
   }),
+  equestionsSchema: Joi.object().keys({
+    question: validate.reqString,
+    marks: validate.reqNumber,
+    exerciseId: validate.reqId
+  }),
 
   quizSchema: Joi.object().keys({
     title: validate.reqString,
@@ -179,6 +185,12 @@ module.exports = {
     totalMarks: validate.reqNumber,
     questions: validate.array
   }),
+  updateExerciseSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.string,
+    totalMarks: validate.reqNumber,
+    questions: validate.array
+  }),
   createQuizSchema: Joi.object().keys({
     title: validate.reqString,
     description: validate.array,
@@ -186,6 +198,13 @@ module.exports = {
     time: validate.reqNumber,
     isPublish: validate.boolean,
     quizId: validate.id
+  }),
+  createExerciseSchema: Joi.object().keys({
+    title: validate.reqString,
+    description: validate.array,
+    assessmentId: validate.reqId,
+    isPublish: validate.boolean,
+    exerciseId: validate.id
   }),
   createPublicQuizSchema: Joi.object().keys({
     title: validate.reqString,
@@ -196,7 +215,8 @@ module.exports = {
   }),
   createAssessmentSchema: Joi.object().keys({
     title: validate.reqString,
-    collegeId: validate.reqId
+    collegeId: validate.reqId,
+    type: validate.reqString
   }),
   assessmentSchema: Joi.object().keys({
     assessmentId: validate.id,

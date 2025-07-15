@@ -18,6 +18,7 @@ const {
   handleExcelQuestionData
 } = require("../helpers/excel.helper");
 const questionController = require("../controllers/question.controller");
+const equestionController = require("../controllers/equestion.controller");
 const quizController = require("../controllers/quiz.controller");
 const assessmentController = require("../controllers/assessment.controller");
 const instructorsController = require("../controllers/instructors.controller");
@@ -30,6 +31,7 @@ const instructorCourseController = require("../controllers/instructorCourse.cont
 const assignAssessmentController = require("../controllers/assignAssement.controller");
 const trackingQuizController = require("../controllers/trackingQuiz.controller");
 const dashboardController = require("../controllers/dashboard.controller");
+const exerciseController = require("../controllers/exercise.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -42,11 +44,7 @@ router.post(
   isAuthenticate,
   userController.resetForgotPassword
 );
-router.get(
-  "/get-user-profile",
-  isAuthenticate,
-  userController.getUserProfile
-);
+router.get("/get-user-profile", isAuthenticate, userController.getUserProfile);
 
 router.put(
   `/update-user-profile`,
@@ -255,6 +253,92 @@ router.post(
   questionController.deleteQuestions
 );
 
+//------------------------------ exercise question ---------------------------------//
+//------------------------------- equestions ---------------------------------//
+router.post(
+  "/equestion",
+  Validate(schemas.equestionsSchema),
+  isAdminCommonAuthenticate,
+  equestionController.createQuestion
+);
+router.put(
+  "/equestion/:id",
+  Validate(schemas.equestionsSchema),
+  isAdminCommonAuthenticate,
+  equestionController.updateQuestion
+);
+
+router.get(
+  "/equestion/:id",
+  isAdminCommonAuthenticate,
+  equestionController.getQuestionById
+);
+
+router.post(
+  "/get-equestions/:exerciseId",
+  Validate(schemas.paginationAndFilterSchema),
+  isAdminCommonAuthenticate,
+  equestionController.getQuestionsByExercise
+);
+
+router.put(
+  "/equestion-status/:id",
+  isAdminCommonAuthenticate,
+  equestionController.changeActiveStatus
+);
+
+router.delete(
+  "/equestion/:id",
+  isAdminCommonAuthenticate,
+  equestionController.deleteQuestion
+);
+router.post(
+  "/delete-equestions",
+  Validate(schemas.deleteQuesetionsSchema),
+  isAdminCommonAuthenticate,
+  equestionController.deleteQuestions
+);
+
+
+
+//------------------------------ exercise ---------------------------------//
+router.post(
+  "/exercise",
+  Validate(schemas.createExerciseSchema),
+  isAdminCommonAuthenticate,
+  exerciseController.createExercise
+);
+
+router.put(
+  "/exercise/:id",
+  Validate(schemas.updateExerciseSchema),
+  isAdminCommonAuthenticate,
+  exerciseController.updateExercise
+);
+
+router.get(
+  "/exercise/:id",
+  isAdminCommonAuthenticate,
+  exerciseController.getExerciseById
+);
+
+router.post(
+  "/get-exercises/:assessmentId",
+  Validate(schemas.paginationAndFilterSchema),
+  // isAdminCommonAuthenticate,
+  exerciseController.getExercisezesByAssessment
+);
+router.put(
+  "/exercise/status/:id",
+  isAdminCommonAuthenticate,
+  exerciseController.changeActiveStatusExercise
+);
+
+router.delete(
+  "/exercise/:id",
+  isAdminCommonAuthenticate,
+  exerciseController.deleteExercise
+);
 //------------------------------ quiz ---------------------------------//
 
 router.post(

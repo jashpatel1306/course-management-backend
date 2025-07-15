@@ -4,12 +4,10 @@ const Validate = (schema) => {
     try {
       const requestData = req?.body;
       if (isset(requestData)) {
-        console.log("requestData: ", requestData);
         const data =
           process.env.NODE_ENV === "development"
             ? { data: JSON.parse(requestData.data) }:
              { data: requestData };
-        console.log("requestData data: ", data);
 
         const result = await schema.validate(data.data);
         if (result.error) {

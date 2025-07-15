@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const createError = require("http-errors");
-const { string } = require("joi");
 const { ObjectId } = mongoose.Types;
 
 const trackingQuizzesSchema = new mongoose.Schema(

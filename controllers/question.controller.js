@@ -5,7 +5,6 @@ const transformData = async (quizId, data) => {
   return await data.map((item) => {
     const answers = [];
     let i = 1;
-    // console.log("item[`answer${i}`] :", item[`answer${i}`]);
     while (i < 5) {
       const answerContent = item[`answer${i}`];
       if (answerContent !== "") {

@@ -88,6 +88,7 @@ module.exports = {
       const perPage = req.body?.perPage;
       const pageNo = req.body?.pageNo;
       const search = req.body?.search;
+      const type = req.body?.type;
       const college_id = req?.body?.collegeId
         ? req.body?.collegeId === "all"
           ? req.body?.college_id
@@ -101,7 +102,7 @@ module.exports = {
           perPage,
           pageNo,
           batchId,
-          college_id
+          college_id,type
         );
       return res.status(200).send({
         success: true,

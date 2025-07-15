@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 3030;
 const app = express();
 
 //postgres connection
-console.log("Testing purpous logs")
 app.use(
   cors({
     origin: "*", // You can specify allowed origins here
@@ -71,21 +70,21 @@ app.use((err, req, res, next) => {
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("SIGTERM signal received: closing HTTP server");
+  console.info("SIGTERM signal received: closing HTTP server");
   app.close(() => {
-    console.log("HTTP server closed");
+    console.info("HTTP server closed");
     process.exit(0);
   });
 });
 
 process.on("SIGINT", () => {
-  console.log("SIGINT signal received: closing HTTP server");
+  console.info("SIGINT signal received: closing HTTP server");
   app.close(() => {
-    console.log("HTTP server closed");
+    console.info("HTTP server closed");
     process.exit(0);
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`server is running on port ` + PORT);
+  console.info(`server is running on port ` + PORT);
 });

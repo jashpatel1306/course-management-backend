@@ -6,6 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const { toggleActive } = require("../quizzes/quizzes.services");
 const trackingCourseModel = require("../trackingCourse/trackingCourse.model");
 const trackingQuizzeseModel = require("../trackingQuiz/trackingQuiz.model");
+const trackingExercisesModel = require("../trackingExercises/trackingExercises.model");
 module.exports = {
   createAssessment: async (data) => {
     try {
@@ -50,7 +51,7 @@ module.exports = {
                   description: 1,
                   active: 1,
                   questionsLength: { $size: "$questions" },
-                  isPublish:1
+                  isPublish: 1
                 }
               }
             ]
@@ -113,11 +114,11 @@ module.exports = {
         {
           $project: {
             title: 1,
+            type: 1,
             totalMarks: 1,
             totalQuestions: 1,
             expiresAt: 1,
             quizTrackingData: 1,
-
             content: {
               $filter: {
                 input: "$contents",
@@ -132,18 +133,34 @@ module.exports = {
       if (!assessment || assessment.length === 0)
         throw createError(404, "Assessment not found");
       let finalData = assessment[0];
-      finalData.trackingQuizData = await trackingQuizzeseModel.find(
-        {
-          userId: userId,
-          assessmentId: id
-        },
-        {
-          _id: 1,
-          userId: 1,
-          quizId: 1,
-          quizType: 1
-        }
-      );
+      if (assessment[0].type === "quiz") {
+        finalData.trackingQuizData = await trackingQuizzeseModel.find(
+          {
+            userId: userId,
+            assessmentId: id
+          },
+          {
+            _id: 1,
+            userId: 1,
+            quizId: 1,
+            quizType: 1
+          }
+        );
+      }
+      if (assessment[0].type === "exercise") {
+        finalData.trackingExerciseData = await trackingExercisesModel.find(
+          {
+            userId: userId,
+            assessmentId: id
+          },
+          {
+            _id: 1,
+            userId: 1,
+            exerciseId: 1,
+          }
+        );
+      }
+
       return finalData; // Since aggregate returns an array
     } catch (error) {
       throw createError.InternalServerError(error);
@@ -181,11 +198,13 @@ module.exports = {
     perPage,
     pageNo,
     batchId,
-    collegeId
+    collegeId,
+    type
   ) => {
     try {
       const filter = {
         $and: [
+          type ? { type } : {},
           batchId !== "all"
             ? {
                 batches: { $in: [batchId] }

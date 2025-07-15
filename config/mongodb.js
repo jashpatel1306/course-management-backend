@@ -25,17 +25,16 @@ switch (environment) {
 
 function mongoConnect() {
   // Database connection
-  console.log("mongoUrl", mongoUrl);
   mongoose
     .connect(mongoUrl)
     .then(async () => {
       addDefaultAdmin();
-      console.log("DB connection successful!");
+      console.info("DB connection successful!");
       // await remindBookingBeforeAWeek();
     })
     .catch((err) => {
-      console.log(err);
-      console.log("Error connecting DB!");
+      console.error(err);
+      console.info("Error connecting DB!");
     });
 }
 process.on("SIGINT", async () => {

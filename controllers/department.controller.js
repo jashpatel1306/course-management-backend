@@ -8,7 +8,6 @@ module.exports = {
           ? req.body?.college_id
           : req.params?.collegeId
         : req.body?.college_id;
-      console.log("college_id: ", college_id);
       const departments = await departmentService.getDepartments(college_id);
       res.status(200).send({
         success: true,
