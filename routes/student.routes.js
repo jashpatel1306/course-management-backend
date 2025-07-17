@@ -16,6 +16,8 @@ const courseController = require("../controllers/course.controller");
 const trackingCourseController = require("../controllers/trackingCourse.controller");
 const quizController = require("../controllers/quiz.controller");
 const trackingQuizController = require("../controllers/trackingQuiz.controller");
+const exerciseController = require("../controllers/exercise.controller");
+const trackingExerciseController = require("../controllers/trackingExercise.controller");
 
 router.post(
   "/get-all-assign-assessments",
@@ -135,7 +137,34 @@ router.put(
   trackingQuizController.updateQuizTracking
 );
 
+router.get(
+  "/exercise/:id",
+  isStudentAuthenticate,
+  exerciseController.getStudentExerciseById
+);
 
+
+// Create and enroll in a course
+
+router.post(
+  "/exercise/enroll/:assessmentId/:exerciseId",
+  isStudentAuthenticate,
+  trackingExerciseController.createEnrollExercise
+);
+
+router.get("/exercise-question/:id", exerciseController.getExerciseQuestionById);
+
+// router.post(
+//   "/quiz/public-enroll/:quizId",
+//   Validate(schemas.publicErollSchema),
+//   trackingQuizController.createPublicEnrollQuiz
+// );
+
+router.put(
+  "/exercise/update/:exerciseId",
+  Validate(schemas.updateExerciseTrackingSchema),
+  trackingExerciseController.updateExerciseTracking
+);
 
 
 module.exports = router;

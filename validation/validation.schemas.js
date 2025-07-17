@@ -116,7 +116,7 @@ module.exports = {
   allQuizResultSchema: Joi.object().keys({
     quizId: validate.array.items(validate.id),
     collegeId: validate.array.items(validate.id),
-    batchId: validate.array.items(validate.id),
+    userId: validate.array.items(validate.id),
     assessmentId: validate.array.items(validate.id),
     pageNo: validate.reqNumber,
     perPage: validate.reqNumber
@@ -417,6 +417,12 @@ module.exports = {
     questionType: validate.reqString,
     trackingId: validate.string
   }),
+  updateExerciseTrackingSchema: Joi.object().keys({
+    questionId: validate.reqId,
+    answerId: validate.reqString,
+    trackingId: validate.string,
+    isSubmit: validate.boolean
+  }),
   bulkQuestionSchema: Joi.object().keys({
     quizId: validate.reqId,
     excelData: validate.array.items(
@@ -508,5 +514,9 @@ module.exports = {
     courseName: validate.string,
     courseId: validate.id,
     certificateStatus: validate.string
+  }),
+  updateResultSchema: Joi.object().keys({
+    totalAssignMarks: validate.number,
+    result: validate.array
   })
 };

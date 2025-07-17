@@ -81,7 +81,7 @@ module.exports = {
   getTrackingQuizByUserId: async (req, res, next) => {
     try {
       const user_id = req.body?.user_id;
-      const trackingQuiz = await trackingQuizServices.getTrackingQuizByUserId(
+      const trackingQuiz = await trackingQuizServices.getQuizResultbyUserId(
         user_id
       );
       return res.status(200).send({

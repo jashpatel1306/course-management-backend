@@ -22,14 +22,11 @@ const trackingExercisesSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    totalTime: {
+    totalAssignMarks: {
       type: Number,
       default: 0
     },
-    takenTime: {
-      type: Number,
-      default: 0
-    },
+
     specificField: {
       type: Object,
       default: {}
@@ -74,6 +71,7 @@ trackingExercisesSchema.post("findOneAndUpdate", async function (data) {
     if (data.result) {
       const { result } = data;
       let totalMarks = 0;
+      let totalAssignMarks = 0;
       for (let i = 0; i < result.length; i++) {
         const item = result[i];
         const questionResult = await mongoose
@@ -84,17 +82,19 @@ trackingExercisesSchema.post("findOneAndUpdate", async function (data) {
 
         if (questionResult) {
           totalMarks += questionResult.marks;
+          totalAssignMarks += item.assignMasks;
         }
       }
 
-      await mongoose.model("trackingExercises").updateOne(
+      await mongoose.model("trackingexercises").updateOne(
         {
           _id: data._id,
           exerciseId: data.exerciseId
         },
         {
           $set: {
-            totalMarks: totalMarks
+            totalMarks: totalMarks,
+            totalAssignMarks: totalAssignMarks
           }
         }
       );

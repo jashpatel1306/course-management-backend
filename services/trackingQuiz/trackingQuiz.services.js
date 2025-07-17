@@ -433,7 +433,9 @@ module.exports = {
                         title: 1,
                         totalMarks: 1,
                         time: 1,
-                        totalQuestions: { $size: { $ifNull: ["$questions", []] } },
+                        totalQuestions: {
+                          $size: { $ifNull: ["$questions", []] }
+                        },
                         questions: {
                           $map: {
                             input: { $ifNull: ["$questions", []] },
@@ -488,7 +490,6 @@ module.exports = {
               totalMarks: "$quizData.totalMarks",
               totalQuestions: "$quizData.totalQuestions",
               quizzes: {
-
                 $map: {
                   input: "$quizData.quizzes",
                   as: "quiz",
@@ -505,7 +506,12 @@ module.exports = {
                           as: "res",
                           cond: {
                             $and: [
-                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
+                              {
+                                $in: [
+                                  "$$res.questionId",
+                                  { $ifNull: ["$$quiz.questions._id", []] }
+                                ]
+                              },
                               {
                                 $let: {
                                   vars: {
@@ -513,9 +519,16 @@ module.exports = {
                                       $arrayElemAt: [
                                         {
                                           $filter: {
-                                            input: { $ifNull: ["$$quiz.questions", []] },
+                                            input: {
+                                              $ifNull: ["$$quiz.questions", []]
+                                            },
                                             as: "q",
-                                            cond: { $eq: ["$$q._id", "$$res.questionId"] }
+                                            cond: {
+                                              $eq: [
+                                                "$$q._id",
+                                                "$$res.questionId"
+                                              ]
+                                            }
                                           }
                                         },
                                         0
@@ -525,11 +538,18 @@ module.exports = {
                                   in: {
                                     $anyElementTrue: {
                                       $map: {
-                                        input: { $ifNull: ["$$question.answers", []] },
+                                        input: {
+                                          $ifNull: ["$$question.answers", []]
+                                        },
                                         as: "ans",
                                         in: {
                                           $and: [
-                                            { $eq: ["$$ans._id", "$$res.answerId"] },
+                                            {
+                                              $eq: [
+                                                "$$ans._id",
+                                                "$$res.answerId"
+                                              ]
+                                            },
                                             { $eq: ["$$ans.correct", true] }
                                           ]
                                         }
@@ -550,7 +570,12 @@ module.exports = {
                           as: "res",
                           cond: {
                             $and: [
-                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
+                              {
+                                $in: [
+                                  "$$res.questionId",
+                                  { $ifNull: ["$$quiz.questions._id", []] }
+                                ]
+                              },
                               {
                                 $let: {
                                   vars: {
@@ -558,9 +583,16 @@ module.exports = {
                                       $arrayElemAt: [
                                         {
                                           $filter: {
-                                            input: { $ifNull: ["$$quiz.questions", []] },
+                                            input: {
+                                              $ifNull: ["$$quiz.questions", []]
+                                            },
                                             as: "q",
-                                            cond: { $eq: ["$$q._id", "$$res.questionId"] }
+                                            cond: {
+                                              $eq: [
+                                                "$$q._id",
+                                                "$$res.questionId"
+                                              ]
+                                            }
                                           }
                                         },
                                         0
@@ -571,11 +603,18 @@ module.exports = {
                                     $not: {
                                       $anyElementTrue: {
                                         $map: {
-                                          input: { $ifNull: ["$$question.answers", []] },
+                                          input: {
+                                            $ifNull: ["$$question.answers", []]
+                                          },
                                           as: "ans",
                                           in: {
                                             $and: [
-                                              { $eq: ["$$ans._id", "$$res.answerId"] },
+                                              {
+                                                $eq: [
+                                                  "$$ans._id",
+                                                  "$$res.answerId"
+                                                ]
+                                              },
                                               { $eq: ["$$ans.correct", true] }
                                             ]
                                           }
@@ -767,10 +806,16 @@ module.exports = {
   changesResultVisibility: async (trackingIds, showResult) => {
     try {
       let result;
-      if(trackingIds.length > 0){
-        result = await trackingQuizModel.updateMany({_id:{$in:trackingIds}},{showResult: showResult});
-      }else{
-        result = await trackingQuizModel.updateMany({},{showResult: showResult});
+      if (trackingIds.length > 0) {
+        result = await trackingQuizModel.updateMany(
+          { _id: { $in: trackingIds } },
+          { showResult: showResult }
+        );
+      } else {
+        result = await trackingQuizModel.updateMany(
+          {},
+          { showResult: showResult }
+        );
       }
 
       if (!result) throw createError(500, "Error while Fetching result.");
@@ -800,6 +845,26 @@ module.exports = {
         },
         { result: 0 }
       );
+      if (!result) throw createError(400, "Invalid quiz tracking id.");
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getQuizResultbyUserId: async (userId) => {
+    try {
+      console.log("userIds :", userId);
+      const result = await trackingQuizModel
+        .findOne({ userId : "67ac324a8adca5d6a8a037a9" })
+        .populate({
+          path: "quizId",
+          select: "title" // Only fetch the name field
+        })
+        .populate({
+          path: "assessmentId",
+          select: "title" // Only fetch the name field
+        });
+      console.log("result: ", result);
       if (!result) throw createError(400, "Invalid quiz tracking id.");
       return result;
     } catch (error) {

@@ -4,7 +4,8 @@ const { Validate } = require("../validation/validation.methods");
 const schemas = require("../validation/validation.schemas");
 const {
   isAdminCommonAuthenticate,
-  isAuthenticate
+  isAuthenticate,
+  isStudentAuthenticate
 } = require("../helpers/auth.helper");
 
 const userController = require("../controllers/users.controller");
@@ -32,6 +33,7 @@ const assignAssessmentController = require("../controllers/assignAssement.contro
 const trackingQuizController = require("../controllers/trackingQuiz.controller");
 const dashboardController = require("../controllers/dashboard.controller");
 const exerciseController = require("../controllers/exercise.controller");
+const trackingExerciseController = require("../controllers/trackingExercise.controller");
 router.post(
   "/sign-in",
   Validate(schemas.logInSchema),
@@ -299,8 +301,6 @@ router.post(
   equestionController.deleteQuestions
 );
 
-
-
 //------------------------------ exercise ---------------------------------//
 router.post(
   "/exercise",
@@ -311,7 +311,7 @@ router.post(
 
 router.put(
   "/exercise/:id",
-  Validate(schemas.updateExerciseSchema),
+  Validate(schemas.createExerciseSchema),
   isAdminCommonAuthenticate,
   exerciseController.updateExercise
 );
@@ -850,27 +850,44 @@ router.post(
   staffController.getCollegeWiseStaff
 );
 router.post(
-  "/get-all-result",
+  "/get-all-quiz-result",
   Validate(schemas.allResultSchema),
   // isAdminCommonAuthenticate,
   trackingQuizController.getAllResult
 );
+router.post(
+  "/get-all-exercise-result",
+  Validate(schemas.allResultSchema),
+  // isAdminCommonAuthenticate,
+  trackingExerciseController.getAllResult
+);
 router.put(
-  "/change-result-visibility",
+  "/change-quiz-result-visibility",
   Validate(schemas.changesResultVisibilitySchema),
   isAdminCommonAuthenticate,
   trackingQuizController.changesResultVisibility
 );
-
+router.put(
+  "/change-exercise-result-visibility",
+  Validate(schemas.changesResultVisibilitySchema),
+  isAdminCommonAuthenticate,
+  trackingExerciseController.changesResultVisibility
+);
+router.post(
+  "/exercise-results/:trackingId",
+  // Validate(schemas.quizResultsFilterSchema),
+  // isAdminCommonAuthenticate,
+  // trackingQuizController.getResultContentOfQuiz
+  exerciseController.getExerciseTrackingResults
+);
 router.post(
   "/get-quiz-results",
-  // Validate(schemas.allQuizResultSchema),
-  // isAdminCommonAuthenticate,
-  studentController.getStudentQuizData
+  isStudentAuthenticate,
+  trackingQuizController.getTrackingQuizByUserId
 );
 router.post(
   "/get-quiz-history",
-  isAdminCommonAuthenticate,
+  isStudentAuthenticate,
   trackingQuizController.getAllQuizTrackingByUserIds
 );
 router.post(
@@ -906,5 +923,10 @@ router.get(
   isAuthenticate,
   dashboardController.getDashboardDataOfStudent
 );
-
+router.put(
+  "/tracking-exercise-result/:id",
+  Validate(schemas.updateResultSchema),
+  isAdminCommonAuthenticate,
+  trackingExerciseController.updateExerciseResult
+);
 module.exports = router;

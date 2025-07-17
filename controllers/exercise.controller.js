@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 const {
   exerciseService,
-  publicLinkServices,
+  exerciseQuestionsService,
   trackingExercisesService
 } = require("../services");
 module.exports = {
@@ -43,6 +43,20 @@ module.exports = {
         success: true,
         message: "Exercise fetched successfully",
         data: exercise
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getExerciseQuestionById: async (req, res, next) => {
+    try {
+      const questionId = req.params.id;
+      const questionData =
+        await exerciseQuestionsService.getExerciseQuestionById(questionId);
+      return res.status(200).send({
+        success: true,
+        message: "Exercise question fetched successfully",
+        data: questionData
       });
     } catch (error) {
       next(error);
@@ -129,25 +143,19 @@ module.exports = {
       const trackingExerciseData =
         await trackingExercisesService.getExerciseResultId(trackingId);
       let result = null;
-      let publicLinkData = null;
       let exerciseData = null;
-      let subject = null;
 
       exerciseData = await exerciseService.getStudentExerciseById(
         trackingExerciseData.exerciseId
       );
-      [result, subject] = await exerciseService.getExerciseResult(
+      [result] = await exerciseService.getExerciseResult(
         [trackingExerciseData.exerciseId],
         trackingId
       );
 
       let finalData = result ? result[0] : {};
-      if (trackingExerciseData.exerciseType === "public") {
-        finalData = { result, subject, exerciseData: publicLinkData };
-      } else {
-        finalData = { result, subject, exerciseData: exerciseData };
-        // finalData.exerciseData = exerciseData;
-      }
+
+      finalData = { result, exerciseData };
 
       return res.status(200).send({
         success: true,

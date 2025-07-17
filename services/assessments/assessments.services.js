@@ -157,6 +157,8 @@ module.exports = {
             _id: 1,
             userId: 1,
             exerciseId: 1,
+            isSubmit: 1,
+            showResult: 1
           }
         );
       }
