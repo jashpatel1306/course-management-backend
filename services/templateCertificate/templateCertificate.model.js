@@ -4,7 +4,6 @@ const TEMPLATE_TYPES = ["DEFAULT", "USER"];
 
 const templateCertificateSchema = new mongoose.Schema(
   {
-
     companyLogo1: { type: String, required: true },
     companyLogo2: { type: String },
     signature1: { type: String, required: true },
@@ -13,10 +12,15 @@ const templateCertificateSchema = new mongoose.Schema(
     signature2: { type: String, required: true },
     signatory2Name: { type: String, required: true },
     signatory2Title: { type: String },
-    type: { type: String, enum: TEMPLATE_TYPES, default: "DEFAULT" },
+    type: { type: String, enum: TEMPLATE_TYPES, default: "USER" },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
+      default: null
+    },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "colleges",
       default: null
     }
   },

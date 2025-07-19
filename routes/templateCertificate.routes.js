@@ -1,35 +1,39 @@
 const express = require("express");
 const schemas = require("../validation/validation.schemas");
 const templateCertificateController = require("../controllers/templateCertificate.controller");
-const { isSuperAdminAuthenticate } = require("../helpers/auth.helper");
+const { isAdminCommonAuthenticate } = require("../helpers/auth.helper");
 const { Validate } = require("../validation/validation.methods");
 const router = express.Router();
 
 // Routes
 router.post(
   "/",
-  Validate(schemas.certificateSchem),
-  isSuperAdminAuthenticate,
+  Validate(schemas.certificateSchema),
+  isAdminCommonAuthenticate,
   templateCertificateController.createCertificate
 );
+
 router.get(
   "/",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   templateCertificateController.getAllCertificates
 );
+
 router.get(
   "/:id",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   templateCertificateController.getCertificateById
 );
+
 router.put(
   "/:id",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   templateCertificateController.updateCertificate
 );
+
 router.delete(
   "/:id",
-  isSuperAdminAuthenticate,
+  isAdminCommonAuthenticate,
   templateCertificateController.deleteCertificate
 );
 

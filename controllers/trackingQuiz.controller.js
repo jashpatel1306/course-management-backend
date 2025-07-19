@@ -276,17 +276,15 @@ module.exports = {
     try {
       // const { trackingId } = req.params;
 
-      const {
-        showResult,
-        trackingIds
-      } = req.body;
+      const { showResult, trackingIds } = req.body;
       await trackingQuizServices.changesResultVisibility(
-        trackingIds, showResult
+        trackingIds,
+        showResult
       );
       return res.status(200).send({
         success: true,
         message: "Quiz result visibility changed successfully.",
-        data: [],
+        data: []
       });
     } catch (error) {
       next(error);

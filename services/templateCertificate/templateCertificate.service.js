@@ -3,10 +3,10 @@ const templateCertificateModel = require("./templateCertificate.model");
 module.exports = {
   createTemplateCertificate: async (data) => {
     const existingTemplate = await templateCertificateModel.findOne({
-      type: "DEFAULT"
+      collegeId: data.collegeId
     });
     if (existingTemplate) {
-      console.log("data", existingTemplate._id, data);
+      // console.log("data", existingTemplate._id, data);
       return await templateCertificateModel.updateOne(
         { _id: existingTemplate._id },
         data,

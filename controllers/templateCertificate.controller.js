@@ -4,6 +4,8 @@ const { templateCertificateService } = require("../services");
 module.exports = {
   createCertificate: async (req, res, next) => {
     try {
+      console.log("college_id : ", req.body.college_id);
+      req.body.collegeId = req.body.college_id;
       const certificate =
         await templateCertificateService.createTemplateCertificate(req.body);
       return res.status(201).json({

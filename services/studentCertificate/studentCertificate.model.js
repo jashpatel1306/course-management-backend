@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-const CERTIFICATE_STATUSES = ["APPROVE", "PENDING", "REJECT"];
-
 const generateCertificateNumber = () => {
   const datePart = new Date()
     .toISOString()
@@ -30,10 +28,19 @@ const studentCertificateSchema = new mongoose.Schema(
       ref: "courses",
       required: true
     },
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "colleges",
+      required: true
+    },
+    batchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "batches",
+      required: true
+    },
     certificateStatus: {
-      type: String,
-      enum: CERTIFICATE_STATUSES,
-      default: "PENDING"
+      type: Boolean,
+      default: false
     },
 
     // Copy from template certificate
@@ -52,9 +59,6 @@ const studentCertificateSchema = new mongoose.Schema(
   }
 );
 
-const studentCertificateModel = mongoose.model(
-  "studentCertificates",
-  studentCertificateSchema
-);
+const studentCertificateModel = mongoose.model("studentCertificates",studentCertificateSchema);
 
 module.exports = studentCertificateModel;

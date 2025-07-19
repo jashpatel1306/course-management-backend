@@ -635,6 +635,15 @@ router.post(
   isAdminCommonAuthenticate,
   courseController.getCourseCompletionReport
 );
+
+//new api
+// router.post(
+//   "/certificate-completion-reports",
+//   Validate(schemas.courseCompletionReportSchema),
+//   isAdminCommonAuthenticate,
+//   courseController.getCertificateReport
+// );
+
 //--------------------------- Sections -------------------------//
 
 router.post(

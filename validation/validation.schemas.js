@@ -112,6 +112,11 @@ module.exports = {
     trackingIds: validate.reqArray,
     showResult: validate.boolean
   }),
+  changesCertificateVisibilitySchema: Joi.object().keys({
+    certificateIds: validate.string,
+    collegeId: validate.string,
+    certificateStatus: validate.boolean
+  }),
 
   allQuizResultSchema: Joi.object().keys({
     quizId: validate.array.items(validate.id),
@@ -498,7 +503,8 @@ module.exports = {
     startDateFilter: validate.date,
     endDateFilter: validate.date
   }),
-  certificateSchem: Joi.object().keys({
+  certificateSchema: Joi.object().keys({
+    collegeId: validate.id,
     companyLogo1: validate.any,
     companyLogo2: validate.any,
     signature1: validate.any,
@@ -512,8 +518,15 @@ module.exports = {
     userId: validate.id,
     studentName: validate.string,
     courseName: validate.string,
-    courseId: validate.id,
-    certificateStatus: validate.string
+    courseId: validate.id
+  }),
+  allCertificateSchema: Joi.object().keys({
+    userId: validate.string,
+    collegeId: validate.string,
+    batchId: validate.string,
+    courseId: validate.string,
+    pageNo: validate.number,
+    perPage: validate.number
   }),
   updateResultSchema: Joi.object().keys({
     totalAssignMarks: validate.number,
