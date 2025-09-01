@@ -63,7 +63,7 @@ const sendMailWithNodemailer = async (to, subject, body) => {
         },
       });
       const mailOptions = {
-        from: process.env.EMAIL_AUTH_USER,
+        from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
         to: to,
         subject: subject,
         html: body,
@@ -92,7 +92,7 @@ const sendMailWithResend = async (to, subject, body) => {
   return new Promise(async (resolve) => {
     try {
       const mailOptions = {
-        from: `LMS <${process.env.RESEND_EMAIL_AUTH_USER}>`,
+        from: `${process.env.RESEND_EMAIL_AUTH_USER} <${process.env.RESEND_EMAIL_AUTH_USER}>`,
         to: to,
         subject: subject,
         html: body,
@@ -124,10 +124,15 @@ module.exports.sendMailWithServices = async (to, subject, body) => {
         console.log("send mail with SES");
         const result = await sendMailWithSES(to, subject, body);
         return resolve(result);
-      } else {
+      } else if (process.env.SEND_MAIL_WITH === "Resend") {
         console.log("send mail with Resend");
         const result = await sendMailWithResend(to, subject, body);
         return resolve(result);
+      }else{
+        console.log("send mail with Nodemailer");
+        const result = await sendMailWithNodemailer(to, subject, body);
+        return resolve(result);
+
       }
     } catch (error) {
       console.log("sendMailWithServices error :", error);
@@ -138,3 +143,30 @@ module.exports.sendMailWithServices = async (to, subject, body) => {
     }
   });
 };
+
+// module.exports.sendMailWithSendGrid(to, subject, body) {
+//   try {
+//     const transporter = nodemailer.createTransport({
+//       host: "smtp.sendgrid.net",
+//       port: 587, // or 465 if you want SSL
+//       secure: false, // true for 465, false for 587
+//       auth: {
+//         user: "apikey", // must be literally "apikey"
+//         pass: process.env.SENDGRID_API_KEY, // your SendGrid API key
+//       },
+//     });
+
+//     const info = await transporter.sendMail({
+//       from: process.env.FROM_EMAIL, // must be verified in SendGrid
+//       to,
+//       subject,
+//       html: body,
+//     });
+
+//     console.log("Message sent: %s", info.messageId);
+//     return { status: true, message: "Email sent", info };
+//   } catch (error) {
+//     console.error("SendGrid SMTP error:", error);
+//     return { status: false, message: error.message };
+//   }
+// }

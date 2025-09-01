@@ -797,7 +797,7 @@ router.put(
   instructorCourseController.updateInstructorCourseContent
 );
 router.delete(
-  "/instructor-content/:contentId",
+  "/instructor-content/:courseId/:contentId",
   isAdminCommonAuthenticate,
   instructorCourseController.deleteInstructorCourseContent
 );
