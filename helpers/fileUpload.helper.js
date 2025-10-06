@@ -64,11 +64,11 @@ module.exports = {
         const fileNameAWS =
           randomstring.generate({ length: 20, charset: `numeric` }) + `.webp`;
         const sizeLimit = limit * 1024 * 1024;
-        if (fileSize > sizeLimit)
-          return resolve({
-            status: false,
-            message: `File size cannot exceed 2MB.`,
-          });
+        // if (fileSize > sizeLimit)
+        //   return resolve({
+        //     status: false,
+        //     message: `File size cannot exceed 2MB.`,
+        //   });
         if (
           !acceptFiles.includes(contentType) ||
           !allowedExtension?.includes(fileExt)
@@ -165,13 +165,13 @@ module.exports = {
           randomstring.generate({ length: 20, charset: `numeric` }) +
           `.${fileExt}`;
 
-        const sizeLimit = 2 * 1024 * 1024; // 2MB size limit (example)
-        if (fileSize > sizeLimit) {
-          return resolve({
-            status: false,
-            message: `File size cannot exceed 2MB.`,
-          });
-        }
+        // const sizeLimit = 2 * 1024 * 1024; // 2MB size limit (example)
+        // if (fileSize > sizeLimit) {
+        //   return resolve({
+        //     status: false,
+        //     message: `File size cannot exceed 2MB.`,
+        //   });
+        // }
 
         // Check if the file is supported by extension and MIME type
         if (
