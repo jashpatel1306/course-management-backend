@@ -141,4 +141,7 @@ const trackingQuizzeseModel = mongoose.model(
   "trackingquizzes",
   trackingQuizzesSchema
 );
+// Performance indexes
+trackingQuizzesSchema.index({ quizId: 1, createdAt: -1 });
+trackingQuizzesSchema.index({ userId: 1, quizId: 1 });
 module.exports = trackingQuizzeseModel;

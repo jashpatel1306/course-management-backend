@@ -386,90 +386,61 @@ module.exports = {
 
   getAllResultByQuiz: async (quizId, perPage, pageNo) => {
     try {
-      //fenil Changes
+      // Apply early pagination to reduce workload before heavy lookups
       const pipeline = [
-        {
-          $match: {
-            quizId: new ObjectId(quizId)
-          }
-        },
+        { $match: { quizId: new ObjectId(quizId) } },
+        { $sort: { createdAt: -1 } },
+        { $skip: (pageNo - 1) * perPage },
+        { $limit: perPage },
         {
           $lookup: {
             from: "publiclinks",
-            let: { quizId: "$quizId" },
+            localField: "quizId",
+            foreignField: "_id",
+            as: "quizData"
+          }
+        },
+        { $unwind: "$quizData" },
+        {
+          $lookup: {
+            from: "quizzes",
+            let: { quizIds: "$quizData.quizId" },
             pipeline: [
-              {
-                $match: {
-                  $expr: { $eq: ["$_id", "$$quizId"] }
-                }
-              },
+              { $match: { $expr: { $in: ["$_id", "$$quizIds"] } } },
               {
                 $lookup: {
-                  from: "quizzes",
-                  let: { quizIds: "$quizId" },
+                  from: "questions",
+                  let: { questionIds: "$questions" },
                   pipeline: [
-                    {
-                      $match: {
-                        $expr: { $in: ["$_id", "$$quizIds"] }
-                      }
-                    },
-                    {
-                      $lookup: {
-                        from: "questions",
-                        let: { questionIds: "$questions" },
-                        pipeline: [
-                          {
-                            $match: {
-                              $expr: { $in: ["$_id", "$$questionIds"] }
-                            }
-                          }
-                        ],
-                        as: "questions"
-                      }
-                    },
-                    {
-                      $project: {
-                        _id: 1,
-                        title: 1,
-                        totalMarks: 1,
-                        time: 1,
-                        totalQuestions: {
-                          $size: { $ifNull: ["$questions", []] }
-                        },
-                        questions: {
-                          $map: {
-                            input: { $ifNull: ["$questions", []] },
-                            as: "question",
-                            in: {
-                              _id: "$$question._id",
-                              question: "$$question.question",
-                              answers: { $ifNull: ["$$question.answers", []] },
-                              marks: "$$question.marks"
-                            }
-                          }
-                        }
-                      }
-                    }
+                    { $match: { $expr: { $in: ["$_id", "$$questionIds"] } } }
                   ],
-                  as: "quizzes"
+                  as: "questions"
                 }
               },
               {
                 $project: {
                   _id: 1,
-                  publicLinkName: 1,
-                  totalTime: 1,
+                  title: 1,
                   totalMarks: 1,
-                  totalQuestions: 1,
-                  quizzes: 1
+                  time: 1,
+                  totalQuestions: { $size: { $ifNull: ["$questions", []] } },
+                  questions: {
+                    $map: {
+                      input: { $ifNull: ["$questions", []] },
+                      as: "question",
+                      in: {
+                        _id: "$$question._id",
+                        question: "$$question.question",
+                        answers: { $ifNull: ["$$question.answers", []] },
+                        marks: "$$question.marks"
+                      }
+                    }
+                  }
                 }
               }
             ],
-            as: "quizData"
+            as: "quizzesData"
           }
-        },
-        {
-          $unwind: "$quizData"
         },
         {
           $project: {
@@ -491,7 +462,7 @@ module.exports = {
               totalQuestions: "$quizData.totalQuestions",
               quizzes: {
                 $map: {
-                  input: "$quizData.quizzes",
+                  input: "$quizzesData",
                   as: "quiz",
                   in: {
                     _id: "$$quiz._id",
@@ -506,31 +477,13 @@ module.exports = {
                           as: "res",
                           cond: {
                             $and: [
-                              {
-                                $in: [
-                                  "$$res.questionId",
-                                  { $ifNull: ["$$quiz.questions._id", []] }
-                                ]
-                              },
+                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
                               {
                                 $let: {
                                   vars: {
                                     question: {
                                       $arrayElemAt: [
-                                        {
-                                          $filter: {
-                                            input: {
-                                              $ifNull: ["$$quiz.questions", []]
-                                            },
-                                            as: "q",
-                                            cond: {
-                                              $eq: [
-                                                "$$q._id",
-                                                "$$res.questionId"
-                                              ]
-                                            }
-                                          }
-                                        },
+                                        { $filter: { input: { $ifNull: ["$$quiz.questions", []] }, as: "q", cond: { $eq: ["$$q._id", "$$res.questionId"] } } },
                                         0
                                       ]
                                     }
@@ -538,21 +491,9 @@ module.exports = {
                                   in: {
                                     $anyElementTrue: {
                                       $map: {
-                                        input: {
-                                          $ifNull: ["$$question.answers", []]
-                                        },
+                                        input: { $ifNull: ["$$question.answers", []] },
                                         as: "ans",
-                                        in: {
-                                          $and: [
-                                            {
-                                              $eq: [
-                                                "$$ans._id",
-                                                "$$res.answerId"
-                                              ]
-                                            },
-                                            { $eq: ["$$ans.correct", true] }
-                                          ]
-                                        }
+                                        in: { $and: [ { $eq: ["$$ans._id", "$$res.answerId"] }, { $eq: ["$$ans.correct", true] } ] }
                                       }
                                     }
                                   }
@@ -570,31 +511,13 @@ module.exports = {
                           as: "res",
                           cond: {
                             $and: [
-                              {
-                                $in: [
-                                  "$$res.questionId",
-                                  { $ifNull: ["$$quiz.questions._id", []] }
-                                ]
-                              },
+                              { $in: ["$$res.questionId", { $ifNull: ["$$quiz.questions._id", []] }] },
                               {
                                 $let: {
                                   vars: {
                                     question: {
                                       $arrayElemAt: [
-                                        {
-                                          $filter: {
-                                            input: {
-                                              $ifNull: ["$$quiz.questions", []]
-                                            },
-                                            as: "q",
-                                            cond: {
-                                              $eq: [
-                                                "$$q._id",
-                                                "$$res.questionId"
-                                              ]
-                                            }
-                                          }
-                                        },
+                                        { $filter: { input: { $ifNull: ["$$quiz.questions", []] }, as: "q", cond: { $eq: ["$$q._id", "$$res.questionId"] } } },
                                         0
                                       ]
                                     }
@@ -603,21 +526,9 @@ module.exports = {
                                     $not: {
                                       $anyElementTrue: {
                                         $map: {
-                                          input: {
-                                            $ifNull: ["$$question.answers", []]
-                                          },
+                                          input: { $ifNull: ["$$question.answers", []] },
                                           as: "ans",
-                                          in: {
-                                            $and: [
-                                              {
-                                                $eq: [
-                                                  "$$ans._id",
-                                                  "$$res.answerId"
-                                                ]
-                                              },
-                                              { $eq: ["$$ans.correct", true] }
-                                            ]
-                                          }
+                                          in: { $and: [ { $eq: ["$$ans._id", "$$res.answerId"] }, { $eq: ["$$ans.correct", true] } ] }
                                         }
                                       }
                                     }
@@ -637,11 +548,7 @@ module.exports = {
         }
       ];
 
-      const result = await trackingQuizModel.aggregate([
-        ...pipeline,
-        { $skip: (pageNo - 1) * perPage },
-        { $limit: perPage }
-      ]);
+      const result = await trackingQuizModel.aggregate(pipeline);
       // const result = await trackingQuizModel
       //   .find({ quizId: new ObjectId(quizId) })
       //   .skip((pageNo - 1) * perPage)
